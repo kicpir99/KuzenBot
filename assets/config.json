@@ -1,0 +1,31 @@
+{
+    "language": "pl",
+    "build_source": "builds",
+    "last_used_source": "builds",
+    "opacity_app": 1.0,
+    "opacity_bg_text": 1.0,
+    "opacity_items": 1.0,
+    "always_on_top": true,
+    "monitor_id": 0,
+    "minimize_to_tray": false,
+    "close_to_tray": false,
+    "auto_start": false,
+    "hide_mini_source": false,
+    "hide_mini_role": false,
+    "hide_mini_aspect": false,
+    "hide_mini_toggle": false,
+    "hide_mini_lock": false,
+    "keybinds": {
+        "show_hide": "Alt+S",
+        "lock_unlock": "Alt+L",
+        "next_build": "Alt+Right",
+        "prev_build": "Alt+Left",
+        "quick_search": "Alt+D",
+        "toggle_source": "Alt+Q"
+    },
+    "theme": "gold",
+    "opacity": 0.3,
+    "font_style": "standard",
+    "window_x": -1306,
+    "window_y": 418
+}

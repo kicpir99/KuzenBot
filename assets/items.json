@@ -1,0 +1,1138 @@
+{
+    "items by stat": {
+        "category": "consumable",
+        "image_url": null
+    },
+    "purification beads": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/Relic_Purification_Beads.png/30px-Relic_Purification_Beads.png?7e7d5"
+    },
+    "blink rune": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/Relic_Blink_Rune.png/30px-Relic_Blink_Rune.png?9707a"
+    },
+    "agility relic": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/Relic_Agility_Relic.png/30px-Relic_Agility_Relic.png?4b301"
+    },
+    "aegis of acceleration": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/Relic_Aegis_of_Acceleration.png/30px-Relic_Aegis_of_Acceleration.png?b77a6"
+    },
+    "sundering arc": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/Relic_Sundering_Arc.png/30px-Relic_Sundering_Arc.png?5c174"
+    },
+    "phantom shell": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/Relic_Phantom_Shell.png/30px-Relic_Phantom_Shell.png?540a8"
+    },
+    "shell of rebuke": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Shell_of_Rebuke.png/30px-T3_Shell_of_Rebuke.png?e8bfd"
+    },
+    "sundering echo": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Sundering_Echo.png/30px-T3_Sundering_Echo.png?10f14"
+    },
+    "talisman of purification": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Talisman_of_Purification.png/30px-T3_Talisman_of_Purification.png?47d3f"
+    },
+    "blinking abyss": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Blinking_Abyss.png/30px-T3_Blinking_Abyss.png?62c0c"
+    },
+    "time-lock aegis": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Time-lock_Aegis.png/30px-T3_Time-lock_Aegis.png?ca31c"
+    },
+    "agility greaves": {
+        "category": "relic",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Agility_Greaves.png/30px-T3_Agility_Greaves.png?4cc2e"
+    },
+    "heimdallr's sight": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Curio_Heimdallr%27s_Sight.png/30px-Curio_Heimdallr%27s_Sight.png?501f9"
+    },
+    "gjallarflare": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Curio_Gjallarflare.png/30px-Curio_Gjallarflare.png?6698b"
+    },
+    "bifrost shard": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Curio_Bifrost_Shard.png/30px-Curio_Bifrost_Shard.png?aedbe"
+    },
+    "battle cry": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Curio_Battle_Cry.png/30px-Curio_Battle_Cry.png?b7f97"
+    },
+    "eyes of the jungle": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Eyes_of_the_Jungle.png/30px-Consumable_Eyes_of_the_Jungle.png?9506c"
+    },
+    "runic bomb": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Runic_Bomb.png/30px-Consumable_Runic_Bomb.png?91345"
+    },
+    "crystalline egg": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Crystalline_Egg.png/30px-Consumable_Crystalline_Egg.png?fd203"
+    },
+    "obsidian dagger": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Obsidian_Dagger.png/30px-Consumable_Obsidian_Dagger.png?a63cf"
+    },
+    "health potion": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Health_Potion.png/30px-Consumable_Health_Potion.png?f48e5"
+    },
+    "vision ward": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Vision_Ward.png/30px-Consumable_Vision_Ward.png?f48e5"
+    },
+    "multi potion": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Multi_Potion.png/30px-Consumable_Multi_Potion.png?06352"
+    },
+    "mana potion": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Mana_Potion.png/30px-Consumable_Mana_Potion.png?f48e5"
+    },
+    "sentry ward": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Sentry_Ward.png/30px-Consumable_Sentry_Ward.png?f48e5"
+    },
+    "health chalice": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Health_Chalice.png/30px-Consumable_Health_Chalice.png?5c362"
+    },
+    "warding chalice": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Warding_Chalice.png/30px-Consumable_Warding_Chalice.png?13e88"
+    },
+    "elixir of strength": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Elixir_of_Strength.png/30px-Consumable_Elixir_of_Strength.png?f48e5"
+    },
+    "elixir of intelligence": {
+        "category": "consumable",
+        "image_url": "https://wiki.smite2.com/images/thumb/Consumable_Elixir_of_Intelligence.png/30px-Consumable_Elixir_of_Intelligence.png?f48e5"
+    },
+    "selflessness": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Selflessness.png/30px-Starter_T1_Selflessness.png?f3ff3",
+        "upgrades": [
+            "heroism"
+        ]
+    },
+    "leather cowl": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Leather_Cowl.png/30px-Starter_T1_Leather_Cowl.png?7c16e",
+        "upgrades": [
+            "hunter's cowl"
+        ]
+    },
+    "bluestone pendant": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Bluestone_Pendant.png/30px-Starter_T1_Bluestone_Pendant.png?a5905",
+        "upgrades": [
+            "bluestone brooch"
+        ]
+    },
+    "vampiric shroud": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Vampiric_Shroud.png/30px-Starter_T1_Vampiric_Shroud.png?310f9",
+        "upgrades": [
+            "blood-soaked shroud"
+        ]
+    },
+    "war flag": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_War_Flag.png/30px-Starter_T1_War_Flag.png?f7fdd",
+        "upgrades": [
+            "war banner"
+        ]
+    },
+    "conduit gem": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Conduit_Gem.png/30px-Starter_T1_Conduit_Gem.png?ff3c9",
+        "upgrades": [
+            "archmage's gem"
+        ]
+    },
+    "gilded arrow": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Gilded_Arrow.png/30px-Starter_T1_Gilded_Arrow.png?eb5d6",
+        "upgrades": [
+            "sharpshooter's arrow"
+        ]
+    },
+    "sands of time": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Sands_Of_Time.png/30px-Starter_T1_Sands_Of_Time.png?071c7",
+        "upgrades": [
+            "pendulum of the ages"
+        ]
+    },
+    "bumba's golden dagger": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Bumba%27s_Golden_Dagger.png/30px-Starter_T1_Bumba%27s_Golden_Dagger.png?ee50f",
+        "upgrades": [
+            "bumba's spear"
+        ]
+    },
+    "bumba's cudgel": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Bumba%27s_Cudgel.png/30px-Starter_T1_Bumba%27s_Cudgel.png?fb701",
+        "upgrades": [
+            "bumba's hammer"
+        ]
+    },
+    "warrior's axe": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Warrior%27s_Axe.png/30px-Starter_T1_Warrior%27s_Axe.png?eb626",
+        "upgrades": [
+            "sundering axe"
+        ]
+    },
+    "death's toll": {
+        "category": "starter",
+        "is_starter_t1": true,
+        "is_starter_t2": false,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T1_Death%27s_Toll.png/30px-Starter_T1_Death%27s_Toll.png?40038",
+        "upgrades": [
+            "death's embrace"
+        ]
+    },
+    "heroism": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Heroism.png/30px-Starter_T2_Heroism.png?b4ee6",
+        "upgraded_from": "selflessness"
+    },
+    "war banner": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_War_Banner.png/30px-Starter_T2_War_Banner.png?6277d",
+        "upgraded_from": "war flag"
+    },
+    "bluestone brooch": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Bluestone_Brooch.png/30px-Starter_T2_Bluestone_Brooch.png?bb553",
+        "upgraded_from": "bluestone pendant"
+    },
+    "hunter's cowl": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Hunter%27s_Cowl.png/30px-Starter_T2_Hunter%27s_Cowl.png?0c3de",
+        "upgraded_from": "leather cowl"
+    },
+    "blood-soaked shroud": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Blood-soaked_Shroud.png/30px-Starter_T2_Blood-soaked_Shroud.png?1683c",
+        "upgraded_from": "vampiric shroud"
+    },
+    "sharpshooter's arrow": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Sharpshooter%27s_Arrow.png/30px-Starter_T2_Sharpshooter%27s_Arrow.png?405f2",
+        "upgraded_from": "gilded arrow"
+    },
+    "bumba's spear": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Bumba%27s_Spear.png/30px-Starter_T2_Bumba%27s_Spear.png?4b1a5",
+        "upgraded_from": "bumba's golden dagger"
+    },
+    "archmage's gem": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Archmage%27s_Gem.png/30px-Starter_T2_Archmage%27s_Gem.png?9bbde",
+        "upgraded_from": "conduit gem"
+    },
+    "sundering axe": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Sundering_Axe.png/30px-Starter_T2_Sundering_Axe.png?e55b6",
+        "upgraded_from": "warrior's axe"
+    },
+    "death's embrace": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Death%27s_Embrace.png/30px-Starter_T2_Death%27s_Embrace.png?10dd0",
+        "upgraded_from": "death's toll"
+    },
+    "bumba's hammer": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Bumba%27s_Hammer.png/30px-Starter_T2_Bumba%27s_Hammer.png?7cd22",
+        "upgraded_from": "bumba's cudgel"
+    },
+    "pendulum of the ages": {
+        "category": "starter",
+        "is_starter_t1": false,
+        "is_starter_t2": true,
+        "image_url": "https://wiki.smite2.com/images/thumb/Starter_T2_Pendulum_Of_The_Ages.png/30px-Starter_T2_Pendulum_Of_The_Ages.png?bc45c",
+        "upgraded_from": "sands of time"
+    },
+    "bow": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Bow.png/30px-T1_Bow.png?4192d"
+    },
+    "shield": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Shield.png/30px-T1_Shield.png?71467"
+    },
+    "sash": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Sash.png/30px-T1_Sash.png?5a3f2"
+    },
+    "rune": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Rune.png/30px-T1_Rune.png?33dbc"
+    },
+    "reliquary": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Reliquary.png/30px-T1_Reliquary.png?18aef"
+    },
+    "medallion": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Medallion.png/30px-T1_Medallion.png?fde34"
+    },
+    "circlet": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Circlet.png/30px-T1_Circlet.png?65a23"
+    },
+    "ring": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Ring.png/30px-T1_Ring.png?5ae36"
+    },
+    "axe": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Axe.png/30px-T1_Axe.png?9c10f"
+    },
+    "gem": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Gem.png/30px-T1_Gem.png?53c52"
+    },
+    "scythe": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Scythe.png/30px-T1_Scythe.png?7cd21"
+    },
+    "sabre": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T1_Sabre.png/30px-T1_Sabre.png?1ea9a"
+    },
+    "mana tome": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Mana_Tome.png/30px-T2_Mana_Tome.png?6052d"
+    },
+    "adroit ring": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Adroit_Ring.png/30px-T2_Adroit_Ring.png?ebdb5"
+    },
+    "olmec blue": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Olmec_Blue.png/30px-T2_Olmec_Blue.png?023b9"
+    },
+    "hunter's bow": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Hunter%27s_Bow.png/30px-T2_Hunter%27s_Bow.png?c68e2"
+    },
+    "circle of protection": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Circle_of_Protection.png/30px-T2_Circle_of_Protection.png?cd067"
+    },
+    "bowl drum": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_BowlDrum.png/30px-T2_BowlDrum.png?31e0d"
+    },
+    "legionnaire armor": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Legionnaire_Armor.png/30px-T2_Legionnaire_Armor.png?e265e"
+    },
+    "cleric's cloak": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Adroit_Ring.png/30px-T2_Adroit_Ring.png?ebdb5"
+    },
+    "odigba": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Odigba.png/30px-T2_Odigba.png?95041"
+    },
+    "sage's ring": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Sage%27s_Ring.png/30px-T2_Sage%27s_Ring.png?d440e"
+    },
+    "veve charm": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Veve_Charm.png/30px-T2_Veve_Charm.png?9fae7"
+    },
+    "engraved guard": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Engraved_Guard.png/30px-T2_Engraved_Guard.png?28095"
+    },
+    "captain's ring": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Captain%27s_Ring.png/30px-T2_Captain%27s_Ring.png?56e91"
+    },
+    "runic hide": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_RunicHide.png/30px-T2_RunicHide.png?9db79"
+    },
+    "medal of disruption": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Medal_of_Disruption.png/30px-T2_Medal_of_Disruption.png?4ee15"
+    },
+    "cursed sickle": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Cursed_Sickle.png/30px-T2_Cursed_Sickle.png?07fd1"
+    },
+    "medal of defense": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Medal_of_Defense.png/30px-T2_Medal_of_Defense.png?39fad"
+    },
+    "plated metal": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_PlatedMetal.png/30px-T2_PlatedMetal.png?6b50d"
+    },
+    "battle axe": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Battle_Axe.png/30px-T2_Battle_Axe.png?b6280"
+    },
+    "soul reliquary": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Soul_Reliquary.png/30px-T2_Soul_Reliquary.png?61de9"
+    },
+    "combat boots": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_CombatBoots.png/30px-T2_CombatBoots.png?bae9d"
+    },
+    "enchanted bracelet": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Enchanted_Bracelet.png/30px-T2_Enchanted_Bracelet.png?0a21d"
+    },
+    "void shard": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Void_Shard.png/30px-T2_Void_Shard.png?dc3d8"
+    },
+    "killing stone": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Killing_Stone.png/30px-T2_Killing_Stone.png?23540"
+    },
+    "manchu bow": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Manchu_Bow.png/30px-T2_Manchu_Bow.png?f3c50"
+    },
+    "oracle staff": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Oracle_Staff.png/30px-T2_Oracle_Staff.png?46210"
+    },
+    "flaming pearl": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Flaming_Pearl.png/30px-T2_Flaming_Pearl.png?fba29"
+    },
+    "ring of dispel": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Ring_of_Dispel.png/30px-T2_Ring_of_Dispel.png?4ae15"
+    },
+    "hooked sword": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Hooked_Sword.png/30px-T2_Hooked_Sword.png?9d5ee"
+    },
+    "skeggox": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Skeggox.png/30px-T2_Skeggox.png?c98e8"
+    },
+    "survivor's sash": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Survivor%27s_Sash.png/30px-T2_Survivor%27s_Sash.png?071e6"
+    },
+    "caestus": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Caestus.png/30px-T2_Caestus.png?31468"
+    },
+    "infused axe": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Infused_Axe.png/30px-T2_Infused_Axe.png?450a5"
+    },
+    "zither": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Zither.png/30px-T2_Zither.png?79996"
+    },
+    "stalwart sigil": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Stalwart_Sigil.png/30px-T2_Stalwart_Sigil.png?ca879"
+    },
+    "evil eye": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Evil_Eye.png/30px-T2_Evil_Eye.png?f0c89"
+    },
+    "adamantine sickle": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Adamantine_Sickle.png/30px-T2_Adamantine_Sickle.png?8af0f"
+    },
+    "lucerne hammer": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Lucerne_Hammer.png/30px-T2_Lucerne_Hammer.png?aba08"
+    },
+    "mote of chaos": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Mote_of_Chaos.png/30px-T2_Mote_of_Chaos.png?1f4f2"
+    },
+    "kopesh": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T2_Kopesh.png/30px-T2_Kopesh.png?adafe"
+    },
+    "blood-bound book": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Blood-Bound_Book.png/30px-T3_Blood-Bound_Book.png?6c321"
+    },
+    "bancroft's talon": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Bancroft%27s_Talon.png/30px-T3_Bancroft%27s_Talon.png?2034f"
+    },
+    "book of thoth": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Book_of_Thoth.png/30px-T3_Book_of_Thoth.png?8326f"
+    },
+    "eros' bow": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Eros%27_Bow.png/30px-T3_Eros%27_Bow.png?a90dc"
+    },
+    "sun beam bow": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Sun_Beam_Bow.png/30px-T3_Sun_Beam_Bow.png?d4d0e"
+    },
+    "jotunn's revenge": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Jotunn%27s_Revenge.png/30px-T3_Jotunn%27s_Revenge.png?1a846"
+    },
+    "chronos' pendant": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Chronos_Pendant.png/30px-T3_Chronos_Pendant.png?6211e"
+    },
+    "transcendence": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Transcendence.png/30px-T3_Transcendence.png?2f000"
+    },
+    "odysseus' bow": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Odysseus%27_Bow.png/30px-T3_Odysseus%27_Bow.png?8dee6"
+    },
+    "rage": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Rage.png/30px-T3_Rage.png?82481"
+    },
+    "hydra's lament": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Hydra%27s_Lament.png/30px-T3_Hydra%27s_Lament.png?50622"
+    },
+    "vital amplifier": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Vital_Amplifier.png/30px-T3_Vital_Amplifier.png?c15b2"
+    },
+    "daybreak gavel": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Daybreak_Gavel.png/30px-T3_Daybreak_Gavel.png?11e14"
+    },
+    "bracer of the abyss": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Bracer_of_The_Abyss.png/30px-T3_Bracer_of_The_Abyss.png?ca975"
+    },
+    "barbed carver": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Barbed_Carver.png/30px-T3_Barbed_Carver.png?9b440"
+    },
+    "nimble ring": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Nimble_Ring.png/30px-T3_Nimble_Ring.png?1f67f"
+    },
+    "mercury's talaria": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Mercury%27sTalaria.png/30px-T3_Mercury%27sTalaria.png?1f04f"
+    },
+    "dagger of frenzy": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Dagger_of_Frenzy.png/30px-T3_Dagger_of_Frenzy.png?e276e"
+    },
+    "lernaean bow": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Lernaean_Bow.png/30px-T3_Lernaean_Bow.png?2d307"
+    },
+    "devourer's gauntlet": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Devourer%27s_Gauntlet.png/30px-T3_Devourer%27s_Gauntlet.png?9b3a9"
+    },
+    "divine ruin": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Divine_Ruin.png/30px-T3_Divine_Ruin.png?f256f"
+    },
+    "soul gem": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Soul_Gem.png/30px-T3_Soul_Gem.png?8826d"
+    },
+    "the executioner": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_The_Executioner.png/30px-T3_The_Executioner.png?f6520"
+    },
+    "gem of focus": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Gem_of_Focus.png/30px-T3_Gem_of_Focus.png?ffc05"
+    },
+    "bloodforge": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Bloodforge.png/30px-T3_Bloodforge.png?b95b4"
+    },
+    "polynomicon": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Polynomicon.png/30px-T3_Polynomicon.png?fa659"
+    },
+    "necronomicon": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Necronomicon.png/30px-T3_Necronomicon.png?9066d"
+    },
+    "oath-sworn spear": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Oath-Sworn_Spear.png/30px-T3_Oath-Sworn_Spear.png?253d3"
+    },
+    "bragi's harp": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Bragi%27s_Harp.png/30px-T3_Bragi%27s_Harp.png?b7365"
+    },
+    "qin's blade": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Qin%27s_Blade.png/30px-T3_Qin%27s_Blade.png?1a0e2"
+    },
+    "typhon's heart": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Typhon%27s_Heart.png/30px-T3_Typhon%27s_Heart.png?07fe7"
+    },
+    "gluttonous grimoire": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Gluttonous_Grimoire.png/30px-T3_Gluttonous_Grimoire.png?1a1a9"
+    },
+    "tyrfing": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Tyrfing.png/30px-T3_Tyrfing.png?c2a9f"
+    },
+    "death metal": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Death_Metal.png/30px-T3_Death_Metal.png?04ed0"
+    },
+    "the reaper": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_The_Reaper.png/30px-T3_The_Reaper.png?0920f"
+    },
+    "ancient signet": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Ancient_Signet.png/30px-T3_Ancient_Signet.png?40d9d"
+    },
+    "spear of desolation": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Spear_of_Desolation.png/30px-T3_Spear_of_Desolation.png?31b29"
+    },
+    "avenging blade": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_AvengingBlade_OB23.png/30px-T3_AvengingBlade_OB23.png?adda8"
+    },
+    "the cosmic horror": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_The_Cosmic_Horror.png/30px-T3_The_Cosmic_Horror.png?6ce44"
+    },
+    "arondight": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Arondight.png/30px-T3_Arondight.png?b4545"
+    },
+    "hastened fatalis": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Hastened_Fatalis.png/30px-T3_Hastened_Fatalis.png?33c6e"
+    },
+    "riptalon": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Riptalon.png/30px-T3_Riptalon.png?462c3"
+    },
+    "tekko-kagi": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Tekko-Kagi.png/30px-T3_Tekko-Kagi.png?9bbbb"
+    },
+    "musashi's dual swords": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Musashi%27s_Dual_Swords.png/30px-T3_Musashi%27s_Dual_Swords.png?bd764"
+    },
+    "doom orb": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Doom_Orb.png/30px-T3_Doom_Orb.png?76015"
+    },
+    "jade scepter": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Jade_Scepter.png/30px-T3_Jade_Scepter.png?79690"
+    },
+    "pendulum blade": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Pendulum_Blade.png/30px-T3_Pendulum_Blade.png?8c08f"
+    },
+    "demon blade": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Demon_Blade.png/30px-T3_Demon_Blade.png?fb466"
+    },
+    "damaru": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Damaru.png/30px-T3_Damaru.png?3d87e"
+    },
+    "omen drum": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_OmenDrum.png/30px-T3_OmenDrum.png?1ce26"
+    },
+    "the crusher": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_The_Crusher.png/30px-T3_The_Crusher.png?cbc28"
+    },
+    "the world stone": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_The_World_Stone.png/30px-T3_The_World_Stone.png?8f936"
+    },
+    "totem of death": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Totem_of_Death.png/30px-T3_Totem_of_Death.png?71824"
+    },
+    "deathbringer": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Deathbringer.png/30px-T3_Deathbringer.png?6d7a6"
+    },
+    "staff of myrddin": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Staff_of_Myrddin.png/30px-T3_Staff_of_Myrddin.png?6eebb"
+    },
+    "soul reaver": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Soul_Reaver.png/30px-T3_Soul_Reaver.png?6867c"
+    },
+    "heartseeker": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Heartseeker.png/30px-T3_Heartseeker.png?c283e"
+    },
+    "rod of tahuti": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Rod_of_Tahuti.png/30px-T3_Rod_of_Tahuti.png?8ad1d"
+    },
+    "obsidian shard": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Obsidian_Shard.png/30px-T3_Obsidian_Shard.png?1c47c"
+    },
+    "titan's bane": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Titan%27s_Bane.png/30px-T3_Titan%27s_Bane.png?dc01e"
+    },
+    "dreamer's idol": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Dreamer%27s_Idol.png/30px-T3_Dreamer%27s_Idol.png?e4f89"
+    },
+    "avatar's parashu": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Avatar%27s_Parashu.png/30px-T3_Avatar%27s_Parashu.png?0b3cd"
+    },
+    "gauntlet of thebes": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Gauntlet_of_Thebes.png/30px-T3_Gauntlet_of_Thebes.png?0e2fe"
+    },
+    "yogi's necklace": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Yogi%27s_Necklace.png/30px-T3_Yogi%27s_Necklace.png?72db5"
+    },
+    "chandra's grace": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Chandra%27s_Grace.png/30px-T3_Chandra%27s_Grace.png?65da4"
+    },
+    "spectral armor": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Spectral_Armor.png/30px-T3_Spectral_Armor.png?d3043"
+    },
+    "eye of providence": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Eye_of_Providence.png/30px-T3_Eye_of_Providence.png?c0cd4"
+    },
+    "amanita charm": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Amanita_Charm.png/30px-T3_Amanita_Charm.png?14c38"
+    },
+    "genji's guard": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Genji%27s_Guard.png/30px-T3_Genji%27s_Guard.png?94cf6"
+    },
+    "alchemist coat": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_AlchemistCoat.png/30px-T3_AlchemistCoat.png?3b3ad"
+    },
+    "erosion": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Erosion.png/30px-T3_Erosion.png?a2188"
+    },
+    "shield of the phoenix": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Shield_of_the_Phoenix.png/30px-T3_Shield_of_the_Phoenix.png?c1e35"
+    },
+    "contagion": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Contagion.png/30px-T3_Contagion.png?079a7"
+    },
+    "breastplate of valor": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Breastplate_of_Valor.png/30px-T3_Breastplate_of_Valor.png?67f3c"
+    },
+    "prophetic cloak": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Prophetic_Cloak.png/30px-T3_Prophetic_Cloak.png?98f59"
+    },
+    "screeching gargoyle": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Screeching_Gargoyle.png/30px-T3_Screeching_Gargoyle.png?f8492"
+    },
+    "phoenix feather": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Phoenix_Feather.png/30px-T3_Phoenix_Feather.png?2f3b6"
+    },
+    "magi's cloak": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Magi%27s_Cloak.png/30px-T3_Magi%27s_Cloak.png?d5068"
+    },
+    "kinetic cuirass": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_KineticCuirass.png/30px-T3_KineticCuirass.png?5931b"
+    },
+    "berserker's shield": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Berserker%27s_Shield.png/30px-T3_Berserker%27s_Shield.png?e5eca"
+    },
+    "stampede": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Stampede.png/30px-T3_Stampede.png?47b39"
+    },
+    "gladiator's shield": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Gladiator%27s_Shield.png/30px-T3_Gladiator%27s_Shield.png?7027b"
+    },
+    "pharaoh's curse": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Pharaoh%27s_Curse.png/30px-T3_Pharaoh%27s_Curse.png?45702"
+    },
+    "umbral link": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Umbral_Link.png/30px-T3_Umbral_Link.png?e41d8"
+    },
+    "shroud of vengeance": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_ShroudofVengeance.png/30px-T3_ShroudofVengeance.png?ef357"
+    },
+    "ancile": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Ancile.png/30px-T3_Ancile.png?195c0"
+    },
+    "spirit robe": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Spirit_Robe.png/30px-T3_Spirit_Robe.png?2e68a"
+    },
+    "shogun's ofuda": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Shogun%27s_Ofuda.png/30px-T3_Shogun%27s_Ofuda.png?7b8ab"
+    },
+    "oni hunter's garb": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Oni_Hunter%27s_Garb.png/30px-T3_Oni_Hunter%27s_Garb.png?9643c"
+    },
+    "leviathan's hide": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Leviathan%27s_Hide.png/30px-T3_Leviathan%27s_Hide.png?c6394"
+    },
+    "doublet of binding": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_DoubletofBinding.png/30px-T3_DoubletofBinding.png?fd6ac"
+    },
+    "hide of the nemean lion": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Hide_of_the_Nemean_Lion.png/30px-T3_Hide_of_the_Nemean_Lion.png?f0951"
+    },
+    "mystical mail": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Mystical_Mail.png/30px-T3_Mystical_Mail.png?9842f"
+    },
+    "regrowth striders": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Regrowth_Striders.png/30px-T3_Regrowth_Striders.png?b701a"
+    },
+    "stone of binding": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Stone_of_Binding.png/30px-T3_Stone_of_Binding.png?a0388"
+    },
+    "glorious pridwen": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Glorious_Pridwen.png/30px-T3_Glorious_Pridwen.png?f7f0c"
+    },
+    "void stone": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Void_Stone.png/30px-T3_Void_Stone.png?22683"
+    },
+    "stygian anchor": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_StygianAnchor.png/30px-T3_StygianAnchor.png?509ac"
+    },
+    "void shield": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Void_Shield.png/30px-T3_Void_Shield.png?a01d4"
+    },
+    "mantle of discord": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Mantle_of_Discord.png/30px-T3_Mantle_of_Discord.png?18e40"
+    },
+    "freya's tears": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Freya%27s_Tears.png/30px-T3_Freya%27s_Tears.png?ae715"
+    },
+    "wyrmskin hide": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_WyrmskinHide.png/30px-T3_WyrmskinHide.png?6dd16"
+    },
+    "ragnarok's wake": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Ragnarok%27s_Wake.png/30px-T3_Ragnarok%27s_Wake.png?9a69e"
+    },
+    "heartwood charm": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Heartwood_Charm.png/30px-T3_Heartwood_Charm.png?9efda"
+    },
+    "draconic scale": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Draconic_Scale.png/30px-T3_Draconic_Scale.png?08552"
+    },
+    "circe's hexstone": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Circe%27s_Hexstone.png/30px-T3_Circe%27s_Hexstone.png?016ec"
+    },
+    "xibalban effigy": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Xibalban_Effigy.png/30px-T3_Xibalban_Effigy.png?ca23c"
+    },
+    "resolute mantle": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_ResoluteMantle.png/30px-T3_ResoluteMantle.png?1143c"
+    },
+    "radiant bulwark": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_RadiantBulwark.png/30px-T3_RadiantBulwark.png?b2326"
+    },
+    "dwarven plate": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Dwarven_Plate.png/30px-T3_Dwarven_Plate.png?b54f7"
+    },
+    "hussar's wings": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Hussar%27s_Wings.png/30px-T3_Hussar%27s_Wings.png?c2c3f"
+    },
+    "rod of asclepius": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Rod_of_Asclepius.png/30px-T3_Rod_of_Asclepius.png?bb839"
+    },
+    "scepter of dominion": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Scepter_of_Dominion.png/30px-T3_Scepter_of_Dominion.png?cdd55"
+    },
+    "shield splitter": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Shield_Splitter.png/30px-T3_Shield_Splitter.png?ca596"
+    },
+    "lifebinder": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Lifebinder.png/30px-T3_Lifebinder.png?a9e4d"
+    },
+    "golden blade": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Golden_Blade.png/30px-T3_Golden_Blade.png?f4d9e"
+    },
+    "gem of isolation": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Gem_of_Isolation.png/30px-T3_Gem_of_Isolation.png?b8920"
+    },
+    "eye of the storm": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Eye_of_the_Storm.png/30px-T3_Eye_of_the_Storm.png?ad879"
+    },
+    "helm of radiance": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Helm_of_Radiance.png/30px-T3_Helm_of_Radiance.png?7473b"
+    },
+    "brawler's beat stick": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Brawler%27s_Beat_Stick.png/30px-T3_Brawler%27s_Beat_Stick.png?f7b05"
+    },
+    "runeforged hammer": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Runeforged_Hammer.png/30px-T3_Runeforged_Hammer.png?e0d63"
+    },
+    "eye of erebus": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Eye_of_Erebus.png/30px-T3_Eye_of_Erebus.png?1421c"
+    },
+    "sanguine lash": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Sanguine_Lash.png/30px-T3_Sanguine_Lash.png?2d069"
+    },
+    "shifter's shield": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Shifter%27s_Shield.png/30px-T3_Shifter%27s_Shield.png?eab04"
+    },
+    "helm of darkness": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Helm_of_Darkness.png/30px-T3_Helm_of_Darkness.png?ab570"
+    },
+    "triton's conch": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Triton%27s_Conch.png/30px-T3_Triton%27s_Conch.png?b82dc"
+    },
+    "sphere of negation": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Sphere_of_Negation.png/30px-T3_Sphere_of_Negation.png?eda59"
+    },
+    "wish-granting pearl": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/T3_Wish-Granting_Pearl.png/30px-T3_Wish-Granting_Pearl.png?7e82b"
+    },
+    "genie's lamp": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Aladdin_Genie%27s_Lamp.png/30px-GodSpecific_Aladdin_Genie%27s_Lamp.png?acaaf"
+    },
+    "masterwork mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Masterwork_Mod.png/30px-GodSpecific_Vulcan_Masterwork_Mod.png?7cc65"
+    },
+    "thermal mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Thermal_Mod.png/30px-GodSpecific_Vulcan_Thermal_Mod.png?283d0"
+    },
+    "magic acorn": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Ratatoskr_Magic_Acorn.png/30px-GodSpecific_Ratatoskr_Magic_Acorn.png?a5602"
+    },
+    "surplus mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Surplus_Mod.png/30px-GodSpecific_Vulcan_Surplus_Mod.png?73da5"
+    },
+    "seismic mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Seismic_Mod.png/30px-GodSpecific_Vulcan_Seismic_Mod.png?6bd3d"
+    },
+    "resonator mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Resonator_Mod.png/30px-GodSpecific_Vulcan_Resonator_Mod.png?dcdd7"
+    },
+    "dual mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Dual_Mod.png/30px-GodSpecific_Vulcan_Dual_Mod.png?854b1"
+    },
+    "efficiency mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Efficiency_Mod.png/30px-GodSpecific_Vulcan_Efficiency_Mod.png?8d4df"
+    },
+    "training grounds": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Hua_Mulan_Training_Grounds.png/30px-GodSpecific_Hua_Mulan_Training_Grounds.png?6fe61"
+    },
+    "alternator mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Alternator_Mod.png/30px-GodSpecific_Vulcan_Alternator_Mod.png?62e59"
+    },
+    "shrapnel mod": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Vulcan_Shrapnel_Mod.png/30px-GodSpecific_Vulcan_Shrapnel_Mod.png?84f55"
+    },
+    "baron's brew": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Baron_Baron%27s_Brew.png/30px-GodSpecific_Baron_Baron%27s_Brew.png?ce494"
+    },
+    "lively acorn": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Ratatoskr_Lively_Acorn.png/30px-GodSpecific_Ratatoskr_Lively_Acorn.png?26b48"
+    },
+    "ashwhorl acorn": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Ratatoskr_Ashwhorl_Acorn.png/30px-GodSpecific_Ratatoskr_Ashwhorl_Acorn.png?493d0"
+    },
+    "briskberry acorn": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Ratatoskr_Briskberry_Acorn.png/30px-GodSpecific_Ratatoskr_Briskberry_Acorn.png?65688"
+    },
+    "thistlethorn acorn": {
+        "category": "item",
+        "image_url": "https://wiki.smite2.com/images/thumb/GodSpecific_Ratatoskr_Thistlethorn_Acorn.png/30px-GodSpecific_Ratatoskr_Thistlethorn_Acorn.png?c819a"
+    },
+    "smite 2 wiki": {
+        "category": "item",
+        "image_url": null
+    },
+    "about the game": {
+        "category": "item",
+        "image_url": null
+    },
+    "gods": {
+        "category": "item",
+        "image_url": null
+    },
+    "items": {
+        "category": "item",
+        "image_url": null
+    },
+    "game modes": {
+        "category": "item",
+        "image_url": null
+    },
+    "patch notes": {
+        "category": "item",
+        "image_url": null
+    },
+    "https://wiki.smite2.com/w/items?oldid=619136": {
+        "category": "item",
+        "image_url": null
+    },
+    "categories": {
+        "category": "item",
+        "image_url": null
+    },
+    "smite 2": {
+        "category": "item",
+        "image_url": null
+    }
+}

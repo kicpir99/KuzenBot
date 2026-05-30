@@ -1,0 +1,46 @@
+# ==============================
+# WIRTUALNE ŚRODOWISKO (Python)
+# ==============================
+venv/
+env/
+.env
+
+# ==============================
+# PYINSTALLER & KOMPILACJA
+# ==============================
+build/
+dist/
+*.pyc
+__pycache__/
+
+# ==============================
+# INNO SETUP & PLIKI WYKONYWALNE
+# ==============================
+# Ignorujemy gotowe instalki, które generuje Inno Setup
+Output/
+# Ignorujemy luźne pliki .exe (żeby przypadkiem nie wrzucić brudnopisów)
+*.exe
+
+# (Wyjątek) Gwarantujemy, że pliki konfiguracyjne NIE zostaną zignorowane
+!KuzenBot.spec
+!kuzenbot_installer.iss
+
+# ==============================
+# LOGI I PLIKI TYMCZASOWE
+# ==============================
+logs/
+*.log
+
+# ==============================
+# DYNAMICZNE DANE BOTA
+# ==============================
+# Ignorujemy cache z obrazkami, które bot sam pobiera ze SmiteSource
+assets/cache/
+# Ignorujemy lokalną bazę danych (jeśli testujesz ją na komputerze)
+smite_data.json
+
+# ==============================
+# USTAWIENIA EDYTORÓW KODU
+# ==============================
+.vscode/
+.idea/
