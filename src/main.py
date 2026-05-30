@@ -211,7 +211,7 @@ class UpdateCheckerWorker(QThread):
     update_available = pyqtSignal(str, str)
 
     def run(self):
-        url = "https://raw.githubusercontent.com/TwojNick/KuzenBot/main/version.json"
+        url = "https://raw.githubusercontent.com/kicpir99/KuzenBot/main/version.json"
         
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'KuzenBot-Updater'})
@@ -219,7 +219,7 @@ class UpdateCheckerWorker(QThread):
                 data = json.loads(response.read().decode('utf-8'))
                 
                 latest_version = data.get("version", "1.0.0")
-                download_url = data.get("url", "https://github.com/TwojNick/KuzenBot/releases")
+                download_url = data.get("url", "https://github.com/kicpir99/KuzenBot/releases")
                 
                 curr_parts = [int(x) for x in CURRENT_VERSION.split(".")]
                 latest_parts = [int(x) for x in latest_version.split(".")]
