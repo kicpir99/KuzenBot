@@ -153,34 +153,27 @@ class GameScanner(QThread):
     def run(self):
         log_dir = os.path.dirname(self.log_path)
         
-        # 2. Inteligentne logowanie problemów ze ścieżkami
         if not os.path.exists(log_dir):
-            logger.warning(f"[Scanner] Katalog logów nie istnieje: {log_dir}. Gra prawdopodobnie nie była jeszcze uruchamiana na tym profilu Windows.")
+            logger.warning(f"[Scanner] Katalog logów nie istnieje: {log_dir}. Gra prawdopodobnie nie była uruchamiana.")
             return
 
         if not os.path.exists(self.log_path):
             logger.warning(f"[Scanner] Nie znaleziono głównego pliku logów pod: {self.log_path}")
-            try:
-                # Wypisujemy to, co faktycznie jest w folderze, aby ułatwić debugowanie
-                available_files = os.listdir(log_dir)
-                logger.info(f"[Scanner] Znalezione pliki w katalogu gry: {available_files}")
-            except Exception as e:
-                logger.error(f"[Scanner] Brak uprawnień do odczytu katalogu logów: {e}")
             return
 
         logger.info(f"[Scanner] Pomyślnie znaleziono plik. Rozpoczęto nasłuch logów: {self.log_path}")
         try:
             with open(self.log_path, "r", encoding="utf-8", errors="ignore") as f:
+                # 1. Ogromny bufor 200 KB - niczego nie przeoczymy!
                 f.seek(0, os.SEEK_END)
                 pos = f.tell()
-                f.seek(pos - min(200000, pos))
+                f.seek(pos - min(2000000, pos))
                 
-                # Skanowanie historii, żeby wiedzieć kto był zaznaczony przed odpaleniem apki
                 last_found_god = None
                 for h_line in f.readlines():
                     if "Ally 0 Skin" in h_line:
                         match = re.search(r"Ally 0 Skin (.+?)$", h_line)
-                        if match:
+                        if match and match.group(1).strip():
                             god_name = self._match_god_name(match.group(1).strip())
                             if god_name: last_found_god = god_name
                 
@@ -188,24 +181,24 @@ class GameScanner(QThread):
                     self.last_emitted_god = last_found_god
                     self.god_detected.emit(last_found_god)
                 
+                # Zabezpieczenie fizycznego rozmiaru pliku
                 f.seek(0, os.SEEK_END)
+                last_file_size = os.path.getsize(self.log_path)
+                
                 logger.info("[Scanner] Oczekiwanie na akcje w lobby...")
                 
                 # Główna pętla
                 while self.running:
-                    # --- DODANO: Wykrywanie resetu pliku (uruchomienie gry w trakcie działania bota) ---
+                    # 2. Bezpieczne wykrywanie restartu gry (odporne na f.tell)
                     try:
                         current_size = os.path.getsize(self.log_path)
-                        # Jeśli plik jest mniejszy niż nasz wskaźnik czytania, gra go wyczyściła!
-                        if current_size < f.tell():
-                            logger.info("[Scanner] Gra wyczyściła plik logów (restart). Resetuję wskaźnik na początek.")
-                            f.seek(0, os.SEEK_SET) # Powrót na sam początek pliku
+                        if current_size < last_file_size:
+                            logger.info("[Scanner] Gra wyczyściła plik logów (restart gry). Resetuję wskaźnik na początek.")
+                            f.seek(0, os.SEEK_SET)
+                        last_file_size = current_size
                     except OSError:
-                        # Gra mogła na ułamek sekundy zablokować plik przy usuwaniu
-                        time.sleep(0.5)
-                        continue
-                    # ---------------------------------------------------------------------------------
-
+                        pass # Gra zablokowała plik do zapisu, czekamy
+                    
                     line = f.readline()
                     if not line:
                         time.sleep(0.05)
@@ -214,36 +207,29 @@ class GameScanner(QThread):
                     if "TransitionToDraftState" in line and "CharacterDraft" in line:
                         if "Setup" in line:
                             self.last_emitted_god = None
-                            self.last_internal_model = None # Czyszczenie przy nowym meczu
+                            self.last_internal_model = None
                             self.lobby_joined.emit()
                     
-                    # --- NOWA LOGIKA: Podsłuch na ładowanie modelu 3D z Unreal Engine ---
                     if "BP_" in line and "_Lobby_C" in line:
                         bp_match = re.search(r"BP_([A-Za-z0-9_]+)_Lobby_C", line)
                         if bp_match:
                             extracted_bp = bp_match.group(1).replace("_", " ").strip()
-                            # ZABEZPIECZENIE: Jeśli gra ładuje generyczny model (jak przy Bari), 
-                            # MUSIMY wyczyścić pamięć po poprzednim bogu!
                             if extracted_bp.lower() in ['god', 'genericactor', 'character']:
                                 self.last_internal_model = None
                             else:
                                 self.last_internal_model = extracted_bp
-                    # --------------------------------------------------------------------
                     
-                    # Trigger wyboru postaci w UI (informuje nas, że to nasz bohater)
+                    # 3. Zabezpieczenie przed pustymi zdarzeniami UI
                     if "Ally 0 Skin" in line:
                         match = re.search(r"Ally 0 Skin (.+?)$", line)
-                        if match:
+                        if match and match.group(1).strip():
                             raw_local = match.group(1).strip()
                             
-                            # MAGIA ARCHITEKTURY: Używamy nazwy z modelu 3D. 
-                            # Jeśli z jakiegoś powodu jej nie ma, dopiero wtedy spadamy do logiki UI (raw_local)
                             search_term = self.last_internal_model if self.last_internal_model else raw_local
-                            
                             god_name = self._match_god_name(search_term)
                             
                             if god_name and god_name != self.last_emitted_god:
-                                logger.info(f"[Scanner] Wykryto wybór: {god_name} (Źródło danych: {search_term})")
+                                logger.info(f"[Scanner] Wykryto wybór: {god_name} (Źródło: {search_term})")
                                 self.last_emitted_god = god_name
                                 self.god_detected.emit(god_name)
 
