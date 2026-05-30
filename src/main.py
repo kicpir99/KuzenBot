@@ -19,7 +19,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.0.0"
+CURRENT_VERSION = "1.1.0"
 
 STATE_LOADING = "loading"
 STATE_DATA = "data"
@@ -1203,13 +1203,27 @@ class SmiteController(QObject):
             return
             
         url = getattr(self.overlay, '_update_url', None)
-        if not url: return
+        if not url: 
+            print("⚠️ [Updater] Brak linku do aktualizacji!")
+            return
+
+        # --- ZMIANA: Wizualna reakcja na kliknięcie ---
+        if hasattr(self.overlay, 'btn_update'):
+            self.overlay.btn_update.setText("⏳ Łączenie...")
 
         self.update_downloader = UpdateDownloaderWorker(url)
         self.update_downloader.progress.connect(self._on_update_progress)
         self.update_downloader.finished.connect(self._on_update_downloaded)
-        self.update_downloader.error.connect(lambda e: print(f"⚠️ [Updater] Błąd pobierania: {e}"))
+        
+        # --- ZMIANA: Podpinamy błąd pod nową metodę zamiast samej lambdy ---
+        self.update_downloader.error.connect(self._on_update_error)
         self.update_downloader.start()
+
+    def _on_update_error(self, error_msg):
+        """Called when download fails (e.g. 404 Not Found)."""
+        print(f"⚠️ [Updater] Błąd pobierania: {error_msg}")
+        if hasattr(self.overlay, 'btn_update'):
+            self.overlay.btn_update.setText("❌ Błąd pobierania")
 
     def _on_update_progress(self, percent):
         """Updates the button text with download progress."""
