@@ -1,14 +1,14 @@
 [Setup]
 ; --- Podstawowe informacje ---
 AppName=KuzenBot App
-AppVersion=1.1.0
+AppVersion=1.1.1
 AppPublisher=kicpir99
 DefaultDirName={autopf}\KuzenBot
 DefaultGroupName=KuzenBot
 
 ; --- Ustawienia pliku wyjściowego ---
 OutputDir=Output
-OutputBaseFilename=KuzenBot_Setup_v1_1_0
+OutputBaseFilename=KuzenBot_Setup_v1_1_1
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=assets\logo.ico
@@ -50,3 +50,13 @@ Filename: "{app}\KuzenBot_App.exe"; Description: "{cm:LaunchProgram,KuzenBot}"; 
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
+
+[Code]
+function InitializeSetup(): Boolean;
+var
+  ErrorCode: Integer;
+begin
+  // Wymuszone zamknięcie starej aplikacji w tle przed startem instalatora
+  ShellExec('open', 'taskkill.exe', '/F /IM KuzenBot_App.exe', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
+  Result := True;
+end;

@@ -13,7 +13,8 @@ class GameScanner(QThread):
 
     def __init__(self):
         super().__init__()
-        self.log_path = os.path.expandvars(r"%LOCALAPPDATA%\SMITE2Alpha\Saved\Logs\Hemingway.log")
+        local_appdata = os.getenv('LOCALAPPDATA')
+        self.log_path = os.path.join(local_appdata, "SMITE2Alpha", "Saved", "Logs", "Hemingway.log")
         self.running = True
         self.gods_db_path = os.path.join("assets", "gods_db.json")
         
@@ -150,11 +151,24 @@ class GameScanner(QThread):
         return None
 
     def run(self):
-        if not os.path.exists(self.log_path):
-            logger.warning(f"[Scanner] Nie znaleziono pliku logow pod: {self.log_path}")
+        log_dir = os.path.dirname(self.log_path)
+        
+        # 2. Inteligentne logowanie problemów ze ścieżkami
+        if not os.path.exists(log_dir):
+            logger.warning(f"[Scanner] Katalog logów nie istnieje: {log_dir}. Gra prawdopodobnie nie była jeszcze uruchamiana na tym profilu Windows.")
             return
 
-        logger.info(f"[Scanner] Rozpoczeto nasluch logow: {self.log_path}")
+        if not os.path.exists(self.log_path):
+            logger.warning(f"[Scanner] Nie znaleziono głównego pliku logów pod: {self.log_path}")
+            try:
+                # Wypisujemy to, co faktycznie jest w folderze, aby ułatwić debugowanie
+                available_files = os.listdir(log_dir)
+                logger.info(f"[Scanner] Znalezione pliki w katalogu gry: {available_files}")
+            except Exception as e:
+                logger.error(f"[Scanner] Brak uprawnień do odczytu katalogu logów: {e}")
+            return
+
+        logger.info(f"[Scanner] Pomyślnie znaleziono plik. Rozpoczęto nasłuch logów: {self.log_path}")
         try:
             with open(self.log_path, "r", encoding="utf-8", errors="ignore") as f:
                 f.seek(0, os.SEEK_END)
