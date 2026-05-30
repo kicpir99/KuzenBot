@@ -38,9 +38,9 @@ class StreamToLogger:
         self.stream = stream
 
     def write(self, buf):
-        # Wypisujemy na oryginalną konsolę
         try:
             self.stream.write(buf)
+            self.stream.flush() # Wymuszenie zapisu na dysk
         except Exception:
             pass
             

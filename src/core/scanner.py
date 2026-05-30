@@ -173,7 +173,7 @@ class GameScanner(QThread):
             with open(self.log_path, "r", encoding="utf-8", errors="ignore") as f:
                 f.seek(0, os.SEEK_END)
                 pos = f.tell()
-                f.seek(pos - min(30000, pos))
+                f.seek(pos - min(200000, pos))
                 
                 # Skanowanie historii, żeby wiedzieć kto był zaznaczony przed odpaleniem apki
                 last_found_god = None
@@ -193,6 +193,19 @@ class GameScanner(QThread):
                 
                 # Główna pętla
                 while self.running:
+                    # --- DODANO: Wykrywanie resetu pliku (uruchomienie gry w trakcie działania bota) ---
+                    try:
+                        current_size = os.path.getsize(self.log_path)
+                        # Jeśli plik jest mniejszy niż nasz wskaźnik czytania, gra go wyczyściła!
+                        if current_size < f.tell():
+                            logger.info("[Scanner] Gra wyczyściła plik logów (restart). Resetuję wskaźnik na początek.")
+                            f.seek(0, os.SEEK_SET) # Powrót na sam początek pliku
+                    except OSError:
+                        # Gra mogła na ułamek sekundy zablokować plik przy usuwaniu
+                        time.sleep(0.5)
+                        continue
+                    # ---------------------------------------------------------------------------------
+
                     line = f.readline()
                     if not line:
                         time.sleep(0.05)
