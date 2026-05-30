@@ -291,7 +291,7 @@ class SmiteController(QObject):
         self.current_index = 0
         self.data_cache = {"builds": None, "stats": None}
         self.last_fetched_source = "builds"
-        self.mode = "AUTO"
+        self.mode = "MANUAL"
         self._config = self._load_config()
         self.build_source = self._resolve_build_source()
         self.hotkey_listener = HotkeyListener()
@@ -375,6 +375,7 @@ class SmiteController(QObject):
         self.hotkey_listener.prev_build_requested.connect(self.prev_build)
         self.hotkey_listener.request_god_change.connect(lambda: self.overlay.navigate_to("search"))
         self.hotkey_listener.toggle_source.connect(self.overlay._toggle_build_source)
+        self.hotkey_listener.trigger_auto_search.connect(self.on_auto_mode_selected)
         self._rebuild_shortcuts(self._config)
         self.app.aboutToQuit.connect(self._on_app_quit)
 
@@ -478,7 +479,8 @@ class SmiteController(QObject):
         # Lista wszystkich akcji, które obsługuje nasza aplikacja
         expected_actions = [
             "show_hide", "lock_unlock", "next_build", 
-            "prev_build", "quick_search", "toggle_source"
+            "prev_build", "quick_search", "toggle_source",
+            "quick_auto_search"
         ]
         
         # Sprawdzamy czy w configu brakuje jakichś wartości i dodajemy domyślne
@@ -502,6 +504,7 @@ class SmiteController(QObject):
             "next_build": "Alt+Right",
             "prev_build": "Alt+Left",
             "quick_search": "Alt+D",
+            "quick_auto_search": "Alt+A",
             "toggle_source": "Alt+Q",
         }
         return defaults.get(action, "")
@@ -597,7 +600,9 @@ class SmiteController(QObject):
             
             # Odświeżenie UI "na żywo", aby gracz wiedział, że bot nie "zaciął się", tylko czeka
             if self.overlay._current_page == "auto_wait":
-                self.overlay.auto_wait_screen.status_lbl.setText(f"WYKRYTO: {god_name.upper()}...")
+                # Używamy systemu tłumaczeń i podmieniamy zmienną {god}
+                status_text = _t("status_detected").format(god=god_name.upper())
+                self.overlay.auto_wait_screen.status_lbl.setText(status_text)
 
     def _on_debounce_timeout(self):
         """Called when the debounce timer expires — final god selection confirmed."""
@@ -986,6 +991,7 @@ class SmiteController(QObject):
                 "next_build": "Alt+Right",
                 "prev_build": "Alt+Left",
                 "quick_search": "Alt+D",
+                "quick_auto_search": "Alt+A",
                 "toggle_source": "Alt+Q",
             },
             "theme": "gold",

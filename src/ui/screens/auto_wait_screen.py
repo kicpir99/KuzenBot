@@ -28,16 +28,51 @@ class AutoWaitScreen(QWidget):
         self.switch_manual_cb = switch_manual_cb
         self._expanded = True
         self._state = "waiting" # "waiting" lub "choice"
+        self._lang_banner_dismissed = False
         self._build_ui()
 
     def _build_ui(self):
         # Główny layout ekranu
         self.main_layout = QVBoxLayout(self)
-        self.main_layout.setContentsMargins(20, 15, 20, 15)
-        self.main_layout.setSpacing(10)
-        # ZMIANA: Usunęliśmy self.main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.main_layout.setContentsMargins(15, 15, 15, 15)
+        self.main_layout.setSpacing(15)
 
-        # NOWOŚĆ: Górny "rozpychacz", który spycha zawartość na dół i chroni nagłówek przed rozciągnięciem
+        self.lang_banner = QFrame()
+        self.lang_banner.setObjectName("lang_warning_banner")
+        banner_lay = QHBoxLayout(self.lang_banner)
+        banner_lay.setContentsMargins(10, 8, 10, 8)
+        banner_lay.setSpacing(10)
+        
+        icon_lbl = QLabel("ℹ️")
+        icon_lbl.setStyleSheet("font-size: 16px; background: transparent; border: none;")
+        icon_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        banner_lay.addWidget(icon_lbl)
+        
+        self.lang_banner_text = QLabel(_t("lang_warning_ext"))
+        self.lang_banner_text.setStyleSheet("color: #93c5fd; font-size: 11px; background: transparent; border: none;")
+        self.lang_banner_text.setWordWrap(True)
+        banner_lay.addWidget(self.lang_banner_text, 1)
+        
+        close_btn = QPushButton("✕")
+        close_btn.setFixedSize(20, 20)
+        close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        close_btn.setStyleSheet("""
+            QPushButton { background: transparent; color: #93c5fd; border: none; font-size: 12px; font-weight: bold; }
+            QPushButton:hover { color: #eff6ff; background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
+        """)
+        close_btn.clicked.connect(self._dismiss_lang_banner)
+        banner_lay.addWidget(close_btn, 0, Qt.AlignmentFlag.AlignTop)
+        
+        self.lang_banner.setStyleSheet("""
+            QFrame#lang_warning_banner {
+                background-color: rgba(59, 130, 246, 0.15);
+                border: 1px dashed rgba(59, 130, 246, 0.4);
+                border-radius: 8px;
+            }
+        """)
+        self.main_layout.addWidget(self.lang_banner)
+        self.lang_banner.hide() # domyślnie ukryty
+
         self.main_layout.addStretch(1)
 
         # Title (widoczny tylko w Extended)
@@ -202,6 +237,11 @@ class AutoWaitScreen(QWidget):
             else:
                 self.status_lbl.setText(_t("session_found_mini").format(god=god))
 
+        if self._expanded and not self._lang_banner_dismissed:
+            self.lang_banner.show()
+        else:
+            self.lang_banner.hide()
+
         old_lay = self.container.layout()
         if old_lay:
             while old_lay.count():
@@ -252,3 +292,8 @@ class AutoWaitScreen(QWidget):
 
     def set_status(self, text):
         self.status.setText(text.upper())
+
+    def _dismiss_lang_banner(self):
+        """Zamyka baner językowy do końca cyklu życia apki."""
+        self._lang_banner_dismissed = True
+        self.lang_banner.hide()

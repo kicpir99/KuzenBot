@@ -20,6 +20,7 @@ class GameScanner(QThread):
         self.english_gods, self.new_gods = self._load_gods_db()
         self.current_god = None
         self.last_emitted_god = None
+        self.last_internal_model = None
 
     GODS_CACHE_TTL = 86400
 
@@ -79,13 +80,15 @@ class GameScanner(QThread):
             return old_names or [], []
 
     def _match_god_name(self, localized_name):
-        """Intelligent, error-resistant name matching with fuzzy logic."""
+        """Intelligent, error-resistant name matching with whole-word parsing and hard-fallbacks."""
         if not self.english_gods:
             return None
 
-        localized_lower = localized_name.lower()
+        # 1. Czyszczenie stringa z logów Unreal Engine
+        clean_name = re.sub(r'[^a-z]', ' ', localized_name.lower())
+        clean_name = f" {clean_name} "
 
-        # 1. SŁOWNIK GLOBALNY: Łapie polskie tłumaczenia oraz skróty/literówki programistów gry
+        # 2. Rozszerzony Słownik Globalny (Twarde mapowanie problematycznych postaci)
         aliases = {
             "jorm": "Jormungandr",
             "jormungand": "Jormungandr",
@@ -102,26 +105,48 @@ class GameScanner(QThread):
             "atena": "Athena", 
             "nemezis": "Nemesis",
             "mama brygida": "Maman Brigitte", 
-            "morrigan": "The Morrigan"
+            "morrigan": "The Morrigan",
+            "jemaja": "Yemoja",
+            "cabrakan": "Cabrakan",
+            "cabra": "Cabrakan",
+            "gruby loki": "Cabrakan",
+            # --- FIX: Bari oraz Da Ji ---
+            "bari": "Bari",
+            "princess bari": "Bari",
+            "daji": "Da Ji",
+            "da ji": "Da Ji"
         }
         
         for alias, eng_name in aliases.items():
-            if alias in localized_lower:
+            alias_clean = re.sub(r'[^a-z]', ' ', alias.lower())
+            if f" {alias_clean} " in clean_name:
                 return eng_name
 
-        # 2. Substring Match: Sprawdza, czy oficjalna angielska nazwa jest częścią napisu (łapie skiny)
-        for eng in self.english_gods:
-            if eng.lower() in localized_lower:
+        # 3. Szukanie DOKŁADNYCH oficjalnych angielskich nazw
+        sorted_gods = sorted(self.english_gods, key=len, reverse=True)
+        for eng in sorted_gods:
+            eng_clean = re.sub(r'[^a-z]', ' ', eng.lower())
+            if f" {eng_clean} " in clean_name:
                 return eng
 
-        # 3. Fuzzy Matching (Ostateczność) z bardzo rygorystycznym progiem błędu (0.75)
-        # Przez tak wysoki próg, algorytm nie będzie już na ślepo zgadywał (jak przy Ah Puch)
+        # 4. Fallback: Chronione dopasowanie częściowe (Tylko dla słów >4 znaków)
+        for eng in sorted_gods:
+            if len(eng) > 4 and eng.lower() in clean_name:
+                return eng
+
+        # 5. Ograniczony Fuzzy Matching (Tylko długie słowa, wysoki rygor)
+        words = clean_name.split()
+        ignore_words = {'bp', 'god', 'c', 'skin', 'default', 'character', 'ally', 'enemy'}
+        filtered_words = [w for w in words if w not in ignore_words and len(w) > 4]
+        
         lower_gods = [g.lower() for g in self.english_gods]
-        matches = difflib.get_close_matches(localized_lower, lower_gods, n=1, cutoff=0.75)
-        if matches:
-            idx = lower_gods.index(matches[0])
-            return self.english_gods[idx]
-            
+        for word in filtered_words:
+            matches = difflib.get_close_matches(word, lower_gods, n=1, cutoff=0.85)
+            if matches:
+                idx = lower_gods.index(matches[0])
+                return self.english_gods[idx]
+
+        logger.warning(f"[Scanner] UWAGA: Nie rozpoznano boga z logu: '{localized_name}'. Czysty string: '{clean_name}'")
         return None
 
     def run(self):
@@ -162,16 +187,36 @@ class GameScanner(QThread):
                     if "TransitionToDraftState" in line and "CharacterDraft" in line:
                         if "Setup" in line:
                             self.last_emitted_god = None
+                            self.last_internal_model = None # Czyszczenie przy nowym meczu
                             self.lobby_joined.emit()
                     
+                    # --- NOWA LOGIKA: Podsłuch na ładowanie modelu 3D z Unreal Engine ---
+                    if "BP_" in line and "_Lobby_C" in line:
+                        bp_match = re.search(r"BP_([A-Za-z0-9_]+)_Lobby_C", line)
+                        if bp_match:
+                            extracted_bp = bp_match.group(1).replace("_", " ").strip()
+                            # ZABEZPIECZENIE: Jeśli gra ładuje generyczny model (jak przy Bari), 
+                            # MUSIMY wyczyścić pamięć po poprzednim bogu!
+                            if extracted_bp.lower() in ['god', 'genericactor', 'character']:
+                                self.last_internal_model = None
+                            else:
+                                self.last_internal_model = extracted_bp
+                    # --------------------------------------------------------------------
+                    
+                    # Trigger wyboru postaci w UI (informuje nas, że to nasz bohater)
                     if "Ally 0 Skin" in line:
                         match = re.search(r"Ally 0 Skin (.+?)$", line)
                         if match:
                             raw_local = match.group(1).strip()
-                            god_name = self._match_god_name(raw_local)
+                            
+                            # MAGIA ARCHITEKTURY: Używamy nazwy z modelu 3D. 
+                            # Jeśli z jakiegoś powodu jej nie ma, dopiero wtedy spadamy do logiki UI (raw_local)
+                            search_term = self.last_internal_model if self.last_internal_model else raw_local
+                            
+                            god_name = self._match_god_name(search_term)
                             
                             if god_name and god_name != self.last_emitted_god:
-                                logger.info(f"[Scanner] Wykryto Twoj wybor: {god_name}")
+                                logger.info(f"[Scanner] Wykryto wybór: {god_name} (Źródło danych: {search_term})")
                                 self.last_emitted_god = god_name
                                 self.god_detected.emit(god_name)
 

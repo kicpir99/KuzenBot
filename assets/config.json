@@ -1,5 +1,5 @@
 {
-    "language": "pl",
+    "language": "en",
     "build_source": "builds",
     "last_used_source": "builds",
     "opacity_app": 1.0,
@@ -21,11 +21,12 @@
         "next_build": "Alt+Right",
         "prev_build": "Alt+Left",
         "quick_search": "Alt+D",
+        "quick_auto_search": "Alt+A",
         "toggle_source": "Alt+Q"
     },
     "theme": "gold",
     "opacity": 0.3,
     "font_style": "standard",
-    "window_x": -1306,
-    "window_y": 418
+    "window_x": -2511,
+    "window_y": 388
 }

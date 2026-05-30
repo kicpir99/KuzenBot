@@ -10,6 +10,7 @@ class HotkeyListener(QThread):
     prev_build_requested = pyqtSignal()
     toggle_click_through = pyqtSignal()
     toggle_source = pyqtSignal()
+    trigger_auto_search = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -22,6 +23,7 @@ class HotkeyListener(QThread):
             "lock_unlock": self.toggle_click_through,
             "next_build": self.next_build_requested,
             "prev_build": self.prev_build_requested,
+            "quick_auto_search": self.trigger_auto_search,
             "quick_search": self.request_god_change,
             "toggle_source": self.toggle_source,
         }

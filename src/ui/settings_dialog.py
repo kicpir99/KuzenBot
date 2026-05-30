@@ -11,7 +11,7 @@ def resource_path(*paths):
     return os.path.join(base_path, *paths)
 
 from PyQt6.QtCore import Qt, pyqtSignal, QEvent, QSize
-from PyQt6.QtGui import QKeySequence, QCursor, QIcon
+from PyQt6.QtGui import QKeySequence, QCursor, QIcon, QPixmap, QPainter, QColor, QBrush
 from PyQt6.QtWidgets import (QApplication, QDialog, QTabWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QComboBox, QCheckBox, QSlider,
                              QPushButton, QWidget, QFrame, QGridLayout,
@@ -453,6 +453,7 @@ class SettingsDialog(QDialog):
             ("lock_unlock", _t("key_lock")),
             ("next_build", _t("key_next")),
             ("prev_build", _t("key_prev")),
+            ("quick_auto_search", _t("key_auto_search")),
             ("quick_search", _t("key_search")),
             ("toggle_source", _t("key_toggle")),
         ]
@@ -662,15 +663,50 @@ class SettingsDialog(QDialog):
         theme_layout = QVBoxLayout(theme_group)
         
         self.theme_cb = QComboBox()
-        # Wyświetlane nazwy dla użytkownika oraz ukryte klucze techniczne dla słownika THEMES
-        self.theme_cb.addItem("🌟 Divine Gold", "gold")
-        self.theme_cb.addItem("🌋 Ruby Rage", "ruby")
-        self.theme_cb.addItem("⚡ Sapphire Blizzard", "blizzard")
-        self.theme_cb.addItem("🌿 Emerald Poison", "emerald")
-        self.theme_cb.addItem("🔮 Shadow Void", "void")
-        self.theme_cb.addItem("👾 Cyber-Night", "cyber")
-        self.theme_cb.addItem("☢️ Toxic Waste", "toxic")
-        self.theme_cb.addItem("🩸 Abyss Alarm", "abyss")
+        self.theme_cb.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.theme_cb.setIconSize(QSize(14, 14)) # Rozmiar kwadratowej próbki
+        
+        # --- DYNAMICZNE GENEROWANIE PRÓBEK KOLORÓW I NAZW MOTYWÓW ---
+        from PyQt6.QtGui import QPixmap, QPainter, QColor, QBrush, QIcon
+        
+        theme_colors = {
+            "gold": "#FCD34D",      
+            "ruby": "#BE123C",      
+            "blizzard": "#1E40AF",  
+            "emerald": "#065F46",   
+            "void": "#1F2937",      
+            "cyber": "#7C3AED",     
+            "toxic": "#A3E635",     
+            "abyss": "#F97316"      
+        }
+
+        def create_color_swatch(color_hex):
+            pixmap = QPixmap(14, 14)
+            pixmap.fill(Qt.GlobalColor.transparent)
+            painter = QPainter(pixmap)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.setBrush(QBrush(QColor(color_hex)))
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.drawRoundedRect(0, 0, 14, 14, 3, 3) 
+            painter.end()
+            return QIcon(pixmap)
+
+        current_lang = self._config.get("language", "en")
+        # get() dla bezpieczeństwa - jeśli klucza nie ma, wraca do angielskiego
+        themes_data = _t("themes")
+        
+        # Zabezpieczenie awaryjne (fallback), na wypadek gdyby translacja nie zadziałała
+        if not isinstance(themes_data, dict):
+            themes_data = {
+                "gold": "Classic Light", "ruby": "Crimson Dark", "blizzard": "Midnight Blue", 
+                "emerald": "Forest Green", "void": "Deep Charcoal", "cyber": "Neon Purple", 
+                "toxic": "Acid Lime", "abyss": "Sunset Orange"
+            }
+        
+        for theme_id, theme_name in themes_data.items():
+            color = theme_colors.get(theme_id, "#FFFFFF")
+            self.theme_cb.addItem(create_color_swatch(color), theme_name, theme_id)
+        # -------------------------------------------------------------
         
         # Ustawiamy aktualny indeks na podstawie configu
         current_theme = self._config.get("theme", "gold")
@@ -681,6 +717,8 @@ class SettingsDialog(QDialog):
         self.theme_cb.currentIndexChanged.connect(self._on_theme_changed)
         theme_layout.addWidget(self.theme_cb)
         layout.addWidget(theme_group)
+        
+        # Reszta kodu bez zmian:
         font_group = QGroupBox(_t("font_style"))
         font_group.setStyleSheet("""
             QGroupBox {
@@ -705,20 +743,10 @@ class SettingsDialog(QDialog):
         self.font_cb.currentIndexChanged.connect(self._on_visuals_changed)
         font_layout.addWidget(self.font_cb)
         layout.addWidget(font_group)
-        layout.setContentsMargins(0, 5, 10, 5) # Zapas z prawej strony na pasek przewijania
+        layout.setContentsMargins(0, 5, 10, 5) 
         layout.setSpacing(12)
 
         # Opacity
-        op_group = QGroupBox(_t("opacity"))
-        op_group.setStyleSheet("""
-            QGroupBox {
-                color: #94a3b8; font-size: 10px; font-weight: 800;
-                border: 1px solid rgba(255,255,255,0.06);
-                border-radius: 8px; padding: 14px 10px 8px; margin-top: 8px;
-            }
-            QGroupBox::title { subcontrol-origin: margin; padding: 0 6px; }
-        """)
-        # Potrójna przezroczystość (Split Opacity System)
         op_group = QGroupBox(_t("adv_opacity"))
         op_group.setStyleSheet("""
             QGroupBox {
@@ -821,7 +849,7 @@ class SettingsDialog(QDialog):
         mon_layout.addLayout(mon_row)
         layout.addWidget(mon_group)
 
-        # Customizacja trybu Mini (Ustawienia ultra-minimalizmu)
+        # Customizacja trybu Mini
         mini_group = QGroupBox(_t("mini_header"))
         mini_group.setStyleSheet("""
             QGroupBox {
@@ -832,7 +860,7 @@ class SettingsDialog(QDialog):
             QGroupBox::title { subcontrol-origin: margin; padding: 0 6px; }
         """)
         mini_layout = QVBoxLayout(mini_group)
-        mini_layout.setSpacing(8) # Zwiększyłem lekko spacing dla lepszego ułożenia ikon
+        mini_layout.setSpacing(8)
 
         self.hide_source_cb = QCheckBox(_t("hide_source"))
         self.hide_source_cb.setIcon(self._colorize_icon(resource_path("assets", "community_mask.svg"), "#94a3b8"))
@@ -893,7 +921,6 @@ class SettingsDialog(QDialog):
         layout.addLayout(reset_row)
 
         layout.addStretch()
-        # ZMIANA: Zwracamy zakładkę opakowaną w ScrollArea
         return self._wrap_in_scroll_area(tab)
 
     def _populate_monitors(self):
