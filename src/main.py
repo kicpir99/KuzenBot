@@ -19,7 +19,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.2"
+CURRENT_VERSION = "1.1.3"
 
 STATE_LOADING = "loading"
 STATE_DATA = "data"
