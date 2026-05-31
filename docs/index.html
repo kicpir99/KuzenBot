@@ -419,6 +419,106 @@
             opacity: 0.5;
         }
 
+        /* ── Hero fade-in animations ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-animate { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+        .hero-animate:nth-child(1) { animation-delay: 0.1s; }
+        .hero-animate:nth-child(2) { animation-delay: 0.25s; }
+        .hero-animate:nth-child(3) { animation-delay: 0.4s; }
+        .hero-animate:nth-child(4) { animation-delay: 0.55s; }
+        .hero-animate:nth-child(5) { animation-delay: 0.7s; }
+
+        /* ── Scroll-reveal for feature rows ── */
+        .feature-row {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .feature-row.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── Shimmer on download button ── */
+        .btn-download {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-download::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -75%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+            transform: skewX(-20deg);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0%   { left: -75%; }
+            60%  { left: 130%; }
+            100% { left: 130%; }
+        }
+
+        /* ── Feature badge glow on hover ── */
+        .feature-badge {
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .feature-badge:hover,
+        .feature-content:hover .feature-badge {
+            box-shadow: 0 0 12px rgba(240, 194, 67, 0.35);
+            border-color: rgba(240, 194, 67, 0.55);
+        }
+
+        /* ── Section separator gradient ── */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.25) 40%, rgba(240, 194, 67, 0.2) 60%, transparent);
+            margin: 0 8%;
+        }
+
+        /* ── FAQ accordion ── */
+        .faq-item {
+            cursor: pointer;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .faq-item:hover {
+            border-color: rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 16px rgba(0, 229, 255, 0.06);
+        }
+        .faq-item h3 {
+            cursor: pointer;
+            user-select: none;
+            justify-content: space-between;
+            margin-bottom: 0;
+        }
+        .faq-item h3::after {
+            content: '+';
+            font-size: 22px;
+            font-weight: 300;
+            color: var(--accent-cyan);
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+        .faq-item.open h3::after {
+            transform: rotate(45deg);
+        }
+        .faq-body {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.4s ease, padding-top 0.3s ease;
+            padding-top: 0;
+        }
+        .faq-item.open .faq-body {
+            max-height: 300px;
+            padding-top: 14px;
+        }
+
         /* Mobile */
         @media (max-width: 768px) {
             nav { padding: 15px 5%; }
@@ -451,17 +551,17 @@
     </nav>
 
     <header>
-        <div class="trust-badge">🛡️ Nakładka, nie cheat. Zero ryzyka bana.</div>
+        <div class="trust-badge hero-animate">🛡️ Nakładka, nie cheat. Zero ryzyka bana.</div>
         
-        <h1>Koniec z alt+tabem. <br><span>Build masz przed oczami.</span></h1>
-        <p>Nakładka dla graczy Smite 2, którzy nie mają czasu szukać itemów w przeglądarce w środku teamfightu. Optymalny build zawsze na wierzchu – lekko, szybko, bez laga.</p>
+        <h1 class="hero-animate">Koniec z alt+tabem. <br><span>Build masz przed oczami.</span></h1>
+        <p class="hero-animate">Nakładka dla graczy Smite 2, którzy nie mają czasu szukać itemów w przeglądarce w środku teamfightu. Optymalny build zawsze na wierzchu – lekko, szybko, bez laga.</p>
         
-        <div class="cta-group">
+        <div class="cta-group hero-animate">
             <a href="#" class="btn-download">Pobierz dla Windows</a>
             <span class="cta-info">Darmowy • Wersja <span id="app-version">najnowsza</span> • Open Source</span>
         </div>
 
-        <div class="hero-image-container">
+        <div class="hero-image-container hero-animate">
             <img src="aplikacja.png" alt="Główny interfejs nakładki KuzenBot w grze" class="hero-app-image">
         </div>
     </header>
@@ -552,23 +652,25 @@
 
     </section>
 
+    <div class="section-divider"></div>
+
     <section class="faq-section" id="faq">
         <div class="faq-container">
             <h2>Najczęściej zadawane pytania</h2>
             
             <div class="faq-item">
                 <h3>🛡️ Czy grozi mi ban za używanie KuzenBota?</h3>
-                <p>Nie. Aplikacja w żaden sposób nie dotyka plików Smite 2 ani pamięci gry – nie ma tu żadnej injekcji ani modyfikacji. KuzenBot to zwykła nakładka systemu Windows, która wyświetla się nad grą jak każde inne okno. Hi-Rez nie ma powodów, żeby to karać, i jest to zgodne z ich regulaminem.</p>
+                <div class="faq-body"><p>Nie. Aplikacja w żaden sposób nie dotyka plików Smite 2 ani pamięci gry – nie ma tu żadnej injekcji ani modyfikacji. KuzenBot to zwykła nakładka systemu Windows, która wyświetla się nad grą jak każde inne okno. Hi-Rez nie ma powodów, żeby to karać, i jest to zgodne z ich regulaminem.</p></div>
             </div>
 
             <div class="faq-item">
                 <h3>⚠️ Windows wyświetla ostrzeżenie przy instalacji – czemu?</h3>
-                <p>Bo to projekt hobbystyczny, który nie zarabia ani złotówki, więc nie ma sensu płacić kilku tysięcy za komercyjny certyfikat cyfrowy Microsoftu. To normalne przy darmowym oprogramowaniu open source. Cały kod źródłowy jest jawny na GitHubie – możesz go przejrzeć samodzielnie i upewnić się, że nie ma tam nic podejrzanego.</p>
+                <div class="faq-body"><p>Bo to projekt hobbystyczny, który nie zarabia ani złotówki, więc nie ma sensu płacić kilku tysięcy za komercyjny certyfikat cyfrowy Microsoftu. To normalne przy darmowym oprogramowaniu open source. Cały kod źródłowy jest jawny na GitHubie – możesz go przejrzeć samodzielnie i upewnić się, że nie ma tam nic podejrzanego.</p></div>
             </div>
 
             <div class="faq-item">
                 <h3>📈 Czy nakładka zamuli mi grę albo obniży FPS?</h3>
-                <p>Nie. KuzenBot jest celowo zaprojektowany tak, żeby nie wpływać na wydajność gry – zużywa dosłownie śladowe ilości RAM i CPU. To nie jest jakiś ciężki klient jak Blitz czy Overwolf. Nakładka działa cicho w tle i nie powinna dać Ci odczuć jej obecności pod względem wydajności.</p>
+                <div class="faq-body"><p>Nie. KuzenBot jest celowo zaprojektowany tak, żeby nie wpływać na wydajność gry – zużywa dosłownie śladowe ilości RAM i CPU. To nie jest jakiś ciężki klient jak Blitz czy Overwolf. Nakładka działa cicho w tle i nie powinna dać Ci odczuć jej obecności pod względem wydajności.</p></div>
             </div>
         </div>
     </section>
@@ -593,21 +695,32 @@
     </footer>
 
     <script>
+        // GitHub version fetch
         const githubApiUrl = 'https://api.github.com/repos/kicpir99/KuzenBot/releases/latest';
-
         fetch(githubApiUrl)
-            .then(response => {
-                if (!response.ok) throw new Error('Brak publicznego API');
-                return response.json();
-            })
-            .then(data => {
-                if(data.tag_name) {
-                    document.getElementById('app-version').textContent = data.tag_name;
+            .then(response => { if (!response.ok) throw new Error('Brak publicznego API'); return response.json(); })
+            .then(data => { if(data.tag_name) document.getElementById('app-version').textContent = data.tag_name; })
+            .catch(error => { console.log('Automatyczne pobieranie wersji wyłączone:', error); });
+
+        // Scroll-reveal for feature rows
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
                 }
-            })
-            .catch(error => {
-                console.log('Automatyczne pobieranie wersji wyłączone:', error);
             });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.feature-row').forEach(row => observer.observe(row));
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.querySelector('h3').addEventListener('click', () => {
+                const isOpen = item.classList.contains('open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!isOpen) item.classList.add('open');
+            });
+        });
     </script>
 </body>
 </html>
