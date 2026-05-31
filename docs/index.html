@@ -3,45 +3,618 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KuzenBot - Nakładka do Smite 2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Smite 2 In-Game Overlay Asystent Buildów</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0f172a; color: #f8fafc; }
-        .hero-bg { background: radial-gradient(circle at top, #1e293b, #0f172a); }
+        :root {
+            --bg-color: #0d0e12;
+            --card-bg: #15171e;
+            --text-primary: #e0e0e0;
+            --text-muted: #8892b0;
+            --accent-cyan: #00e5ff;
+            --accent-gold: #f0c243;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glow-cyan: rgba(0, 229, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Navbar Style */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(13, 14, 18, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: var(--accent-gold);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Hero Section */
+        header {
+            padding: 160px 8% 100px 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--accent-cyan);
+            filter: blur(150px);
+            opacity: 0.12;
+            top: 50px;
+            z-index: -1;
+        }
+
+        .trust-badge {
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: var(--accent-cyan);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header h1 {
+            font-size: 56px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            max-width: 800px;
+            color: #fff;
+        }
+
+        header h1 span {
+            color: var(--accent-cyan);
+        }
+
+        header p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        .cta-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, var(--accent-cyan), #00b0ff);
+            color: #000;
+            padding: 16px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 229, 255, 0.5);
+        }
+
+        .cta-info {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Mockup Window */
+        .hero-mockup {
+            margin-top: 60px;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        /* Simulating an overlay on blurred game background */
+        .mockup-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop') center/cover;
+            filter: blur(8px);
+            transform: scale(1.05);
+            z-index: 1;
+        }
+
+        .mockup-overlay {
+            position: absolute;
+            top: 25%;
+            left: 30%;
+            width: 40%;
+            background: rgba(21, 23, 30, 0.85);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 2;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .mockup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        .mockup-title {
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--accent-gold);
+            font-size: 18px;
+        }
+
+        .mockup-mode {
+            background: rgba(0, 229, 255, 0.2);
+            color: var(--accent-cyan);
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .mockup-items {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mockup-item-slot {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        /* Features Zig-Zag Layout */
+        .features-section {
+            padding: 100px 8%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 120px;
+            gap: 60px;
+        }
+
+        .feature-row:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-graphic {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            aspect-ratio: 4/3;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .feature-graphic::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: var(--accent-cyan);
+            filter: blur(8px);
+            opacity: 0.05;
+        }
+
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--accent-gold);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .feature-content h2 {
+            font-size: 36px;
+            color: #fff;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .feature-content p {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Visual styling inside graphics */
+        .graphic-preview {
+            width: 80%;
+            height: 70%;
+            background: rgba(13, 14, 18, 0.6);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        /* UI Swatches / Mini Simulation */
+        .swatch-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .swatch.gold { background: #f0c243; border-color: #fff; }
+        .swatch.ruby { background: #ff4a4a; }
+        .swatch.cyber { background: #00e5ff; }
+
+        /* FAQ Section */
+        .faq-section {
+            background: rgba(21, 23, 30, 0.4);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 100px 8%;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-section h2 {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .faq-item h3 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .faq-item p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 8% 40px 8%;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .disclaimer {
+            font-size: 11px;
+            max-width: 600px;
+            margin: 20px auto 0 auto;
+            opacity: 0.5;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 5%;
+            }
+            .nav-links {
+                display: none; /* Simplification for layout representation */
+            }
+            header {
+                padding: 120px 5% 60px 5%;
+            }
+            header h1 {
+                font-size: 36px;
+            }
+            .feature-row, .feature-row:nth-child(even) {
+                flex-direction: column;
+                gap: 30px;
+                margin-bottom: 60px;
+            }
+            .feature-graphic {
+                width: 100%;
+            }
+            .faq-section {
+                padding: 60px 5%;
+            }
+        }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <div class="hero-bg min-h-screen flex flex-col items-center justify-center text-center px-4 py-20">
-        
-        <div class="text-6xl mb-6">🐢⚡</div>
-        
-        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-            KuzenBot
-        </h1>
-        
-        <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mb-10">
-            Zaawansowana i lekka nakładka dla graczy Smite 2. <br>
-            Najlepsze buildy i statystyki meta prosto na Twoim ekranie, bez Alt-Tabowania.
-        </p>
+    <!-- Nawigacja -->
+    <nav>
+        <div class="logo">⚡ SMITE2BOT</div>
+        <div class="nav-links">
+            <a href="#features">Funkcje</a>
+            <a href="#faq">FAQ</a>
+            <a href="https://github.com" target="_blank">GitHub</a>
+        </div>
+    </nav>
 
-        <a href="https://github.com/kicpir99/KuzenBot/releases/latest" 
-           class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform transition hover:scale-105 mb-4">
-            🚀 Pobierz najnowszą wersję
-        </a>
-        <p class="text-sm text-slate-400">Dla systemu Windows 10/11 • Darmowa i Open-Source</p>
+    <!-- Sekcja Główna (Hero) -->
+    <header>
+        <div class="trust-badge">🛡️ Zgodne z regulaminem Smite 2</div>
+        <h1>Skup się na walce. <br><span>Buildy zostaw nam.</span></h1>
+        <p>Lekki, bezpieczny asystent w formie przejrzystej nakładki. Wyświetlaj optymalne statystyki i przedmioty prosto w grze, bez minimalizowania ekranu.</p>
         
-        <div class="mt-16 w-full max-w-4xl bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
-            <div class="bg-slate-900 px-4 py-2 flex items-center gap-2">
-                <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div class="w-3 h-3 rounded-full bg-green-500"></div>
-            </div>
-            <div class="aspect-video bg-slate-800 flex items-center justify-center text-slate-500">
-                [ Miejsce na zrzut ekranu lub GIF z działania aplikacji ]
+        <div class="cta-group">
+            <a href="#" class="btn-download">Pobierz dla Windows</a>
+            <span class="cta-info">Darmowy • Wersja v1.0.0 • Otwarty kod źródłowy</span>
+        </div>
+
+        <div class="hero-mockup">
+            <div class="mockup-bg"></div>
+            <div class="mockup-overlay">
+                <div class="mockup-header">
+                    <span class="mockup-title">Ymir Build Asystent</span>
+                    <span class="mockup-mode">Mini Mode</span>
+                </div>
+                <div class="mockup-items">
+                    <div class="mockup-item-slot" style="background: rgba(0,229,255,0.1); border-color: var(--accent-cyan);"></div>
+                    <div class="mockup-item-slot"></div>
+                    <div class="mockup-item-slot"></div>
+                    <div class="mockup-item-slot"></div>
+                </div>
             </div>
         </div>
-    </div>
+    </header>
+
+    <!-- Sekcja Funkcji (Alternating Layout) -->
+    <section class="features-section" id="features">
+        
+        <!-- Wiersz 1 -->
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge">✨ Tryb Elastyczny</div>
+                <h2>Dwa niezależne tryby interfejsu (Extended & Mini)</h2>
+                <p>Aplikacja idealnie dopasowuje się do Twojej sytuacji na mapie. Tryb <strong>Extended</strong> oferuje pełny, szczegółowy widok ze statystykami przedmiotów idealny podczas analizy w bazie. Tryb <strong>Mini</strong> przekształca asystenta w kompaktowy, smukły kafelek, który monitoruje build bez zasłaniania pola widzenia w walce.</p>
+            </div>
+            <div class="feature-graphic">
+                <div class="graphic-preview" style="display:flex; flex-direction:column; justify-content:space-between;">
+                    <div style="border:1px dashed var(--accent-muted); padding:10px; border-radius:4px; font-size:12px; color:var(--text-muted);">
+                        [Extended View] Pełne drzewo statystyk i alternatyw
+                    </div>
+                    <div style="background:rgba(0,229,255,0.1); padding:8px; border-radius:4px; width:50%; font-size:11px; border:1px solid var(--accent-cyan);">
+                        [Mini View] Tylko ikony przedmiotów
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wiersz 2 -->
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge">⚙️ Personalizacja</div>
+                <h2>Głęboka customizacja wyglądu i sterowania</h2>
+                <p>Masz absolutną kontrolę nad estetyką nakładki. Wybierz jeden z dedykowanych motywów kolorystycznych dopasowanych do Twojego stylu (Gold, Ruby, Cyber), precyzyjnie dostosuj przezroczystość elementów tła oraz swobodnie przypisz globalne skróty klawiszowe pod własną klawiaturę.</p>
+                <div class="swatch-group">
+                    <div class="swatch gold"></div>
+                    <div class="swatch ruby"></div>
+                    <div class="swatch cyber"></div>
+                </div>
+            </div>
+            <div class="feature-graphic">
+                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px;">
+                    <span style="font-size:12px; color:var(--accent-gold);">Aktywny Motyw: Gold Premium</span>
+                    <div style="width:80%; height:8px; background:#222; border-radius:4px; overflow:hidden;">
+                        <div style="width:60%; height:100%; background:var(--accent-gold);"></div>
+                    </div>
+                    <span style="font-size:11px; color:var(--text-muted);">Przezroczystość tła: 60%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wiersz 3 -->
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge">🤖 Inteligencja</div>
+                <h2>W pełni automatyczny tryb asystenta (AUTO)</h2>
+                <p>Zapomnij o ręcznym wpisywaniu nazw bogów w trakcie wyboru postaci. Program natychmiastowo rozpoznaje sytuację na ekranie i automatycznie ładuje najbardziej optymalny zestaw przedmiotów. Szybko, bezbłędnie i całkowicie bezobsługowo.</p>
+            </div>
+            <div class="feature-graphic">
+                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; color:var(--accent-cyan); font-family:'Rajdhani', sans-serif; font-size:20px; font-weight:bold; gap:10px;">
+                    🔄 Wykryto postać: Zeus -> Ładowanie meta-buildu...
+                </div>
+            </div>
+        </div>
+
+        <!-- Wiersz 4 -->
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge">🔒 Bezpieczeństwo i Wygoda</div>
+                <h2>Płynna nakładka "Click-Through" oraz hotkeye</h2>
+                <p>Interfejs wyświetla się bezpośrednio nad oknem Smite 2. Jednym skrótem klawiszowym możesz błyskawicznie "zablokować" nakładkę – staje się ona całkowicie przezroczysta dla kliknięć myszką (Ghost Mode). Dzięki temu eliminujesz ryzyko przypadkowego kliknięcia w menu aplikacji podczas rzucania umiejętności.</p>
+            </div>
+            <div class="feature-graphic">
+                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:5px;">
+                    <span style="font-size:24px;">🔓 ➜ 🔒</span>
+                    <span style="font-size:13px; color:var(--text-muted);">Aktywowano tryb ignorowania kliknięć myszy</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wiersz 5 -->
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge">📊 Elastyczność Danych</div>
+                <h2>Dynamiczne źródła danych w locie</h2>
+                <p>Chcesz sprawdzić czystą matematykę efektywności przedmiotów czy wolisz zaufać wysokim ocenom graczy? Za pomocą jednego kliknięcia lub skrótu przełączasz się natychmiast między zweryfikowanymi statystykami (Stats) a najwyżej ocenianymi kompozycjami społeczności (Community).</p>
+            </div>
+            <div class="feature-graphic">
+                <div class="graphic-preview" style="display:flex; justify-content:center; align-items:center; gap:20px;">
+                    <div style="padding:10px; background:#1a1d26; border:1px solid var(--accent-cyan); border-radius:4px; font-size:12px;">📊 STATS</div>
+                    <div style="padding:10px; background:#1a1d26; border:1px solid transparent; opacity:0.4; font-size:12px;">👥 COMMUNITY</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wiersz 6 -->
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge">🚀 Utrzymanie</div>
+                <h2>Cichy Auto-Updater w tle</h2>
+                <p>Nie marnuj czasu na ręczne sprawdzanie nowych wersji po każdym patchu gry. Nasz wbudowany mechanizm samoczynnie weryfikuje aktualizacje bezpośrednio z serwerów GitHub, pobiera je bezgłośnie w tle i instaluje jednym kliknięciem z poziomu samej nakładki.</p>
+            </div>
+            <div class="feature-graphic">
+                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;">
+                    <span style="font-size:12px; color:var(--accent-cyan);">Pobieranie aktualizacji z GitHub...</span>
+                    <div style="width:70%; height:4px; background:#222; border-radius:2px;">
+                        <div style="width:100%; height:100%; background:var(--accent-cyan); animation: pulse 2s infinite;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Sekcja FAQ -->
+    <section class="faq-section" id="faq">
+        <div class="faq-container">
+            <h2>Często Zadawane Pytania (FAQ)</h2>
+            
+            <div class="faq-item">
+                <h3>🛡️ Czy za używanie tej nakładki grozi ban?</h3>
+                <p>Zdecydowanie nie. Nasza aplikacja działa w pełnej separacji procesowej – nie modyfikuje plików Smite 2 ani nie wstrzykuje kodu do pamięci gry (Zero Memory Injection). Wyświetla dane wyłącznie jako niezależna, transparentna warstwa graficzna systemu Windows, co jest w 100% bezpieczne i zgodne z regulaminem firmy Hi-Rez Studios.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>⚠️ Dlaczego Windows SmartScreen wyświetla komunikat o zagrożeniu?</h3>
+                <p>Ponieważ aplikacja jest całkowicie darmowa i tworzona hobbystycznie jako Open-Source. Nie generuje zysków, więc nie posiada kosztownego, komercyjnego certyfikatu cyfrowego Windows (Code Signing). Cały kod źródłowy projektu jest jawny i dostępny do zweryfikowania na naszym oficjalnym repozytorium GitHub.</p>
+            </div>
+
+            <div class="faq-item">
+                <h3>📈 Czy nakładka spowoduje spadki FPS w grze?</h3>
+                <p>Nie. Program został zaprojektowany z myślą o grach e-sportowych i optymalizacji zasobów. W przeciwieństwie do ciężkich pakietów oprogramowania (np. Overwolf), nasza nakładka zużywa znikome ilości pamięci RAM oraz procesora, gwarantując stałą płynność rozgrywki bez mikro-przycięć.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stopka -->
+    <footer>
+        <div class="footer-links">
+            <a href="#features">Funkcje</a>
+            <a href="#faq">FAQ</a>
+            <a href="https://github.com" target="_blank">Zgłoś błąd (GitHub Issues)</a>
+        </div>
+        <p>© 2026 Smite2Bot. Strona stworzona na infrastrukturze GitHub Pages.</p>
+        <p class="disclaimer">Smite2Bot jest niezależnym projektem oprogramowania o otwartym kodzie źródłowym i nie jest w żaden sposób powiązany, autoryzowany ani wspierany przez Hi-Rez Studios ani Titan Forge Games.</p>
+    </footer>
 
 </body>
 </html>
