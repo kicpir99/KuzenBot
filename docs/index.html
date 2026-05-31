@@ -177,48 +177,58 @@
 
         /* Mockup */
         .hero-image-container {
-            margin-top: 80px; /* Zwiększamy odstęp, aby nie przykrywać tekstu */
+            margin-top: 60px;
             width: 100%;
-            max-width: 500px; 
+            max-width: 380px;
             position: relative;
             display: flex;
             justify-content: center;
         }
 
-        /* Subtelne wykończenie obrazu - zamiast agresywnego gradientu */
-        .hero-app-image {
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-            /* Cienka, subtelna ramka zamiast "świecącego" gradientu */
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            /* Delikatny cień, który nie "krzyczy" neonem */
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            transition: transform 0.4s ease;
-        }
-
-        /* Opcjonalny, bardzo delikatny efekt hover zamiast lewitacji */
-        .hero-image-container:hover .hero-app-image {
-            transform: scale(1.02); /* Bardzo delikatne powiększenie zamiast ruchu */
+        /* Poświata pod obrazkiem */
+        .hero-image-container::before {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 60px;
+            background: var(--accent-cyan);
+            filter: blur(40px);
+            opacity: 0.2;
+            border-radius: 50%;
+            z-index: 0;
         }
 
         /* Wygląd samej aplikacji z gradientową ramką */
         .hero-app-image {
             width: 100%;
             height: auto;
-            border-radius: 16px; /* Nieco mocniejsze zaokrąglenie w stylu nowoczesnych systemów */
-            
-            /* Trik UI: Gradientowa ramka zbudowana za pomocą paddingu i tła */
-            padding: 2px; 
+            border-radius: 16px;
+            position: relative;
+            z-index: 1;
+
+            /* Gradientowa ramka */
+            padding: 2px;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
-            
-            /* Podwójny cień: Głębia przestrzeni + neonowy glow */
-            box-shadow: 
-                0 30px 60px rgba(0, 0, 0, 0.8), 
-                0 0 35px rgba(0, 229, 255, 0.25);
-            
+
+            /* Cień + neonowy glow */
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.8),
+                0 0 40px rgba(0, 229, 255, 0.2),
+                0 0 80px rgba(240, 194, 67, 0.08);
+
             object-fit: cover;
-            animation: heroFloat 6s ease-in-out infinite; /* Aktywacja płynnego ruchu */
+            animation: heroFloat 6s ease-in-out infinite;
+            transition: box-shadow 0.4s ease;
+        }
+
+        .hero-app-image:hover {
+            box-shadow:
+                0 35px 70px rgba(0, 0, 0, 0.85),
+                0 0 55px rgba(0, 229, 255, 0.3),
+                0 0 100px rgba(240, 194, 67, 0.12);
         }
 
         /* Z-Pattern Layout */
@@ -419,6 +429,11 @@
             opacity: 0.5;
         }
 
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+
         /* ── Hero fade-in animations ── */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(24px); }
@@ -557,7 +572,7 @@
         <p class="hero-animate">Nakładka dla graczy Smite 2, którzy nie mają czasu szukać itemów w przeglądarce w środku teamfightu. Optymalny build zawsze na wierzchu – lekko, szybko, bez laga.</p>
         
         <div class="cta-group hero-animate">
-            <a href="#" id="download-link" class="btn-download">Pobierz dla Windows</a>
+            <a href="#" id="download-link" class="btn-download" download>Pobierz dla Windows</a>
             <span class="cta-info">Darmowy • Wersja <span id="app-version">najnowsza</span> • Open Source</span>
         </div>
 
