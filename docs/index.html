@@ -56,13 +56,29 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-family: 'Rajdhani', sans-serif;
+            text-decoration: none; /* Na wypadek dodania linku do logo */
         }
+
+        .logo img { 
+            height: 40px; /* Zwiększono lekko ikonę dla lepszych proporcji */
+            width: auto; 
+            display: block;
+        }
+
+        .logo-text {
+            font-size: 26px; /* Wymuszamy sztywny, duży rozmiar tekstu */
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-text-white { color: #ffffff; }
+        .logo-text-brand { color: var(--brand-gold); }
 
         /* Nowe style dla podziału kolorów nazwy */
         .logo-text-white { color: #ffffff; }
@@ -375,13 +391,13 @@
 <body>
 
     <nav>
-        <!-- WDROŻENIE 1: Nowe logo -->
         <div class="logo">
-            <img src="logo.svg" alt="KuzenBot Logo">
-            <div>
+            <img src="logo.svg" alt="Ikona KuzenBot">
+            <div class="logo-text">
                 <span class="logo-text-white">Kuzen</span><span class="logo-text-brand">Bot</span>
             </div>
         </div>
+        
         <div class="nav-links">
             <a href="#features">Funkcje</a>
             <a href="#faq">FAQ</a>
