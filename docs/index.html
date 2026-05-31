@@ -205,6 +205,41 @@
             .feature-media.media-sm { width: 85%; }
             .faq-section { padding: 60px 5%; }
         }
+
+        body, header::before, .hero-app-image, .feature-graphic::after, 
+        .btn-download, .trust-badge, .feature-badge {
+            transition: background-color 0.5s ease, background 0.5s ease, 
+                        border-color 0.5s ease, box-shadow 0.5s ease, color 0.5s ease;
+        }
+
+        /* Nowe style dla kafelków personalizacji */
+        .swatch-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .swatch:hover {
+            transform: scale(1.15);
+        }
+        .swatch.active {
+            border-color: #ffffff;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px currentColor; /* Kółko świeci własnym kolorem */
+        }
+        .swatch:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
@@ -317,10 +352,15 @@
                 <div class="feature-badge" data-i18n="feat6_badge">⚙️ Personalizacja</div>
                 <h2 data-i18n="feat6_title">Motywy, hotkeye, przezroczystość – wszystko pod siebie</h2>
                 <p data-i18n="feat6_desc">Wybierz motyw kolorystyczny, który Ci odpowiada, ustaw swoje własne skróty klawiszowe i dostosuj wygląd panelu do swoich przyzwyczajeń. KuzenBot ma się wpasować w Twój setup, a nie odwrotnie.</p>
-                <div class="swatch-group">
-                    <div class="swatch gold"></div>
-                    <div class="swatch ruby"></div>
-                    <div class="swatch cyber"></div>
+                <div class="swatch-group" id="theme-switcher" role="radiogroup" aria-label="Wybierz motyw kolorystyczny">
+                    <div class="swatch active" data-theme="gold" style="background: #C5A059;" tabindex="0" role="radio" aria-checked="true" aria-label="Złoty motyw"></div>
+                    <div class="swatch" data-theme="ruby" style="background: #EF4444;" tabindex="0" role="radio" aria-checked="false" aria-label="Rubinowy motyw"></div>
+                    <div class="swatch" data-theme="blizzard" style="background: #3B82F6;" tabindex="0" role="radio" aria-checked="false" aria-label="Niebieski motyw Blizzard"></div>
+                    <div class="swatch" data-theme="emerald" style="background: #10B981;" tabindex="0" role="radio" aria-checked="false" aria-label="Szmaragdowy motyw"></div>
+                    <div class="swatch" data-theme="void" style="background: #8B5CF6;" tabindex="0" role="radio" aria-checked="false" aria-label="Fioletowy motyw Void"></div>
+                    <div class="swatch" data-theme="cyber" style="background: #F472B6;" tabindex="0" role="radio" aria-checked="false" aria-label="Różowy motyw Cyber"></div>
+                    <div class="swatch" data-theme="toxic" style="background: #A3E635;" tabindex="0" role="radio" aria-checked="false" aria-label="Zielony motyw Toxic"></div>
+                    <div class="swatch" data-theme="abyss" style="background: #FF003C;" tabindex="0" role="radio" aria-checked="false" aria-label="Czerwony motyw Abyss"></div>
                 </div>
             </div>
             <div class="feature-graphic">
@@ -816,6 +856,58 @@
                 const isOpen = item.classList.contains('open');
                 document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
                 if (!isOpen) item.classList.add('open');
+            });
+        });
+
+        // --- 🎨 SYSTEM MOTYWÓW WIZUALNYCH (LIVE PREVIEW) ---
+        const appThemes = {
+            "gold": { primary: "#C5A059", primary_rgb: "197, 160, 89", bg_base: "#0f172a", bg_card: "#15171e" },
+            "ruby": { primary: "#EF4444", primary_rgb: "239, 68, 68", bg_base: "#1a0f0f", bg_card: "#1f1414" },
+            "blizzard": { primary: "#3B82F6", primary_rgb: "59, 130, 246", bg_base: "#0f142a", bg_card: "#151a24" },
+            "emerald": { primary: "#10B981", primary_rgb: "16, 185, 129", bg_base: "#0f1a15", bg_card: "#13201a" },
+            "void": { primary: "#8B5CF6", primary_rgb: "139, 92, 246", bg_base: "#170f2a", bg_card: "#1d1524" },
+            "cyber": { primary: "#F472B6", primary_rgb: "244, 114, 182", bg_base: "#0f0514", bg_card: "#1a0f24" },
+            "toxic": { primary: "#A3E635", primary_rgb: "163, 230, 53", bg_base: "#0a0c08", bg_card: "#10140d" },
+            "abyss": { primary: "#FF003C", primary_rgb: "255, 0, 60", bg_base: "#050505", bg_card: "#0f0a0a" }
+        };
+
+        const swatches = document.querySelectorAll('.swatch');
+        
+        function applyTheme(themeName) {
+            const theme = appThemes[themeName];
+            if (!theme) return;
+
+            // Zmiana globalnych zmiennych CSS na żywo
+            const root = document.documentElement;
+            root.style.setProperty('--accent-cyan', theme.primary);
+            root.style.setProperty('--accent-gold', theme.primary);
+            root.style.setProperty('--brand-gold', theme.primary);
+            root.style.setProperty('--bg-color', theme.bg_base);
+            root.style.setProperty('--card-bg', theme.bg_card);
+            
+            // Rekalkulacja poświaty przy użyciu RGB
+            root.style.setProperty('--glow-cyan', `rgba(${theme.primary_rgb}, 0.15)`);
+
+            // Aktualizacja UI kafelków
+            swatches.forEach(s => {
+                s.classList.remove('active');
+                s.setAttribute('aria-checked', 'false');
+                if (s.dataset.theme === themeName) {
+                    s.classList.add('active');
+                    s.setAttribute('aria-checked', 'true');
+                }
+            });
+        }
+
+        swatches.forEach(swatch => {
+            // Obsługa myszy
+            swatch.addEventListener('click', (e) => applyTheme(e.target.dataset.theme));
+            // Obsługa klawiatury dla dostępności
+            swatch.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    applyTheme(e.target.dataset.theme);
+                }
             });
         });
     </script>
