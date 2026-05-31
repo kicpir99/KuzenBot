@@ -294,6 +294,17 @@
             transition: transform 0.3s ease;
         }
 
+        .feature-media.media-sm {
+            width: 55%; /* Zmniejszyliśmy go prawie o połowę względem okna */
+        }
+        
+        /* Zabezpieczenie dla telefonów komórkowych, by tam nie był za mały */
+        @media (max-width: 768px) {
+            .feature-media.media-sm {
+                width: 85%;
+            }
+        }
+
         .feature-graphic:hover .feature-media {
             transform: translateY(-5px);
         }
@@ -504,7 +515,7 @@
                 </div>
             </div>
             <div class="feature-graphic">
-                <img src="options.gif" alt="Panel opcji i personalizacji nakładki" class="feature-media">
+                <img src="options.gif" alt="Panel opcji i personalizacji nakładki" class="feature-media media-sm">
             </div>
         </div>
 
