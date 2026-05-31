@@ -256,18 +256,17 @@
         .feature-content {
             flex: 1;
         }
-
+        
         .feature-graphic {
-            flex: 1;
+            flex: 1.4; /* Zwiększa proporcję szerokości o ~40% na korzyść okna z GIFem */
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            aspect-ratio: 4/3;
+            padding: 24px; /* Zastępujemy stałe proporcje paddingiem, by dopasować się do rozmiaru GIFów */
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
@@ -285,7 +284,7 @@
 
         /* KLASA DLA TWOICH GIFÓW I OBRAZKÓW */
         .feature-media {
-            width: 85%;
+            width: 100%; /* Powiększa samego GIF-a, by w całości wypełniał nowe, większe okno */
             height: auto;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
