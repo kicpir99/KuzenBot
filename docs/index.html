@@ -269,10 +269,12 @@
             flex-direction: row-reverse;
         }
 
-        .feature-content { flex: 0 0 35%; }
+        .feature-content {
+            flex: 0 0 42%; /* ZWIĘKSZONO z 35% do 42% - tekst zyskuje dużo miejsca */
+        }
         
         .feature-graphic {
-            flex: 0 0 60%;
+            flex: 0 0 52%; /* ZMNIEJSZONO z 60% do 52% - oddajemy przestrzeń tekstowi */
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
