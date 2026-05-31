@@ -176,57 +176,30 @@
         }
 
         /* Mockup */
-        🧩 1. Diagnoza problemu
-
-    Zbyt mała dywersyfikacja wizualna (Lack of Contrast in Components): Użycie dokładnie tej samej ramki i cienia w głównej sekcji Hero, co w sekcjach funkcji poniżej, sprawia, że główny obrazek nie ma statusu "Premium". Wygląda jak kolejny zrzut ekranu, a nie główny produkt.
-
-    Brak dynamiki (Static Hero): Sekcja otwierająca (Hero) to najważniejsze miejsce na stronie. Musi przyciągać wzrok i sugerować, że aplikacja to nowoczesne i aktywne narzędzie.
-
-    Optymalizacja rozmiaru: Konieczność dalszego pomniejszenia grafiki oznacza, że musimy zrekompensować mniejszy rozmiar silniejszym efektem "Wow", aby obrazek nie zginął na stronie.
-
-👤 2. Perspektywa użytkownika
-
-    Kim jest: Odbiorca doceniający estetykę gamingową (RGB, płynne animacje, neony).
-
-    Jaki ma cel: Chce mieć poczucie, że instaluje nowoczesny, dobrze zakodowany program wysokiej jakości.
-
-    Jakie może mieć obawy: Statyczny, zwykły zrzut ekranu na samej górze sugeruje amatorski projekt, co w przypadku nakładek (overlay) budzi niepokój o stabilność i wydajność.
-
-🏗 3. Rekomendowana struktura (Wdrożenie CSS)
-
-Zastosujemy tu sztuczkę projektową, która stworzy gradientową, świecącą ramkę dookoła Twojej aplikacji (przejście od Twojego Cyjanu do Złota) oraz dodamy efekt delikatnej lewitacji (Floating), aby okno wydawało się żywe i zawieszone w wirtualnej przestrzeni.
-
-Odszukaj swój poprzedni blok stylów dla Hero (od .hero-image-container aż do .hero-app-image) i zastąp go w całości tym kodem:
-CSS
-
-        /* Główny kontener - jeszcze mniejszy i wyśrodkowany */
         .hero-image-container {
-            margin-top: 50px;
+            margin-top: 80px; /* Zwiększamy odstęp, aby nie przykrywać tekstu */
             width: 100%;
-            max-width: 450px; /* ZMIANA: Kolejne drastyczne pomniejszenie dla idealnego detalu */
+            max-width: 500px; 
             position: relative;
             display: flex;
             justify-content: center;
-            z-index: 2;
         }
 
-        .hero-image-container::before {
-            content: '';
-            position: absolute;
-            width: 90%;
-            height: 90%;
-            background: var(--accent-cyan);
-            filter: blur(100px);
-            opacity: 0.2;
-            z-index: -1;
-            top: 5%;
+        /* Subtelne wykończenie obrazu - zamiast agresywnego gradientu */
+        .hero-app-image {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            /* Cienka, subtelna ramka zamiast "świecącego" gradientu */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            /* Delikatny cień, który nie "krzyczy" neonem */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s ease;
         }
 
-        /* Definicja płynnej animacji lewitacji */
-        @keyframes heroFloat {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
-            100% { transform: translateY(0px); }
+        /* Opcjonalny, bardzo delikatny efekt hover zamiast lewitacji */
+        .hero-image-container:hover .hero-app-image {
+            transform: scale(1.02); /* Bardzo delikatne powiększenie zamiast ruchu */
         }
 
         /* Wygląd samej aplikacji z gradientową ramką */
