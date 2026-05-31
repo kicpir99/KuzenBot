@@ -159,7 +159,7 @@
             color: var(--text-muted);
         }
 
-        /* Mockup Window */
+        /* Hero Mockup Window */
         .hero-mockup {
             margin-top: 60px;
             width: 100%;
@@ -173,7 +173,6 @@
             aspect-ratio: 16/9;
         }
 
-        /* Simulating an overlay on blurred game background */
         .mockup-bg {
             position: absolute;
             width: 100%;
@@ -272,14 +271,32 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
+        /* Ambient Glow behind GIFs */
         .feature-graphic::after {
             content: '';
             position: absolute;
             width: 150px;
             height: 150px;
             background: var(--accent-cyan);
-            filter: blur(8px);
-            opacity: 0.05;
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: 1;
+        }
+
+        /* KLASA DLA TWOICH GIFÓW I OBRAZKÓW */
+        .feature-media {
+            width: 85%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            z-index: 2;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-graphic:hover .feature-media {
+            transform: translateY(-5px);
         }
 
         .feature-badge {
@@ -307,17 +324,7 @@
             margin-bottom: 20px;
         }
 
-        /* Visual styling inside graphics */
-        .graphic-preview {
-            width: 80%;
-            height: 70%;
-            background: rgba(13, 14, 18, 0.6);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 6px;
-            padding: 15px;
-        }
-
-        /* UI Swatches / Mini Simulation */
+        /* UI Swatches dla sekcji personalizacji */
         .swatch-group {
             display: flex;
             gap: 10px;
@@ -413,7 +420,7 @@
                 padding: 15px 5%;
             }
             .nav-links {
-                display: none; /* Simplification for layout representation */
+                display: none;
             }
             header {
                 padding: 120px 5% 60px 5%;
@@ -437,7 +444,6 @@
 </head>
 <body>
 
-    <!-- Nawigacja -->
     <nav>
         <div class="logo">⚡ SMITE2BOT</div>
         <div class="nav-links">
@@ -447,7 +453,6 @@
         </div>
     </nav>
 
-    <!-- Sekcja Główna (Hero) -->
     <header>
         <div class="trust-badge">🛡️ Zgodne z regulaminem Smite 2</div>
         <h1>Skup się na walce. <br><span>Buildy zostaw nam.</span></h1>
@@ -459,162 +464,4 @@
         </div>
 
         <div class="hero-mockup">
-            <div class="mockup-bg"></div>
-            <div class="mockup-overlay">
-                <div class="mockup-header">
-                    <span class="mockup-title">Ymir Build Asystent</span>
-                    <span class="mockup-mode">Mini Mode</span>
-                </div>
-                <div class="mockup-items">
-                    <div class="mockup-item-slot" style="background: rgba(0,229,255,0.1); border-color: var(--accent-cyan);"></div>
-                    <div class="mockup-item-slot"></div>
-                    <div class="mockup-item-slot"></div>
-                    <div class="mockup-item-slot"></div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Sekcja Funkcji (Alternating Layout) -->
-    <section class="features-section" id="features">
-        
-        <!-- Wiersz 1 -->
-        <div class="feature-row">
-            <div class="feature-content">
-                <div class="feature-badge">✨ Tryb Elastyczny</div>
-                <h2>Dwa niezależne tryby interfejsu (Extended & Mini)</h2>
-                <p>Aplikacja idealnie dopasowuje się do Twojej sytuacji na mapie. Tryb <strong>Extended</strong> oferuje pełny, szczegółowy widok ze statystykami przedmiotów idealny podczas analizy w bazie. Tryb <strong>Mini</strong> przekształca asystenta w kompaktowy, smukły kafelek, który monitoruje build bez zasłaniania pola widzenia w walce.</p>
-            </div>
-            <div class="feature-graphic">
-                <div class="graphic-preview" style="display:flex; flex-direction:column; justify-content:space-between;">
-                    <div style="border:1px dashed var(--accent-muted); padding:10px; border-radius:4px; font-size:12px; color:var(--text-muted);">
-                        [Extended View] Pełne drzewo statystyk i alternatyw
-                    </div>
-                    <div style="background:rgba(0,229,255,0.1); padding:8px; border-radius:4px; width:50%; font-size:11px; border:1px solid var(--accent-cyan);">
-                        [Mini View] Tylko ikony przedmiotów
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Wiersz 2 -->
-        <div class="feature-row">
-            <div class="feature-content">
-                <div class="feature-badge">⚙️ Personalizacja</div>
-                <h2>Głęboka customizacja wyglądu i sterowania</h2>
-                <p>Masz absolutną kontrolę nad estetyką nakładki. Wybierz jeden z dedykowanych motywów kolorystycznych dopasowanych do Twojego stylu (Gold, Ruby, Cyber), precyzyjnie dostosuj przezroczystość elementów tła oraz swobodnie przypisz globalne skróty klawiszowe pod własną klawiaturę.</p>
-                <div class="swatch-group">
-                    <div class="swatch gold"></div>
-                    <div class="swatch ruby"></div>
-                    <div class="swatch cyber"></div>
-                </div>
-            </div>
-            <div class="feature-graphic">
-                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:10px;">
-                    <span style="font-size:12px; color:var(--accent-gold);">Aktywny Motyw: Gold Premium</span>
-                    <div style="width:80%; height:8px; background:#222; border-radius:4px; overflow:hidden;">
-                        <div style="width:60%; height:100%; background:var(--accent-gold);"></div>
-                    </div>
-                    <span style="font-size:11px; color:var(--text-muted);">Przezroczystość tła: 60%</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Wiersz 3 -->
-        <div class="feature-row">
-            <div class="feature-content">
-                <div class="feature-badge">🤖 Inteligencja</div>
-                <h2>W pełni automatyczny tryb asystenta (AUTO)</h2>
-                <p>Zapomnij o ręcznym wpisywaniu nazw bogów w trakcie wyboru postaci. Program natychmiastowo rozpoznaje sytuację na ekranie i automatycznie ładuje najbardziej optymalny zestaw przedmiotów. Szybko, bezbłędnie i całkowicie bezobsługowo.</p>
-            </div>
-            <div class="feature-graphic">
-                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; color:var(--accent-cyan); font-family:'Rajdhani', sans-serif; font-size:20px; font-weight:bold; gap:10px;">
-                    🔄 Wykryto postać: Zeus -> Ładowanie meta-buildu...
-                </div>
-            </div>
-        </div>
-
-        <!-- Wiersz 4 -->
-        <div class="feature-row">
-            <div class="feature-content">
-                <div class="feature-badge">🔒 Bezpieczeństwo i Wygoda</div>
-                <h2>Płynna nakładka "Click-Through" oraz hotkeye</h2>
-                <p>Interfejs wyświetla się bezpośrednio nad oknem Smite 2. Jednym skrótem klawiszowym możesz błyskawicznie "zablokować" nakładkę – staje się ona całkowicie przezroczysta dla kliknięć myszką (Ghost Mode). Dzięki temu eliminujesz ryzyko przypadkowego kliknięcia w menu aplikacji podczas rzucania umiejętności.</p>
-            </div>
-            <div class="feature-graphic">
-                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:5px;">
-                    <span style="font-size:24px;">🔓 ➜ 🔒</span>
-                    <span style="font-size:13px; color:var(--text-muted);">Aktywowano tryb ignorowania kliknięć myszy</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Wiersz 5 -->
-        <div class="feature-row">
-            <div class="feature-content">
-                <div class="feature-badge">📊 Elastyczność Danych</div>
-                <h2>Dynamiczne źródła danych w locie</h2>
-                <p>Chcesz sprawdzić czystą matematykę efektywności przedmiotów czy wolisz zaufać wysokim ocenom graczy? Za pomocą jednego kliknięcia lub skrótu przełączasz się natychmiast między zweryfikowanymi statystykami (Stats) a najwyżej ocenianymi kompozycjami społeczności (Community).</p>
-            </div>
-            <div class="feature-graphic">
-                <div class="graphic-preview" style="display:flex; justify-content:center; align-items:center; gap:20px;">
-                    <div style="padding:10px; background:#1a1d26; border:1px solid var(--accent-cyan); border-radius:4px; font-size:12px;">📊 STATS</div>
-                    <div style="padding:10px; background:#1a1d26; border:1px solid transparent; opacity:0.4; font-size:12px;">👥 COMMUNITY</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Wiersz 6 -->
-        <div class="feature-row">
-            <div class="feature-content">
-                <div class="feature-badge">🚀 Utrzymanie</div>
-                <h2>Cichy Auto-Updater w tle</h2>
-                <p>Nie marnuj czasu na ręczne sprawdzanie nowych wersji po każdym patchu gry. Nasz wbudowany mechanizm samoczynnie weryfikuje aktualizacje bezpośrednio z serwerów GitHub, pobiera je bezgłośnie w tle i instaluje jednym kliknięciem z poziomu samej nakładki.</p>
-            </div>
-            <div class="feature-graphic">
-                <div class="graphic-preview" style="display:flex; align-items:center; justify-content:center; flex-direction:column; gap:8px;">
-                    <span style="font-size:12px; color:var(--accent-cyan);">Pobieranie aktualizacji z GitHub...</span>
-                    <div style="width:70%; height:4px; background:#222; border-radius:2px;">
-                        <div style="width:100%; height:100%; background:var(--accent-cyan); animation: pulse 2s infinite;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </section>
-
-    <!-- Sekcja FAQ -->
-    <section class="faq-section" id="faq">
-        <div class="faq-container">
-            <h2>Często Zadawane Pytania (FAQ)</h2>
-            
-            <div class="faq-item">
-                <h3>🛡️ Czy za używanie tej nakładki grozi ban?</h3>
-                <p>Zdecydowanie nie. Nasza aplikacja działa w pełnej separacji procesowej – nie modyfikuje plików Smite 2 ani nie wstrzykuje kodu do pamięci gry (Zero Memory Injection). Wyświetla dane wyłącznie jako niezależna, transparentna warstwa graficzna systemu Windows, co jest w 100% bezpieczne i zgodne z regulaminem firmy Hi-Rez Studios.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>⚠️ Dlaczego Windows SmartScreen wyświetla komunikat o zagrożeniu?</h3>
-                <p>Ponieważ aplikacja jest całkowicie darmowa i tworzona hobbystycznie jako Open-Source. Nie generuje zysków, więc nie posiada kosztownego, komercyjnego certyfikatu cyfrowego Windows (Code Signing). Cały kod źródłowy projektu jest jawny i dostępny do zweryfikowania na naszym oficjalnym repozytorium GitHub.</p>
-            </div>
-
-            <div class="faq-item">
-                <h3>📈 Czy nakładka spowoduje spadki FPS w grze?</h3>
-                <p>Nie. Program został zaprojektowany z myślą o grach e-sportowych i optymalizacji zasobów. W przeciwieństwie do ciężkich pakietów oprogramowania (np. Overwolf), nasza nakładka zużywa znikome ilości pamięci RAM oraz procesora, gwarantując stałą płynność rozgrywki bez mikro-przycięć.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stopka -->
-    <footer>
-        <div class="footer-links">
-            <a href="#features">Funkcje</a>
-            <a href="#faq">FAQ</a>
-            <a href="https://github.com" target="_blank">Zgłoś błąd (GitHub Issues)</a>
-        </div>
-        <p>© 2026 Smite2Bot. Strona stworzona na infrastrukturze GitHub Pages.</p>
-        <p class="disclaimer">Smite2Bot jest niezależnym projektem oprogramowania o otwartym kodzie źródłowym i nie jest w żaden sposób powiązany, autoryzowany ani wspierany przez Hi-Rez Studios ani Titan Forge Games.</p>
-    </footer>
-
-</body>
-</html>
+            <div class
