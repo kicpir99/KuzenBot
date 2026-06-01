@@ -3,6 +3,8 @@
   
   <img src="docs/logo.png" alt="KuzenBot Logo" width="120">
 
+  # KuzenBot
+
   **Stop Alt-Tabbing. Builds right on your screen..**
   
   <p align="center">
@@ -70,6 +72,8 @@ If you want to run the project from the source:
 <div align="center">
   
   <img src="docs/logo.png" alt="KuzenBot Logo" width="120">
+
+  # KuzenBot
 
   **Koniec z alt+tabem. Build masz przed oczami.**
   
