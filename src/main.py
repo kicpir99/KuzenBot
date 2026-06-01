@@ -19,7 +19,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.5"
+CURRENT_VERSION = "1.1.6"
 
 STATE_LOADING = "loading"
 STATE_DATA = "data"
@@ -376,6 +376,7 @@ class SmiteController(QObject):
         self.hotkey_listener.request_god_change.connect(lambda: self.overlay.navigate_to("search"))
         self.hotkey_listener.toggle_source.connect(self.overlay._toggle_build_source)
         self.hotkey_listener.trigger_auto_search.connect(self.on_auto_mode_selected)
+        self.hotkey_listener.toggle_size_mode.connect(self.overlay.toggle_mode)
         self._rebuild_shortcuts(self._config)
         self.app.aboutToQuit.connect(self._on_app_quit)
 
@@ -480,7 +481,7 @@ class SmiteController(QObject):
         expected_actions = [
             "show_hide", "lock_unlock", "next_build", 
             "prev_build", "quick_search", "toggle_source",
-            "quick_auto_search"
+            "quick_auto_search", "toggle_size"
         ]
         
         # Sprawdzamy czy w configu brakuje jakichś wartości i dodajemy domyślne
@@ -505,6 +506,7 @@ class SmiteController(QObject):
             "prev_build": "Alt+Left",
             "quick_search": "Alt+D",
             "quick_auto_search": "Alt+A",
+            "toggle_size": "Alt+M",
             "toggle_source": "Alt+Q",
         }
         return defaults.get(action, "")

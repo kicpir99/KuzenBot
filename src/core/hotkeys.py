@@ -11,6 +11,7 @@ class HotkeyListener(QThread):
     toggle_click_through = pyqtSignal()
     toggle_source = pyqtSignal()
     trigger_auto_search = pyqtSignal()
+    toggle_size_mode = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -25,6 +26,7 @@ class HotkeyListener(QThread):
             "prev_build": self.prev_build_requested,
             "quick_auto_search": self.trigger_auto_search,
             "quick_search": self.request_god_change,
+            "toggle_size": self.toggle_size_mode,
             "toggle_source": self.toggle_source,
         }
 

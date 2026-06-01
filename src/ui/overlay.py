@@ -641,14 +641,58 @@ class SmiteOverlay(QMainWindow):
 
     # ============================================================ TOGGLE MODE
     def toggle_mode(self):
-        from PyQt6.QtCore import QParallelAnimationGroup, QPropertyAnimation, QEasingCurve, QSize
+        from PyQt6.QtCore import QParallelAnimationGroup, QPropertyAnimation, QEasingCurve, QSize, QPoint
+        from PyQt6.QtGui import QGuiApplication
         
-        # 1. Pobieramy obecny rozmiar
+        # 1. Pobieramy obecny rozmiar i POZYCJĘ okna (To MUSI być na samej górze!)
         start_size = self.size()
+        start_pos = self.pos()
         
         self.is_expanded = not self.is_expanded
         target_w, target_h = self.EXPANDED_SIZE if self.is_expanded else self.MINI_SIZE
         end_size = QSize(target_w, target_h)
+
+        # --- KULOODPORNE ZACHOWANIE KOTWICY (Smart Anchor Preservation) ---
+        # Pobieramy ekran, na którym aktualnie znajduje się środek aplikacji
+        screen = QGuiApplication.screenAt(self.geometry().center())
+        if not screen:
+            screen = QGuiApplication.primaryScreen()
+            
+        # ZMIANA: Używamy pełnej fizycznej matrycy monitora (ignoruje pasek zadań)
+        avail_rect = screen.geometry()
+
+        # Obliczamy fizyczne odległości obecnych krawędzi okna od krawędzi monitora
+        dist_left = start_pos.x() - avail_rect.left()
+        dist_right = avail_rect.right() - (start_pos.x() + start_size.width())
+        dist_top = start_pos.y() - avail_rect.top()
+        dist_bottom = avail_rect.bottom() - (start_pos.y() + start_size.height())
+
+        # Dynamiczny wybór kotwicy poziomej (lewa vs prawa)
+        if dist_right < dist_left:
+            # Okno jest bliżej prawej strony: zachowaj prawą krawędź w miejscu
+            current_right = start_pos.x() + start_size.width()
+            target_x = current_right - target_w
+        else:
+            # Okno jest bliżej lewej strony: zachowaj lewą krawędź w miejscu
+            target_x = start_pos.x()
+
+        # Dynamiczny wybór kotwicy pionowej (góra vs dół)
+        if dist_bottom < dist_top:
+            # Okno jest bliżej dołu: zachowaj dolną krawędź w miejscu
+            current_bottom = start_pos.y() + start_size.height()
+            target_y = current_bottom - target_h
+        else:
+            # Okno jest bliżej góry: zachowaj górną krawędź w miejscu
+            target_y = start_pos.y()
+
+        # Dodatkowe, sztywne zabezpieczenie przed obcięciem okna za ekranem (Clamp)
+        if target_x + target_w > avail_rect.right(): target_x = avail_rect.right() - target_w
+        if target_x < avail_rect.left(): target_x = avail_rect.left()
+        if target_y + target_h > avail_rect.bottom(): target_y = avail_rect.bottom() - target_h
+        if target_y < avail_rect.top(): target_y = avail_rect.top()
+
+        end_pos = QPoint(int(target_x), int(target_y))
+        # ------------------------------------------------------------------
 
         # 2. TWARDA BLOKADA: Ustawiamy na sztywno obecny rozmiar ZANIM cokolwiek się zmieni.
         # To neutralizuje 'adjustSize' wywoływane w tle przez inne ekrany.
@@ -671,7 +715,7 @@ class SmiteOverlay(QMainWindow):
         # Przełączamy ekran - layout spróbuje skoczyć, ale zablokowaliśmy go w kroku 2!
         self.navigate_to(self._current_page, save_history=False, force=True)
 
-        # --- KULOODPORNA ANIMACJA PREMIUM ---
+        # --- ANIMACJA GRUPOWA (Płynne skalowanie i przesuwanie jednocześnie) ---
         self._anim_group = QParallelAnimationGroup(self)
 
         # Animujemy minimalny rozmiar
@@ -688,6 +732,13 @@ class SmiteOverlay(QMainWindow):
         self._max_anim.setEndValue(end_size)
         self._max_anim.setEasingCurve(QEasingCurve.Type.InOutQuint)
         
+        # Animujemy pozycję (X, Y) okna na pulpicie
+        self._pos_anim = QPropertyAnimation(self, b"pos")
+        self._pos_anim.setDuration(450)
+        self._pos_anim.setStartValue(start_pos)
+        self._pos_anim.setEndValue(end_pos)
+        self._pos_anim.setEasingCurve(QEasingCurve.Type.InOutQuint)
+        
         # Animacja przygaszenia (Fade)
         self._fade_anim = QPropertyAnimation(self, b"windowOpacity")
         self._fade_anim.setDuration(450)
@@ -697,9 +748,10 @@ class SmiteOverlay(QMainWindow):
         self._fade_anim.setKeyValueAt(1.0, target_op)
         self._fade_anim.setEasingCurve(QEasingCurve.Type.InOutSine)
         
-        # Grupujemy animacje
+        # Łączymy wszystkie cztery animacje w jeden perfekcyjny mechanizm
         self._anim_group.addAnimation(self._min_anim)
         self._anim_group.addAnimation(self._max_anim)
+        self._anim_group.addAnimation(self._pos_anim)
         self._anim_group.addAnimation(self._fade_anim)
         
         self._anim_group.finished.connect(lambda: self._on_toggle_anim_done(target_w, target_h))
@@ -1266,12 +1318,12 @@ class SmiteOverlay(QMainWindow):
                 if text:
                     self.tooltip_label.setText(text)
                     
-                    # --- NAJWIĘKSZY SEKRET PYQT: Ukryte okna nie zmieniają rozmiaru! ---
-                    # 1. Przenosimy tooltip na współrzędne -5000, -5000 (poza obszar monitora)
-                    self.tooltip.move(-5000, -5000)
+                    # --- NAJWIĘKSZY SEKRET PYQT v2: Zapobiegamy mruganiu na środku ekranu! ---
+                    # Windows czasem ignoruje ujemne koordynaty przy pierwszym rysowaniu.
+                    # 1. ZERUJEMY przezroczystość całkowicie ZANIM pokażemy okno do obliczeń!
+                    self.tooltip.setWindowOpacity(0.0)
                     
-                    # 2. POKAZUJEMY GO TAM. Dopiero w tym momencie PyQt posłusznie i 
-                    # fizycznie kurczy okno wokół naszego nowego tekstu!
+                    # 2. Pokazujemy okno "w tle" - PyQt posłusznie kurczy je wokół nowego tekstu
                     self.tooltip.show()
                     self.tooltip.adjustSize()
                     
@@ -1291,8 +1343,11 @@ class SmiteOverlay(QMainWindow):
                     elif tx + tw > win_rect.right(): 
                         tx = win_rect.right() - tw
                         
-                    # 5. Przesuwamy go z "zaświatów" prosto nad nasz przycisk.
+                    # 5. Przesuwamy w niewidzialności na właściwą pozycję nad przyciskiem
                     self.tooltip.move(tx, ty)
+                    
+                    # 6. Przywracamy pełną widoczność!
+                    self.tooltip.setWindowOpacity(1.0)
                     
             elif event.type() == QEvent.Type.Leave:
                 self.tooltip.hide()
@@ -1318,7 +1373,52 @@ class SmiteOverlay(QMainWindow):
             self._drag_pos = event.globalPosition().toPoint()
 
     def mouseReleaseEvent(self, event):
-        self._drag_pos = None
+        if event.button() == Qt.MouseButton.LeftButton:
+            self._drag_pos = None
+            event.accept()
+
+            # --- MAGNETYCZNE PRZYCIĄGANIE DO KRAWĘDZI (Smart Edge Snapping) ---
+            from PyQt6.QtGui import QGuiApplication
+            from PyQt6.QtCore import QPropertyAnimation, QEasingCurve, QPoint
+            
+            snap_threshold = 30  # Siła magnesu w pikselach (odległość, przy której okno łapie krawędź)
+            
+            screen = QGuiApplication.screenAt(self.geometry().center())
+            if not screen:
+                screen = QGuiApplication.primaryScreen()
+                
+            # ZMIANA: Używamy pełnej fizycznej matrycy monitora (ignoruje pasek zadań)
+            avail_rect = screen.geometry() 
+            current_rect = self.geometry()
+            
+            target_x = current_rect.x()
+            target_y = current_rect.y()
+            snapped = False
+            
+            # 1. Sprawdzanie osi X (Lewa / Prawa krawędź)
+            if abs(current_rect.left() - avail_rect.left()) < snap_threshold:
+                target_x = avail_rect.left()
+                snapped = True
+            elif abs(current_rect.right() - avail_rect.right()) < snap_threshold:
+                target_x = avail_rect.right() - current_rect.width()
+                snapped = True
+                
+            # 2. Sprawdzanie osi Y (Górna / Dolna krawędź)
+            if abs(current_rect.top() - avail_rect.top()) < snap_threshold:
+                target_y = avail_rect.top()
+                snapped = True
+            elif abs(current_rect.bottom() - avail_rect.bottom()) < snap_threshold:
+                target_y = avail_rect.bottom() - current_rect.height()
+                snapped = True
+                
+            # Jeśli okno złapało krawędź, wykonaj miękką animację przyciągnięcia!
+            if snapped:
+                self._snap_anim = QPropertyAnimation(self, b"pos")
+                self._snap_anim.setDuration(150) # Bardzo szybka, ledwie zauważalna animacja (0.15 sekundy)
+                self._snap_anim.setStartValue(self.pos())
+                self._snap_anim.setEndValue(QPoint(target_x, target_y))
+                self._snap_anim.setEasingCurve(QEasingCurve.Type.OutQuad)
+                self._snap_anim.start()
 
     def update_mini_buttons_visibility(self):
         """Dynamically manages control visibility based on mode and config."""

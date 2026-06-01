@@ -1,9 +1,4 @@
 {
-<<<<<<< HEAD
-"version": "1.1.5",
-  "url": "https://github.com/kicpir99/KuzenBot/releases/download/v1.1.5/KuzenBot_Setup_v1_1_5.exe"
-=======
-"version": "1.1.4",
-  "url": "https://github.com/kicpir99/KuzenBot/releases/download/1.1.4/KuzenBot_Setup_v1_1_4.exe"
->>>>>>> 25f476ffc2461e22df1f42b8e532a5b981c14ecb
+  "version": "1.1.6",
+  "url": "https://github.com/kicpir99/KuzenBot/releases/download/v1.1.6/KuzenBot_Setup_v1_1_6.exe"
 }

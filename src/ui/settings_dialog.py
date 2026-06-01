@@ -455,6 +455,7 @@ class SettingsDialog(QDialog):
             ("prev_build", _t("key_prev")),
             ("quick_auto_search", _t("key_auto_search")),
             ("quick_search", _t("key_search")),
+            ("toggle_size", _t("key_toggle_size")),
             ("toggle_source", _t("key_toggle")),
         ]
         for action_key, action_label in actions:
@@ -540,7 +541,9 @@ class SettingsDialog(QDialog):
             "lock_unlock": "Alt+L",
             "next_build": "Alt+Right",
             "prev_build": "Alt+Left",
+            "quick_auto_search": "Alt+A",
             "quick_search": "Alt+D",
+            "toggle_size": "Alt+M",
             "toggle_source": "Alt+Q",
         }
         return defaults.get(action, "")

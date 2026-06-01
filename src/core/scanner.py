@@ -17,11 +17,23 @@ class GameScanner(QThread):
         self.log_path = os.path.join(local_appdata, "SMITE2Alpha", "Saved", "Logs", "Hemingway.log")
         self.running = True
         self.gods_db_path = os.path.join("assets", "gods_db.json")
+        self.aliases_path = os.path.join("assets", "god_aliases.json") # <--- NOWE
         
         self.english_gods, self.new_gods = self._load_gods_db()
+        self.aliases = self._load_aliases() # <--- NOWE
         self.current_god = None
         self.last_emitted_god = None
         self.last_internal_model = None
+
+    def _load_aliases(self):
+        """Ładuje słownik aliasów językowych z pliku JSON."""
+        if os.path.exists(self.aliases_path):
+            try:
+                with open(self.aliases_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.error(f"[Scanner] Błąd odczytu pliku z aliasami: {e}")
+        return {}
 
     GODS_CACHE_TTL = 86400
 
@@ -85,40 +97,11 @@ class GameScanner(QThread):
         if not self.english_gods:
             return None
 
-        # 1. Czyszczenie stringa z logów Unreal Engine
         clean_name = re.sub(r'[^a-z]', ' ', localized_name.lower())
         clean_name = f" {clean_name} "
 
-        # 2. Rozszerzony Słownik Globalny (Twarde mapowanie problematycznych postaci)
-        aliases = {
-            "jorm": "Jormungandr",
-            "jormungand": "Jormungandr",
-            "tsokuyomi": "Tsukuyomi",
-            "afrodyta": "Aphrodite", 
-            "ozyrys": "Osiris", 
-            "wulkan": "Vulcan",
-            "chepri": "Khepri", 
-            "bachus": "Bacchus", 
-            "tanatos": "Thanatos",
-            "odyn": "Odin", 
-            "merkury": "Mercury", 
-            "kupidyn": "Cupid",
-            "atena": "Athena", 
-            "nemezis": "Nemesis",
-            "mama brygida": "Maman Brigitte", 
-            "morrigan": "The Morrigan",
-            "jemaja": "Yemoja",
-            "cabrakan": "Cabrakan",
-            "cabra": "Cabrakan",
-            "gruby loki": "Cabrakan",
-            # --- FIX: Bari oraz Da Ji ---
-            "bari": "Bari",
-            "princess bari": "Bari",
-            "daji": "Da Ji",
-            "da ji": "Da Ji"
-        }
-        
-        for alias, eng_name in aliases.items():
+        # 2. Używamy załadowanego słownika z pliku JSON
+        for alias, eng_name in self.aliases.items():
             alias_clean = re.sub(r'[^a-z]', ' ', alias.lower())
             if f" {alias_clean} " in clean_name:
                 return eng_name
@@ -189,7 +172,6 @@ class GameScanner(QThread):
                 
                 # Główna pętla
                 while self.running:
-                    # 2. Bezpieczne wykrywanie restartu gry (odporne na f.tell)
                     try:
                         current_size = os.path.getsize(self.log_path)
                         if current_size < last_file_size:
@@ -197,7 +179,7 @@ class GameScanner(QThread):
                             f.seek(0, os.SEEK_SET)
                         last_file_size = current_size
                     except OSError:
-                        pass # Gra zablokowała plik do zapisu, czekamy
+                        pass
                     
                     line = f.readline()
                     if not line:
@@ -207,29 +189,24 @@ class GameScanner(QThread):
                     if "TransitionToDraftState" in line and "CharacterDraft" in line:
                         if "Setup" in line:
                             self.last_emitted_god = None
-                            self.last_internal_model = None
                             self.lobby_joined.emit()
                     
-                    if "BP_" in line and "_Lobby_C" in line:
-                        bp_match = re.search(r"BP_([A-Za-z0-9_]+)_Lobby_C", line)
-                        if bp_match:
-                            extracted_bp = bp_match.group(1).replace("_", " ").strip()
-                            if extracted_bp.lower() in ['god', 'genericactor', 'character']:
-                                self.last_internal_model = None
-                            else:
-                                self.last_internal_model = extracted_bp
+                    # --------------------------------------------------------------------
+                    # Usunięto podsłuch na modele "BP_" - powodował błędy przy pickach sojuszników
+                    # --------------------------------------------------------------------
                     
-                    # 3. Zabezpieczenie przed pustymi zdarzeniami UI
                     if "Ally 0 Skin" in line:
                         match = re.search(r"Ally 0 Skin (.+?)$", line)
                         if match and match.group(1).strip():
                             raw_local = match.group(1).strip()
                             
-                            search_term = self.last_internal_model if self.last_internal_model else raw_local
-                            god_name = self._match_god_name(search_term)
+                            # Przekazujemy CZYSTY tekst z UI do dopasowania
+                            god_name = self._match_god_name(raw_local)
                             
+                            # Jeśli funkcja zwróci None (bo np. gracz założył skina "Mroczne Serce"),
+                            # program bezpiecznie to zignoruje i zatrzyma Twojego oryginalnego boga.
                             if god_name and god_name != self.last_emitted_god:
-                                logger.info(f"[Scanner] Wykryto wybór: {god_name} (Źródło: {search_term})")
+                                logger.info(f"[Scanner] Wykryto wybór gracza: {god_name} (Odczyt z gry: {raw_local})")
                                 self.last_emitted_god = god_name
                                 self.god_detected.emit(god_name)
 
