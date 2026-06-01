@@ -40,7 +40,7 @@
 | **📊 Data Flexibility on the Fly**<br>Seamlessly switch between raw item statistics and the most popular community builds. | <img width="371" height="209" alt="commstats" src="https://github.com/user-attachments/assets/2c666e0c-12e8-4d1c-9aaf-afcb620d71c7" /> |
 | **👻 Invisible Interface**<br>Adjust the background opacity down to zero, leaving only clean item icons on the screen. | <img width="367" height="206" alt="opacity" src="https://github.com/user-attachments/assets/5867bb18-5593-43cc-992f-622e653d6c96" /> |
 | **⚙️ Deep Customization**<br>Full control over the UI: precise settings, global hotkeys, and 8 built-in color themes. | <img width="348" height="434" alt="options" src="https://github.com/user-attachments/assets/badfa8c1-9f8e-42b7-a99d-7c6a8f0bb8e2" /> |
-| **🚀 Silent Auto-Updater**<br>After every game patch, the app automatically checks GitHub in the background, downloads updates, and offers a 1-click install. | <img width="575" height="303" alt="update" src="auto-updater.png" /> |
+| **🚀 Silent Auto-Updater**<br>After every game patch, the app automatically checks GitHub in the background, downloads updates, and offers a 1-click install. | <img width="575" height="303" alt="update" src="docs/auto-updater.png" /> |
 
 ### 🛠️ Tech Stack
 
@@ -102,12 +102,12 @@ KuzenBot został zaprojektowany z myślą o minimalizmie i wydajności. Poniżej
 | Funkcja | Podgląd w grze |
 | :--- | :---: |
 | **✨ Tryb Elastyczny (Extended & Mini)**<br>W bazie rozłóż pełne statystyki itemów. W walce przełącz się na tryb Mini – mały kafelek, który nie zasłania nic ważnego. | <img width="348" height="196" alt="mini" src="https://github.com/user-attachments/assets/6dd565de-8345-4298-b434-b79b497c1bfe" /> |
-| **🤖 Inteligencja (AUTO Mode)**<br>Program automatycznie rozpoznaje wybranego przez Ciebie boga w lobby i natychmiast ładuje dedykowany build. | <img width="512" height="588" alt="auto" src="https://kicpir99.github.io/KuzenBot/lobby.gif" /> |
+| **🤖 Inteligencja (AUTO Mode)**<br>Program automatycznie rozpoznaje wybranego przez Ciebie boga w lobby i natychmiast ładuje dedykowany build. | <img width="512" height="588" alt="auto" src="docs/lobby.gif" /> |
 | **🔒 Ghost Mode (Click-Through)**<br>Jeden skrót zablokuje nakładkę – staje się przezroczysta dla myszki. Koniec z przypadkowym kliknięciem w panel zamiast rzucenia umiejętności. | <img width="512" height="288" alt="lock" src="https://github.com/user-attachments/assets/8c13d8de-8cf8-4270-aef5-82a5dc7b09cd" /> |
 | **📊 Elastyczność Danych w Locie**<br>Przełączaj się płynnie między statystykami przedmiotów a najpopularniejszymi kompozycjami społeczności. | <img width="371" height="209" alt="commstats" src="https://github.com/user-attachments/assets/2c666e0c-12e8-4d1c-9aaf-afcb620d71c7" /> |
 | **👻 Niewidzialny Interfejs**<br>Dostosuj suwak przezroczystości tła do zera, aby na ekranie wyświetlały się tylko czyste ikony przedmiotów. | <img width="367" height="206" alt="opacity" src="https://github.com/user-attachments/assets/5867bb18-5593-43cc-992f-622e653d6c96" /> |
 | **⚙️ Głęboka Personalizacja**<br>Pełna kontrola nad interfejsem: precyzyjne ustawienia, globalne hotkeye oraz 8 wbudowanych motywów kolorystycznych (Themes). | <img width="348" height="434" alt="options" src="https://github.com/user-attachments/assets/badfa8c1-9f8e-42b7-a99d-7c6a8f0bb8e2" /> |
-| **🚀 Cichy Auto-Updater**<br>Po każdym patchu gry aplikacja automatycznie, w tle sprawdzi GitHub, pobierze aktualizacje i zaoferuje instalację jednym kliknięciem. | <img width="575" height="303" alt="update" src="auto-updater.png" /> |
+| **🚀 Cichy Auto-Updater**<br>Po każdym patchu gry aplikacja automatycznie, w tle sprawdzi GitHub, pobierze aktualizacje i zaoferuje instalację jednym kliknięciem. | <img width="575" height="303" alt="update" src="docs/auto-updater.png" /> |
 
 ---
 
