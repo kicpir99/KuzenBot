@@ -1,23 +1,18 @@
+# KuzenBot 🐢⚡
+
 <div align="center">
-  <img src="logo.png" alt="KuzenBot Logo" width="120">
+  <a href="#-english-version">🇬🇧 English</a> • <a href="#-wersja-polska">🇵🇱 Polski</a>
+</div>
 
-  # KuzenBot 🐢⚡
-  **Stop Alt-Tabbing. Builds right on your screen.**
-  
-  <p align="center">
-    <a href="#-english-version">🇬🇧 English</a> • <a href="#-wersja-polska">🇵🇱 Polski</a>
-  </p>
+<p align="center">
+  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python Version">
+  <img src="https://img.shields.io/badge/UI-PyQt6-green" alt="PyQt6">
+  <img src="https://img.shields.io/badge/Game-Smite_2-orange" alt="Smite 2">
+  <img src="https://img.shields.io/github/v/release/kicpir99/KuzenBot?color=purple" alt="Latest Release">
+</p>
 
-  <p align="center">
-    <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python Version">
-    <img src="https://img.shields.io/badge/UI-PyQt6-green" alt="PyQt6">
-    <img src="https://img.shields.io/badge/Game-Smite_2-orange" alt="Smite 2">
-    <img src="https://img.shields.io/github/v/release/kicpir99/KuzenBot?color=purple" alt="Latest Release">
-  </p>
-
-  <h3>
-    <a href="https://kicpir99.github.io/KuzenBot/">🌐 Visit official website (Download)</a>
-  </h3>
+<div align="center">
+  <h3><a href="https://kicpir99.github.io/KuzenBot/">🌐 Odwiedź oficjalną stronę / Visit official website (Download)</a></h3>
 </div>
 
 ---
@@ -33,9 +28,9 @@
   <p>KuzenBot is an external Windows overlay. It does not inject code into the game memory (Zero Memory Injection) and does not modify any files, making it completely safe to use with Anti-Cheat systems.</p>
 </div>
 
-### ✨ Main Features
+### ✨ Main Features & In-Game Preview
 
-| Feature | In-Game Preview |
+| Feature | Preview |
 | :--- | :---: |
 | **✨ Flexible Mode (Extended & Mini)**<br>In base? Open Extended to view full item stats. In combat? Switch to Mini – a small tile that doesn't block vision. | <img src="mini.gif" width="350" alt="Mini Mode"> |
 | **🤖 Intelligence (AUTO Mode)**<br>The app automatically detects the god you pick in the lobby and instantly loads the dedicated build. | <img src="lobby.gif" width="350" alt="God Detection"> |
