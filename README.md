@@ -97,6 +97,11 @@ If you want to run the project from the source:
 </div>
 
 ---
+## 🇵🇱 Wersja Polska
+
+**KuzenBot** to zaawansowana, lekka nakładka dla graczy Smite 2, która wyświetla najlepsze buildy społeczności i metastatystyki bezpośrednio na ekranie, bez konieczności minimalizowania gry (Alt-Tab).
+
+> ⚠️ **WAŻNE:** Aby nakładka poprawnie wyświetlała się na wierzchu gry, Smite 2 **musi** działać w trybie **Okna bez Ramki** lub **Okna**. Wyłączny tryb pełnoekranowy zablokuje wyświetlanie nakładki.
 
 <div align="center">
   <h3>🛡️ W 100% bezpieczne. Zero modyfikacji plików gry.</h3>
