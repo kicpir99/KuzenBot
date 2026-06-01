@@ -35,7 +35,7 @@
 | Feature | Preview |
 | :--- | :---: |
 | **✨ Flexible Mode (Extended & Mini)**<br>In base? Open Extended to view full item stats. In combat? Switch to Mini – a small tile that doesn't block vision. | <img width="348" height="196" alt="mini" src="https://github.com/user-attachments/assets/6dd565de-8345-4298-b434-b79b497c1bfe" /> |
-| **🤖 Intelligence (AUTO Mode)**<br>The app automatically detects the god you pick in the lobby and instantly loads the dedicated build. | <img width="512" height="588" alt="auto" src="https://kicpir99.github.io/KuzenBot/lobby.gif" /> |
+| **🤖 Intelligence (AUTO Mode)**<br>The app automatically detects the god you pick in the lobby and instantly loads the dedicated build. | <img width="512" height="588" alt="auto" src="docs/lobby.gif" /> |
 | **🔒 Ghost Mode (Click-Through)**<br>One hotkey locks the overlay – making it transparent to mouse clicks. No more accidental panel clicks instead of casting abilities. | <img width="512" height="288" alt="lock" src="https://github.com/user-attachments/assets/8c13d8de-8cf8-4270-aef5-82a5dc7b09cd" /> |
 | **📊 Data Flexibility on the Fly**<br>Seamlessly switch between raw item statistics and the most popular community builds. | <img width="371" height="209" alt="commstats" src="https://github.com/user-attachments/assets/2c666e0c-12e8-4d1c-9aaf-afcb620d71c7" /> |
 | **👻 Invisible Interface**<br>Adjust the background opacity down to zero, leaving only clean item icons on the screen. | <img width="367" height="206" alt="opacity" src="https://github.com/user-attachments/assets/5867bb18-5593-43cc-992f-622e653d6c96" /> |
