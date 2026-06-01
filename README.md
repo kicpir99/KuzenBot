@@ -1,21 +1,27 @@
 
-<img src="docs/logo.png" alt="KuzenBot Logo" width="120">
-
-# KuzenBot
-
 <div align="center">
-  <a href="#-english-version">🇬🇧 English</a> • <a href="#-wersja-polska">🇵🇱 Polski</a>
-</div>
+  
+  <img src="docs/logo.png" alt="KuzenBot Logo" width="120">
 
-<p align="center">
-  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python Version">
-  <img src="https://img.shields.io/badge/UI-PyQt6-green" alt="PyQt6">
-  <img src="https://img.shields.io/badge/Game-Smite_2-orange" alt="Smite 2">
-  <img src="https://img.shields.io/github/v/release/kicpir99/KuzenBot?color=purple" alt="Latest Release">
-</p>
+  **Stop Alt-Tabbing. Builds right on your screen..**
+  
+  <p align="center">
+    <a href="#-english-version">🇬🇧 English</a> • <a href="#-wersja-polska">🇵🇱 Polski</a>
+  </p>
 
-<div align="center">
-  <h3><a href="https://kicpir99.github.io/KuzenBot/">🌐 Odwiedź oficjalną stronę / Visit official website (Download)</a></h3>
+  <p align="center">
+    <img src="https://img.shields.io/badge/Status-Active-success.svg" alt="Status">
+    <img src="https://img.shields.io/badge/Game-Smite_2-orange" alt="Smite 2">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+    <img src="https://img.shields.io/github/v/release/kicpir99/KuzenBot?color=purple" alt="Latest Release">
+  </p>
+
+  <h3>
+    <a href="https://kicpir99.github.io/KuzenBot/">🌐 Visit official website (Download)</a>
+  </h3>
+
+  <i>A lightweight, undetectable overlay for Smite 2 players that delivers the best builds straight to your screen without minimizing the game.</i>
+
 </div>
 
 ---
