@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KuzenBot - Smite 2 In-Game Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0e12;
+            --card-bg: #15171e;
+            --text-primary: #e0e0e0;
+            --text-muted: #8892b0;
+            --accent-cyan: #00e5ff;
+            --accent-gold: #f0c243;
+            --brand-gold: #C5A059;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glow-cyan: rgba(0, 229, 255, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Navbar Style */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(13, 14, 18, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo img { height: 40px; width: auto; display: block; }
+        .logo-text { font-size: 26px; font-weight: 700; font-family: 'Rajdhani', sans-serif; letter-spacing: 0.5px; display: flex; align-items: center; }
+        .logo-text-white { color: #ffffff; }
+        .logo-text-brand { color: var(--brand-gold); }
+
+        .nav-right { display: flex; align-items: center; gap: 30px; }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--accent-cyan); }
+
+        /* Modyfikacja CSS: Wygląd przełącznika języka */
+        .lang-switcher select {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        .lang-switcher select:hover { border-color: var(--accent-cyan); }
+        .lang-switcher select option { background: var(--card-bg); color: #fff; }
+
+        /* Hero Section */
+        header {
+            padding: 160px 8% 100px 8%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        header::before {
+            content: ''; position: absolute; width: 400px; height: 400px;
+            background: var(--accent-cyan); filter: blur(150px); opacity: 0.12; top: 50px; z-index: -1;
+        }
+
+        .trust-badge {
+            background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.2); color: var(--accent-cyan);
+            padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 24px; letter-spacing: 0.5px;
+        }
+
+        header h1 { font-size: 56px; line-height: 1.1; margin-bottom: 20px; max-width: 800px; color: #fff; }
+        header h1 span { color: var(--accent-cyan); }
+        header p { font-size: 18px; color: var(--text-muted); max-width: 600px; margin-bottom: 40px; }
+
+        .cta-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .btn-download {
+            background: linear-gradient(135deg, var(--accent-cyan), #00b0ff); color: #000;
+            padding: 16px 40px; font-size: 16px; font-weight: 700; text-decoration: none; border-radius: 8px;
+            transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3); position: relative; overflow: hidden;
+        }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0, 229, 255, 0.5); }
+        
+        .cta-info { font-size: 12px; color: var(--text-muted); }
+        .cta-warning { font-size: 12px; color: rgba(240, 194, 67, 0.7); max-width: 420px; text-align: center; line-height: 1.5; }
+
+        .hero-image-container { margin-top: 60px; width: 100%; max-width: 580px; position: relative; display: flex; justify-content: center; }
+        .hero-image-container::before {
+            content: ''; position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); width: 70%; height: 60px;
+            background: var(--accent-cyan); filter: blur(40px); opacity: 0.2; border-radius: 50%; z-index: 0;
+        }
+        .hero-app-image {
+            width: 100%; height: auto; border-radius: 16px; position: relative; z-index: 1; padding: 2px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 229, 255, 0.2), 0 0 80px rgba(240, 194, 67, 0.08);
+            object-fit: cover; animation: heroFloat 6s ease-in-out infinite; transition: box-shadow 0.4s ease;
+        }
+        .hero-app-image:hover { box-shadow: 0 35px 70px rgba(0, 0, 0, 0.85), 0 0 55px rgba(0, 229, 255, 0.3), 0 0 100px rgba(240, 194, 67, 0.12); }
+
+        .features-section { padding: 100px 8%; max-width: 1550px; margin: 0 auto; }
+        .feature-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 120px; gap: 60px; }
+        .feature-row:nth-child(even) { flex-direction: row-reverse; }
+        .feature-content { flex: 0 0 38%; }
+        
+        .feature-graphic {
+            flex: 0 0 56%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
+            padding: 24px; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .feature-graphic::after { content: ''; position: absolute; width: 150px; height: 150px; background: var(--accent-cyan); filter: blur(80px); opacity: 0.15; z-index: 1; }
+
+        .feature-media { width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); z-index: 2; object-fit: cover; transition: transform 0.3s ease; }
+        .feature-media.media-sm { width: 75%; }
+        .feature-graphic:hover .feature-media { transform: translateY(-5px); }
+
+        .feature-badge {
+            display: inline-flex; align-items: center; gap: 8px; color: var(--accent-gold);
+            background-color: rgba(240, 194, 67, 0.1); border: 1px solid rgba(240, 194, 67, 0.25);
+            padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+        }
+
+        .feature-content h2 { font-size: 36px; color: #fff; margin-bottom: 16px; line-height: 1.2; }
+        .feature-content p { color: var(--text-muted); font-size: 16px; margin-bottom: 20px; }
+
+        .swatch-group { display: flex; gap: 10px; margin-top: 15px; }
+        .swatch { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+        .swatch.gold { background: #f0c243; border-color: #fff; }
+        .swatch.ruby { background: #ff4a4a; }
+        .swatch.cyber { background: #00e5ff; }
+
+        .faq-section { background: rgba(21, 23, 30, 0.4); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 100px 8%; }
+        .faq-container { max-width: 800px; margin: 0 auto; }
+        .faq-section h2 { text-align: center; font-size: 40px; margin-bottom: 50px; color: #fff; }
+        .faq-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 24px; margin-bottom: 16px; cursor: pointer; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+        .faq-item:hover { border-color: rgba(0, 229, 255, 0.2); box-shadow: 0 0 16px rgba(0, 229, 255, 0.06); }
+        .faq-item h3 { font-size: 18px; color: #fff; margin-bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; user-select: none; }
+        .faq-item h3::after { content: '+'; font-size: 22px; font-weight: 300; color: var(--accent-cyan); transition: transform 0.3s ease; flex-shrink: 0; margin-left: 12px; }
+        .faq-item.open h3::after { transform: rotate(45deg); }
+        .faq-body { overflow: hidden; max-height: 0; transition: max-height 0.4s ease, padding-top 0.3s ease; padding-top: 0; }
+        .faq-item.open .faq-body { max-height: 300px; padding-top: 14px; color: var(--text-muted); font-size: 15px; line-height: 1.6; }
+
+        footer { padding: 60px 8% 40px 8%; text-align: center; font-size: 14px; color: var(--text-muted); }
+        .footer-content { display: flex; flex-direction: column; align-items: center; gap: 24px; margin-bottom: 30px; }
+        .footer-links a { color: var(--text-primary); text-decoration: none; margin: 0 15px; transition: color 0.3s ease; }
+        .footer-links a:hover { color: var(--accent-cyan); }
+        .support-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 16px 32px; border-radius: 8px; display: inline-block; }
+        .support-box strong { color: #fff; display: block; margin-bottom: 8px; }
+        .support-box span { color: #fff; font-weight: 500; }
+        .support-box a { color: var(--accent-cyan); text-decoration: none; font-weight: 500; }
+        .disclaimer { font-size: 11px; max-width: 600px; margin: 0 auto; opacity: 0.5; }
+
+        @keyframes heroFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        .hero-animate { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+        .hero-animate:nth-child(1) { animation-delay: 0.1s; }
+        .hero-animate:nth-child(2) { animation-delay: 0.25s; }
+        .hero-animate:nth-child(3) { animation-delay: 0.4s; }
+        .hero-animate:nth-child(4) { animation-delay: 0.55s; }
+        .hero-animate:nth-child(5) { animation-delay: 0.7s; }
+        .feature-row { opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .feature-row.visible { opacity: 1; transform: translateY(0); }
+        .section-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.25) 40%, rgba(240, 194, 67, 0.2) 60%, transparent); margin: 0 8%; }
+
+        @media (max-width: 850px) {
+            nav { flex-direction: column; gap: 15px; padding: 15px 5%; }
+            .nav-right { flex-direction: column; gap: 15px; }
+            header { padding: 160px 5% 60px 5%; }
+            header h1 { font-size: 36px; }
+            .feature-row, .feature-row:nth-child(even) { flex-direction: column; gap: 30px; margin-bottom: 60px; }
+            .feature-content, .feature-graphic { flex: 1 1 100%; width: 100%; }
+            .feature-media.media-sm { width: 85%; }
+            .faq-section { padding: 60px 5%; }
+        }
+
+        body, header::before, .hero-app-image, .feature-graphic::after, 
+        .btn-download, .trust-badge, .feature-badge {
+            transition: background-color 0.5s ease, background 0.5s ease, 
+                        border-color 0.5s ease, box-shadow 0.5s ease, color 0.5s ease;
+        }
+
+        /* Nowe style dla kafelków personalizacji */
+        .swatch-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .swatch:hover {
+            transform: scale(1.15);
+        }
+        .swatch.active {
+            border-color: #ffffff;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px currentColor; /* Kółko świeci własnym kolorem */
+        }
+        .swatch:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="https://github.com/kicpir99/KuzenBot" target="_blank" class="logo">
+            <img src="logo.png" alt="Ikona KuzenBot">
+            <div class="logo-text">
+                <span class="logo-text-white">Kuzen</span><span class="logo-text-brand">Bot</span>
+            </div>
+        </a>
+        
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="#features" data-i18n="nav_features">Funkcje</a>
+                <a href="#faq" data-i18n="nav_faq">FAQ</a>
+                <a href="https://github.com/kicpir99/KuzenBot" target="_blank">GitHub</a>
+            </div>
+            
+            <div class="lang-switcher">
+                <select id="langSelect">
+                    <option value="pl">🇵🇱 Polski</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
+                    <option value="de">🇩🇪 Deutsch</option>
+                    <option value="it">🇮🇹 Italiano</option>
+                    <option value="ru">🇷🇺 Русский</option>
+                    <option value="uk">🇺🇦 Українська</option>
+                    <option value="pt">🇵🇹 Português</option>
+                    <option value="zh">🇨🇳 中文(简体)</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <header>
+        <div class="trust-badge hero-animate" data-i18n="hero_badge">🛡️ Nakładka, nie cheat. Zero ryzyka bana.</div>
+        
+        <h1 class="hero-animate"><span data-i18n="hero_h1_1">Koniec z alt+tabem.</span> <br><span data-i18n="hero_h1_2">Build masz przed oczami.</span></h1>
+        <p class="hero-animate" data-i18n="hero_desc">Nakładka dla graczy Smite 2, którzy nie mają czasu szukać itemów w przeglądarce w środku teamfightu. Optymalny build zawsze na wierzchu – lekko, szybko, bez laga.</p>
+        
+        <div class="cta-group hero-animate">
+            <a href="#" id="download-link" class="btn-download" download data-i18n="btn_download">Pobierz dla Windows</a>
+            <span class="cta-info"><span data-i18n="cta_info_1">Darmowy • Wersja</span> <span id="app-version">najnowsza</span> <span data-i18n="cta_info_2">• Open Source</span></span>
+            <span class="cta-warning" data-i18n="cta_warning">⚠️ Windows może wyświetlić ostrzeżenie SmartScreen przy pierwszym uruchomieniu – to normalne dla darmowego open source. Kliknij „Więcej informacji" → „Uruchom mimo to".</span>
+        </div>
+
+        <div class="hero-image-container hero-animate">
+            <img src="aplikacja.png" alt="Główny interfejs nakładki KuzenBot w grze" class="hero-app-image">
+        </div>
+    </header>
+
+    <section class="features-section" id="features">
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge" data-i18n="feat1_badge">✨ Tryb Elastyczny</div>
+                <h2 data-i18n="feat1_title">Extended i Mini – jeden skrót, dwa tryby</h2>
+                <p data-i18n="feat1_desc">W bazie? Rozłóż <strong>Extended</strong> i przejrzyj pełne statsy itemów, zanim wydasz złoto. W trakcie walki? Przełącz się na <strong>Mini</strong> – mały kafelek w rogu, który nie zasłania nic ważnego. Zero rozpraszania, pełna kontrola.</p>
+            </div>
+            <div class="feature-graphic">
+                <img src="mini.gif" alt="Nakładka w trybie Mini widoczna podczas teamfightu" class="feature-media">
+            </div>
+        </div>
+
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge" data-i18n="feat2_badge">🤖 Inteligencja</div>
+                <h2 data-i18n="feat2_title">Tryb AUTO – aplikacja sama wie, kogo grasz</h2>
+                <p data-i18n="feat2_desc">Nie musisz wpisywać nic w pick phase. KuzenBot widzi, kogo wybierasz i od razu ładuje build dla tego boga. Zanim skończy się countdown, masz już gotową ścieżkę itemów. Zero klikania, zero guglowania.</p>
+            </div>
+            <div class="feature-graphic">
+                <img src="lobby.gif" alt="Automatyczne wykrywanie boga w lobby" class="feature-media">
+            </div>
+        </div>
+
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge" data-i18n="feat3_badge">🔒 Bezpieczeństwo i Wygoda</div>
+                <h2 data-i18n="feat3_title">Ghost Mode – nakładka znika dla kursora</h2>
+                <p data-i18n="feat3_desc">Jeden skrót i nakładka przestaje reagować na kliknięcia – możesz klikać przez nią jakby jej nie było. Koniec z przypadkowym kliknięciem w panel zamiast rzucenia ulta. Kiedy chcesz znowu coś zmienić, jednym przyciskiem ją odblokowujesz.</p>
+            </div>
+            <div class="feature-graphic">
+                <img src="lock.gif" alt="Blokowanie nakładki w trybie click-through" class="feature-media">
+            </div>
+        </div>
+
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge" data-i18n="feat4_badge">📊 Elastyczność Danych</div>
+                <h2 data-i18n="feat4_title">Statystyczne i Społeczność – przełącz w locie</h2>
+                <p data-i18n="feat4_desc">Wolisz sprawdzić co proponują budować inni użytkownicy? Ustaw <strong>Community</strong>. Wolisz twarde liczby i matematykę za itemami? Przełącz na <strong>Stats</strong>. Jeden klik i gotowe – bez wychodzenia z gry, bez zmiany żadnych ustawień.</p>
+            </div>
+            <div class="feature-graphic">
+                <img src="commstats.gif" alt="Przełączanie między statystykami a buildami społeczności" class="feature-media">
+            </div>
+        </div>
+
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge" data-i18n="feat5_badge">👻 Niewidzialny Interfejs</div>
+                <h2 data-i18n="feat5_title">Ustaw przezroczystość tak, żeby nie przeszkadzała</h2>
+                <p data-i18n="feat5_desc">Możesz ściągnąć tło do zera i zostają tylko ikonki itemów – minimalistycznie i bez zasłaniania mapy. A możesz zostawić pełny panel. Regulujesz suwak i dopasowujesz pod siebie, zależnie od tego jak bardzo chcesz mieć nakładkę "w tle".</p>
+            </div>
+            <div class="feature-graphic">
+                <img src="opacity.gif" alt="Suwak przezroczystości zmieniający widoczność nakładki w grze" class="feature-media">
+            </div>
+        </div>
+
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge" data-i18n="feat6_badge">⚙️ Personalizacja</div>
+                <h2 data-i18n="feat6_title">Motywy, hotkeye, przezroczystość – wszystko pod siebie</h2>
+                <p data-i18n="feat6_desc">Wybierz motyw kolorystyczny, który Ci odpowiada, ustaw swoje własne skróty klawiszowe i dostosuj wygląd panelu do swoich przyzwyczajeń. KuzenBot ma się wpasować w Twój setup, a nie odwrotnie.</p>
+                <div class="swatch-group" id="theme-switcher" role="radiogroup" aria-label="Wybierz motyw kolorystyczny">
+                    <div class="swatch active" data-theme="gold" style="background: #C5A059;" tabindex="0" role="radio" aria-checked="true" aria-label="Złoty motyw"></div>
+                    <div class="swatch" data-theme="ruby" style="background: #EF4444;" tabindex="0" role="radio" aria-checked="false" aria-label="Rubinowy motyw"></div>
+                    <div class="swatch" data-theme="blizzard" style="background: #3B82F6;" tabindex="0" role="radio" aria-checked="false" aria-label="Niebieski motyw Blizzard"></div>
+                    <div class="swatch" data-theme="emerald" style="background: #10B981;" tabindex="0" role="radio" aria-checked="false" aria-label="Szmaragdowy motyw"></div>
+                    <div class="swatch" data-theme="void" style="background: #8B5CF6;" tabindex="0" role="radio" aria-checked="false" aria-label="Fioletowy motyw Void"></div>
+                    <div class="swatch" data-theme="cyber" style="background: #F472B6;" tabindex="0" role="radio" aria-checked="false" aria-label="Różowy motyw Cyber"></div>
+                    <div class="swatch" data-theme="toxic" style="background: #A3E635;" tabindex="0" role="radio" aria-checked="false" aria-label="Zielony motyw Toxic"></div>
+                    <div class="swatch" data-theme="abyss" style="background: #FF003C;" tabindex="0" role="radio" aria-checked="false" aria-label="Czerwony motyw Abyss"></div>
+                </div>
+            </div>
+            <div class="feature-graphic">
+                <img src="options.gif" alt="Panel opcji i personalizacji nakładki" class="feature-media media-sm">
+            </div>
+        </div>
+
+        <div class="feature-row">
+            <div class="feature-content">
+                <div class="feature-badge" data-i18n="feat7_badge">🚀 Utrzymanie</div>
+                <h2 data-i18n="feat7_title">Aktualizacje same wpadają – Ty nie musisz nic robić</h2>
+                <p data-i18n="feat7_desc">Po każdym patchu Smite 2 nie musisz pamiętać o sprawdzeniu nowej wersji. KuzenBot sam sprawdza, czy jest coś nowego na GitHubie, pobiera w tle i informuje Cię jednym przyciskiem. Jedno kliknięcie i jesteś na bieżąco.</p>
+            </div>
+            <div class="feature-graphic">
+                <img src="auto-updater.png" alt="Ekran cichego auto-updatera w tle" class="feature-media">
+            </div>
+        </div>
+
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section class="faq-section" id="faq">
+        <div class="faq-container">
+            <h2 data-i18n="faq_title">Najczęściej zadawane pytania</h2>
+            
+            <div class="faq-item">
+                <h3 data-i18n="faq1_q">🛡️ Czy grozi mi ban za używanie KuzenBota?</h3>
+                <div class="faq-body"><p data-i18n="faq1_a">Nie. Aplikacja w żaden sposób nie dotyka plików Smite 2 ani pamięci gry – nie ma tu żadnej injekcji ani modyfikacji. KuzenBot to zwykła nakładka systemu Windows, która wyświetla się nad grą jak każde inne okno. Hi-Rez nie ma powodów, żeby to karać, i jest to zgodne z ich regulaminem.</p></div>
+            </div>
+
+            <div class="faq-item">
+                <h3 data-i18n="faq2_q">⚠️ Windows wyświetla ostrzeżenie przy instalacji – czemu?</h3>
+                <div class="faq-body"><p data-i18n="faq2_a">Bo to projekt hobbystyczny, który nie zarabia ani złotówki, więc nie ma sensu płacić kilku tysięcy za komercyjny certyfikat cyfrowy Microsoftu. To normalne przy darmowym oprogramowaniu open source. Cały kod źródłowy jest jawny na GitHubie – możesz go przejrzeć samodzielnie i upewnić się, że nie ma tam nic podejrzanego.</p></div>
+            </div>
+
+            <div class="faq-item">
+                <h3 data-i18n="faq3_q">📈 Czy nakładka zamuli mi grę albo obniży FPS?</h3>
+                <div class="faq-body"><p data-i18n="faq3_a">Nie. KuzenBot jest celowo zaprojektowany tak, żeby nie wpływać na wydajność gry – zużywa dosłownie śladowe ilości RAM i CPU. To nie jest jakiś ciężki klient jak Blitz czy Overwolf. Nakładka działa cicho w tle i nie powinna dać Ci odczuć jej obecności pod względem wydajności.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#features" data-i18n="nav_features">Funkcje</a>
+                <a href="#faq" data-i18n="nav_faq">FAQ</a>
+                <a href="https://github.com/kicpir99/KuzenBot" target="_blank">GitHub</a>
+            </div>
+            
+            <div class="support-box">
+                <strong data-i18n="footer_support">Masz problem albo pomysł? Napisz:</strong>
+                Discord: <span>lukaszkozaczekv.2.0</span> &nbsp;|&nbsp; 
+                E-mail: <a href="mailto:kicpir99@wp.pl">kicpir99@wp.pl</a>
+            </div>
+        </div>
+        
+        <p data-i18n="footer_copy">© 2026 KuzenBot. Strona stworzona na infrastrukturze GitHub Pages.</p>
+        <p class="disclaimer" data-i18n="footer_disc">KuzenBot to niezależny projekt open source, niezwiązany w żaden sposób z Hi-Rez Studios ani Titan Forge Games. Smite 2 i wszelkie powiązane znaki towarowe należą do ich właścicieli.</p>
+    </footer>
+
+    <script>
+        // --- 🌍 SYSTEM WIELOJĘZYCZNOŚCI (i18n) ---
+        const translations = {
+            pl: {
+                nav_features: "Funkcje", nav_faq: "FAQ",
+                hero_badge: "🛡️ Nakładka, nie cheat. Zero ryzyka bana.",
+                hero_h1_1: "Koniec z alt+tabem.", hero_h1_2: "Build masz przed oczami.",
+                hero_desc: "Nakładka dla graczy Smite 2, którzy nie mają czasu szukać itemów w przeglądarce w środku teamfightu. Optymalny build zawsze na wierzchu – lekko, szybko, bez laga.",
+                btn_download: "Pobierz dla Windows",
+                cta_info_1: "Darmowy • Wersja", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ Windows może wyświetlić ostrzeżenie SmartScreen przy pierwszym uruchomieniu – to normalne dla darmowego open source. Kliknij „Więcej informacji\" → „Uruchom mimo to\".",
+                feat1_badge: "✨ Tryb Elastyczny",
+                feat1_title: "Extended i Mini – jeden skrót, dwa tryby",
+                feat1_desc: "W bazie? Rozłóż <strong>Extended</strong> i przejrzyj pełne statsy itemów, zanim wydasz złoto. W trakcie walki? Przełącz się na <strong>Mini</strong> – mały kafelek w rogu, który nie zasłania nic ważnego. Zero rozpraszania, pełna kontrola.",
+                feat2_badge: "🤖 Inteligencja",
+                feat2_title: "Tryb AUTO – aplikacja sama wie, kogo grasz",
+                feat2_desc: "Nie musisz wpisywać nic w pick phase. KuzenBot widzi, kogo wybierasz i od razu ładuje build dla tego boga. Zanim skończy się countdown, masz już gotową ścieżkę itemów. Zero klikania, zero guglowania.",
+                feat3_badge: "🔒 Bezpieczeństwo i Wygoda",
+                feat3_title: "Ghost Mode – nakładka znika dla kursora",
+                feat3_desc: "Jeden skrót i nakładka przestaje reagować na kliknięcia – możesz klikać przez nią jakby jej nie było. Koniec z przypadkowym kliknięciem w panel zamiast rzucenia ulta. Kiedy chcesz znowu coś zmienić, jednym przyciskiem ją odblokowujesz.",
+                feat4_badge: "📊 Elastyczność Danych",
+                feat4_title: "Statystyczne i Społeczność – przełącz w locie",
+                feat4_desc: "Wolisz sprawdzić co proponują budować inni użytkownicy? Ustaw <strong>Community</strong>. Wolisz twarde liczby i matematykę za itemami? Przełącz na <strong>Stats</strong>. Jeden klik i gotowe – bez wychodzenia z gry, bez zmiany żadnych ustawień.",
+                feat5_badge: "👻 Niewidzialny Interfejs",
+                feat5_title: "Ustaw przezroczystość tak, żeby nie przeszkadzała",
+                feat5_desc: "Możesz ściągnąć tło do zera i zostają tylko ikonki itemów – minimalistycznie i bez zasłaniania mapy. A możesz zostawić pełny panel. Regulujesz suwak i dopasowujesz pod siebie, zależnie od tego jak bardzo chcesz mieć nakładkę \"w tle\".",
+                feat6_badge: "⚙️ Personalizacja",
+                feat6_title: "Motywy, hotkeye, przezroczystość – wszystko pod siebie",
+                feat6_desc: "Wybierz motyw kolorystyczny, który Ci odpowiada, ustaw swoje własne skróty klawiszowe i dostosuj wygląd panelu do swoich przyzwyczajeń. KuzenBot ma się wpasować w Twój setup, a nie odwrotnie.",
+                feat7_badge: "🚀 Utrzymanie",
+                feat7_title: "Aktualizacje same wpadają – Ty nie musisz nic robić",
+                feat7_desc: "Po każdym patchu Smite 2 nie musisz pamiętać o sprawdzeniu nowej wersji. KuzenBot sam sprawdza, czy jest coś nowego na GitHubie, pobiera w tle i informuje Cię jednym przyciskiem. Jedno kliknięcie i jesteś na bieżąco.",
+                faq_title: "Najczęściej zadawane pytania",
+                faq1_q: "🛡️ Czy grozi mi ban za używanie KuzenBota?",
+                faq1_a: "Nie. Aplikacja w żaden sposób nie dotyka plików Smite 2 ani pamięci gry – nie ma tu żadnej injekcji ani modyfikacji. KuzenBot to zwykła nakładka systemu Windows, która wyświetla się nad grą jak każde inne okno. Hi-Rez nie ma powodów, żeby to karać, i jest to zgodne z ich regulaminem.",
+                faq2_q: "⚠️ Windows wyświetla ostrzeżenie przy instalacji – czemu?",
+                faq2_a: "Bo to projekt hobbystyczny, który nie zarabia ani złotówki, więc nie ma sensu płacić kilku tysięcy za komercyjny certyfikat cyfrowy Microsoftu. To normalne przy darmowym oprogramowaniu open source. Cały kod źródłowy jest jawny na GitHubie – możesz go przejrzeć samodzielnie i upewnić się, że nie ma tam nic podejrzanego.",
+                faq3_q: "📈 Czy nakładka zamuli mi grę albo obniży FPS?",
+                faq3_a: "Nie. KuzenBot jest celowo zaprojektowany tak, żeby nie wpływać na wydajność gry – zużywa dosłownie śladowe ilości RAM i CPU. To nie jest jakiś ciężki klient jak Blitz czy Overwolf. Nakładka działa cicho w tle i nie powinna dać Ci odczuć jej obecności pod względem wydajności.",
+                footer_support: "Masz problem albo pomysł? Napisz:",
+                footer_copy: "© 2026 KuzenBot. Strona stworzona na infrastrukturze GitHub Pages.",
+                footer_disc: "KuzenBot to niezależny projekt open source, niezwiązany w żaden sposób z Hi-Rez Studios ani Titan Forge Games. Smite 2 i wszelkie powiązane znaki towarowe należą do ich właścicieli."
+            },
+            en: {
+                nav_features: "Features", nav_faq: "FAQ",
+                hero_badge: "🛡️ Overlay, not a cheat. Zero ban risk.",
+                hero_h1_1: "Stop Alt-Tabbing.", hero_h1_2: "Builds right on your screen.",
+                hero_desc: "An overlay for Smite 2 players who don't have time to search for items in a browser during a teamfight. Optimal builds always on top – lightweight, fast, lag-free.",
+                btn_download: "Download for Windows",
+                cta_info_1: "Free • Version", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ Windows might show a SmartScreen warning on first launch – this is normal for free open-source software. Click 'More info' → 'Run anyway'.",
+                feat1_badge: "✨ Flexible Mode",
+                feat1_title: "Extended & Mini – one hotkey, two modes",
+                feat1_desc: "In base? Open <strong>Extended</strong> mode to view full item stats before spending gold. In combat? Switch to <strong>Mini</strong> – a small tile in the corner that doesn't block vision. Zero distraction, full control.",
+                feat2_badge: "🤖 Intelligence",
+                feat2_title: "AUTO Mode – app knows who you play",
+                feat2_desc: "No need to type anything during pick phase. KuzenBot sees your selected god and instantly loads the build. You have an item path ready before the countdown ends. Zero clicks, zero googling.",
+                feat3_badge: "🔒 Security & Comfort",
+                feat3_title: "Ghost Mode – overlay becomes unclickable",
+                feat3_desc: "One hotkey and the overlay stops reacting to clicks – you can click right through it. No more accidental panel clicks instead of casting an ult. Unlock it instantly with a hotkey when needed.",
+                feat4_badge: "📊 Data Flexibility",
+                feat4_title: "Stats & Community – switch on the fly",
+                feat4_desc: "Prefer to see what other users are building? Choose <strong>Community</strong>. Prefer raw numbers and item math? Switch to <strong>Stats</strong>. One click and you're set – without alt-tabbing or messing with settings.",
+                feat5_badge: "👻 Invisible UI",
+                feat5_title: "Set opacity to stay out of your way",
+                feat5_desc: "You can drop the background opacity to zero, leaving only item icons – minimalistic and map-friendly. Or keep the full panel. Adjust the slider to match how much you want the overlay 'in the background'.",
+                feat6_badge: "⚙️ Customization",
+                feat6_title: "Themes, hotkeys, opacity – make it yours",
+                feat6_desc: "Choose a color theme that fits your style, set your own global hotkeys, and adjust the panel look to your habits. KuzenBot is designed to fit your setup, not the other way around.",
+                feat7_badge: "🚀 Maintenance",
+                feat7_title: "Silent Auto-Updates in the background",
+                feat7_desc: "No need to manually check for new versions after every Smite 2 patch. KuzenBot automatically checks GitHub for updates, downloads them in the background, and lets you install with one click.",
+                faq_title: "Frequently Asked Questions",
+                faq1_q: "🛡️ Can I get banned for using KuzenBot?",
+                faq1_a: "No. The app does not touch Smite 2 files or game memory in any way – zero injection or modification. KuzenBot is just a standard Windows overlay. Hi-Rez has no reason to punish this, and it complies with their Terms of Service.",
+                faq2_q: "⚠️ Why does Windows show a warning during installation?",
+                faq2_a: "Because this is a hobbyist project making zero profit, so there's no point in paying thousands for a commercial Microsoft code signing certificate. It's normal for free open-source software. The source code is public on GitHub – you can verify it yourself.",
+                faq3_q: "📈 Will the overlay lag my game or drop FPS?",
+                faq3_a: "No. KuzenBot is specifically designed not to impact game performance – it consumes trace amounts of RAM and CPU. It's not a heavy client like Blitz or Overwolf. The overlay runs silently in the background.",
+                footer_support: "Got an issue or idea? Contact:",
+                footer_copy: "© 2026 KuzenBot. Site built on GitHub Pages infrastructure.",
+                footer_disc: "KuzenBot is an independent open-source project, not affiliated with or endorsed by Hi-Rez Studios or Titan Forge Games. Smite 2 and all related trademarks belong to their respective owners."
+            },
+            fr: {
+                nav_features: "Fonctionnalités", nav_faq: "FAQ",
+                hero_badge: "🛡️ Overlay, pas un cheat. Zéro risque de ban.",
+                hero_h1_1: "Fini les Alt+Tab.", hero_h1_2: "Les builds sous vos yeux.",
+                hero_desc: "Un overlay pour les joueurs de Smite 2 qui n'ont pas le temps de chercher des objets sur navigateur en plein teamfight. Le build optimal toujours au premier plan – léger, rapide, sans lag.",
+                btn_download: "Télécharger pour Windows",
+                cta_info_1: "Gratuit • Version", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ Windows peut afficher un avertissement SmartScreen au premier lancement – c'est normal pour un logiciel open source gratuit. Cliquez sur « Informations complémentaires » → « Exécuter quand même ».",
+                feat1_badge: "✨ Mode Flexible",
+                feat1_title: "Extended et Mini – un raccourci, deux modes",
+                feat1_desc: "À la base ? Ouvrez <strong>Extended</strong> et consultez les stats complètes avant de dépenser votre or. En combat ? Passez en <strong>Mini</strong> – une petite tuile qui ne bloque pas la vue. Zéro distraction, contrôle total.",
+                feat2_badge: "🤖 Intelligence",
+                feat2_title: "Mode AUTO – l'appli sait qui vous jouez",
+                feat2_desc: "Pas besoin de taper quoi que ce soit. KuzenBot voit quel dieu vous choisissez et charge instantanément son build. Zéro clic, zéro recherche.",
+                feat3_badge: "🔒 Sécurité & Confort",
+                feat3_title: "Ghost Mode – l'overlay devient incliquable",
+                feat3_desc: "Un raccourci et l'overlay cesse de réagir aux clics – vous pouvez cliquer à travers comme s'il n'était pas là. Fini les clics accidentels à la place d'un ulti.",
+                feat4_badge: "📊 Flexibilité des données",
+                feat4_title: "Stats et Communauté – changez à la volée",
+                feat4_desc: "Vous préférez voir ce que les autres joueurs construisent ? Choisissez <strong>Community</strong>. Vous préférez les chiffres bruts ? Passez à <strong>Stats</strong>. Un clic et c'est réglé.",
+                feat5_badge: "👻 Interface Invisible",
+                feat5_title: "Réglez l'opacité pour ne pas être dérangé",
+                feat5_desc: "Vous pouvez baisser l'opacité du fond à zéro, ne laissant que les icônes des objets – minimaliste et pratique. Ajustez le curseur selon vos préférences.",
+                feat6_badge: "⚙️ Personnalisation",
+                feat6_title: "Thèmes, raccourcis, opacité – à votre goût",
+                feat6_desc: "Choisissez un thème de couleurs, configurez vos propres raccourcis clavier et ajustez l'apparence. KuzenBot s'adapte à votre setup, et non l'inverse.",
+                feat7_badge: "🚀 Maintenance",
+                feat7_title: "Mises à jour silencieuses en arrière-plan",
+                feat7_desc: "Plus besoin de chercher de nouvelles versions après chaque patch de Smite 2. KuzenBot vérifie GitHub, télécharge en arrière-plan et vous informe.",
+                faq_title: "Foire aux questions",
+                faq1_q: "🛡️ Est-ce que je risque un ban pour utiliser KuzenBot ?",
+                faq1_a: "Non. L'application ne touche pas aux fichiers de Smite 2 ni à la mémoire du jeu – aucune injection. KuzenBot est un simple overlay Windows, conforme aux règles d'Hi-Rez.",
+                faq2_q: "⚠️ Pourquoi Windows affiche-t-il un avertissement ?",
+                faq2_a: "Parce qu'il s'agit d'un projet amateur gratuit, sans certificat commercial Microsoft coûteux. Le code source est public sur GitHub, vous pouvez le vérifier vous-même.",
+                faq3_q: "📈 L'overlay va-t-il faire baisser mes FPS ?",
+                faq3_a: "Non. KuzenBot est conçu pour ne pas impacter les performances. Il consomme très peu de RAM et de CPU, contrairement aux gros clients comme Blitz ou Overwolf.",
+                footer_support: "Un problème ou une idée ? Contactez :",
+                footer_copy: "© 2026 KuzenBot. Site créé sur l'infrastructure GitHub Pages.",
+                footer_disc: "KuzenBot est un projet open source indépendant, non affilié à Hi-Rez Studios ou Titan Forge Games. Smite 2 et les marques associées appartiennent à leurs propriétaires respectifs."
+            },
+            de: {
+                nav_features: "Funktionen", nav_faq: "FAQ",
+                hero_badge: "🛡️ Overlay, kein Cheat. Null Bann-Risiko.",
+                hero_h1_1: "Schluss mit Alt+Tab.", hero_h1_2: "Builds direkt auf dem Bildschirm.",
+                hero_desc: "Ein Overlay für Smite 2 Spieler, die mitten im Teamfight keine Zeit haben, Items im Browser zu suchen. Der optimale Build immer im Vordergrund – leicht, schnell, ohne Lags.",
+                btn_download: "Für Windows herunterladen",
+                cta_info_1: "Kostenlos • Version", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ Windows zeigt beim ersten Start möglicherweise eine SmartScreen-Warnung an – normal für kostenlose Open Source Software. Klicke auf „Weitere Informationen“ → „Trotzdem ausführen“.",
+                feat1_badge: "✨ Flexibler Modus",
+                feat1_title: "Extended & Mini – ein Hotkey, zwei Modi",
+                feat1_desc: "In der Basis? Öffne <strong>Extended</strong>, um die vollen Item-Stats zu sehen. Im Kampf? Wechsle zu <strong>Mini</strong> – eine kleine Kachel, die die Sicht nicht blockiert. Volle Kontrolle.",
+                feat2_badge: "🤖 Intelligenz",
+                feat2_title: "AUTO-Modus – die App weiß, wen du spielst",
+                feat2_desc: "KuzenBot erkennt, welchen Gott du wählst, und lädt sofort den Build. Du hast einen fertigen Item-Pfad, bevor der Countdown endet. Null Klicks.",
+                feat3_badge: "🔒 Sicherheit & Komfort",
+                feat3_title: "Ghost Mode – Klicks gehen durch das Overlay",
+                feat3_desc: "Ein Hotkey und das Overlay reagiert nicht mehr auf Klicks. Keine versehentlichen Klicks auf das Panel statt deiner Ult. Einfach per Knopfdruck wieder entsperren.",
+                feat4_badge: "📊 Daten-Flexibilität",
+                feat4_title: "Stats & Community – Wechsel im laufenden Spiel",
+                feat4_desc: "Du willst sehen, was andere bauen? Wähle <strong>Community</strong>. Lieber harte Zahlen? Wechsle zu <strong>Stats</strong>. Ein Klick und fertig – ohne Alt-Tab.",
+                feat5_badge: "👻 Unsichtbares UI",
+                feat5_title: "Transparenz anpassen, damit nichts stört",
+                feat5_desc: "Du kannst den Hintergrund auf null reduzieren, sodass nur die Item-Icons bleiben. Passe den Schieberegler an deine Bedürfnisse an.",
+                feat6_badge: "⚙️ Personalisierung",
+                feat6_title: "Themes, Hotkeys, Transparenz – ganz dein Stil",
+                feat6_desc: "Wähle ein Farbschema, lege deine eigenen Hotkeys fest und passe das Panel an. KuzenBot passt sich deinem Setup an, nicht umgekehrt.",
+                feat7_badge: "🚀 Wartung",
+                feat7_title: "Stille Auto-Updates im Hintergrund",
+                feat7_desc: "KuzenBot sucht automatisch auf GitHub nach neuen Versionen, lädt sie im Hintergrund herunter und informiert dich. Ein Klick und du bist auf dem neuesten Stand.",
+                faq_title: "Häufig gestellte Fragen",
+                faq1_q: "🛡️ Kann ich für die Nutzung von KuzenBot gebannt werden?",
+                faq1_a: "Nein. Die App berührt weder die Smite 2-Dateien noch den Spielspeicher – keine Injektion. KuzenBot ist ein normales Windows-Overlay und entspricht den Hi-Rez-Richtlinien.",
+                faq2_q: "⚠️ Warum zeigt Windows eine Warnung an?",
+                faq2_a: "Weil dies ein Hobbyprojekt ist, das keinen Gewinn abwirft, gibt es kein teures kommerzielles Microsoft-Zertifikat. Der Quellcode ist auf GitHub öffentlich einsehbar.",
+                faq3_q: "📈 Wird das Overlay mein Spiel verlangsamen (FPS-Drop)?",
+                faq3_a: "Nein. KuzenBot ist so konzipiert, dass es die Leistung nicht beeinträchtigt. Es verbraucht kaum RAM und CPU – ganz im Gegensatz zu schweren Clients wie Blitz.",
+                footer_support: "Problem oder Idee? Kontakt:",
+                footer_copy: "© 2026 KuzenBot. Seite erstellt über GitHub Pages.",
+                footer_disc: "KuzenBot ist ein unabhängiges Open-Source-Projekt und in keiner Weise mit Hi-Rez Studios oder Titan Forge Games verbunden."
+            },
+            it: {
+                nav_features: "Caratteristiche", nav_faq: "FAQ",
+                hero_badge: "🛡️ Overlay, non un cheat. Rischio ban zero.",
+                hero_h1_1: "Basta Alt+Tab.", hero_h1_2: "Build a portata di sguardo.",
+                hero_desc: "Un overlay per i giocatori di Smite 2 che non hanno tempo di cercare oggetti nel browser durante i teamfight. La build ottimale sempre in primo piano: leggero, veloce, senza lag.",
+                btn_download: "Scarica per Windows",
+                cta_info_1: "Gratis • Versione", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ Al primo avvio Windows potrebbe mostrare un avviso SmartScreen. È normale per i software open source gratuiti. Clicca su 'Ulteriori informazioni' → 'Esegui comunque'.",
+                feat1_badge: "✨ Modalità Flessibile",
+                feat1_title: "Extended e Mini – un tasto, due modalità",
+                feat1_desc: "In base? Apri <strong>Extended</strong> per vedere le statistiche complete prima di spendere oro. In combattimento? Passa a <strong>Mini</strong> – non blocca la visuale. Controllo totale.",
+                feat2_badge: "🤖 Intelligenza",
+                feat2_title: "Modalità AUTO – l'app sa chi stai giocando",
+                feat2_desc: "KuzenBot vede quale dio scegli e carica all'istante la build. Zero clic, zero ricerche.",
+                feat3_badge: "🔒 Sicurezza e Comfort",
+                feat3_title: "Ghost Mode – overlay non cliccabile",
+                feat3_desc: "Con un tasto rapido l'overlay smette di reagire ai clic, permettendoti di cliccare attraverso di esso. Mai più clic accidentali sul pannello invece che sulla mappa.",
+                feat4_badge: "📊 Flessibilità dei Dati",
+                feat4_title: "Statistiche e Community – cambia in volo",
+                feat4_desc: "Vuoi vedere cosa costruiscono gli altri? Scegli <strong>Community</strong>. Preferisci i numeri puri? Passa a <strong>Stats</strong>. Un clic e sei a posto.",
+                feat5_badge: "👻 Interfaccia Invisibile",
+                feat5_title: "Imposta l'opacità per non disturbare",
+                feat5_desc: "Puoi ridurre l'opacità dello sfondo a zero, lasciando solo le icone degli oggetti. Regola lo slider per decidere quanto vuoi che l'overlay sia visibile.",
+                feat6_badge: "⚙️ Personalizzazione",
+                feat6_title: "Temi, tasti, opacità – rendilo tuo",
+                feat6_desc: "Scegli un tema di colori, imposta le tue scorciatoie da tastiera e adatta il pannello alle tue abitudini. KuzenBot si adatta al tuo setup.",
+                feat7_badge: "🚀 Manutenzione",
+                feat7_title: "Auto-Update silenziosi in background",
+                feat7_desc: "Dopo ogni patch di Smite 2 non devi cercare aggiornamenti. KuzenBot controlla GitHub, scarica in background e ti avvisa. Un clic e sei aggiornato.",
+                faq_title: "Domande Frequenti (FAQ)",
+                faq1_q: "🛡️ Rischio il ban usando KuzenBot?",
+                faq1_a: "No. L'app non tocca i file di Smite 2 né la memoria del gioco (nessuna iniezione). KuzenBot è un normale overlay di Windows, conforme alle regole di Hi-Rez.",
+                faq2_q: "⚠️ Perché Windows mostra un avviso durante l'installazione?",
+                faq2_a: "Perché è un progetto amatoriale senza scopo di lucro, sprovvisto di un costoso certificato commerciale Microsoft. Il codice sorgente è pubblico su GitHub.",
+                faq3_q: "📈 L'overlay rallenterà il gioco o causerà cali di FPS?",
+                faq3_a: "No. KuzenBot è progettato per non influire sulle prestazioni. Consuma pochissima RAM e CPU, a differenza di client pesanti come Blitz.",
+                footer_support: "Hai un problema o un'idea? Contattami:",
+                footer_copy: "© 2026 KuzenBot. Sito realizzato su infrastruttura GitHub Pages.",
+                footer_disc: "KuzenBot è un progetto open source indipendente, non affiliato a Hi-Rez Studios o Titan Forge Games."
+            },
+            ru: {
+                nav_features: "Функции", nav_faq: "FAQ",
+                hero_badge: "🛡️ Оверлей, а не чит. Нулевой риск бана.",
+                hero_h1_1: "Хватит альт-табаться.", hero_h1_2: "Билды прямо на экране.",
+                hero_desc: "Оверлей для игроков Smite 2, у которых нет времени искать предметы в браузере во время тимфайта. Оптимальный билд всегда поверх игры — легко, быстро, без лагов.",
+                btn_download: "Скачать для Windows",
+                cta_info_1: "Бесплатно • Версия", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ При первом запуске Windows может показать предупреждение SmartScreen. Нажмите «Подробнее» → «Выполнить в любом случае».",
+                feat1_badge: "✨ Гибкий режим",
+                feat1_title: "Extended и Mini – один хоткей, два режима",
+                feat1_desc: "На базе? Открой <strong>Extended</strong>, чтобы посмотреть полные статы предметов. В бою? Переключись на <strong>Mini</strong> – маленькая плитка, которая не закрывает обзор.",
+                feat2_badge: "🤖 Интеллект",
+                feat2_title: "Режим AUTO – приложение знает, кем ты играешь",
+                feat2_desc: "KuzenBot видит, какого бога ты выбрал, и мгновенно загружает билд. Тебе не нужно ничего вводить. Ноль кликов, ноль поиска.",
+                feat3_badge: "🔒 Безопасность и удобство",
+                feat3_title: "Ghost Mode – оверлей исчезает для курсора",
+                feat3_desc: "Одно нажатие, и оверлей перестает реагировать на клики – ты можешь кликать сквозь него. Больше никаких случайных нажатий по панели вместо ульты.",
+                feat4_badge: "📊 Гибкость данных",
+                feat4_title: "Статистика и Комьюнити – переключай на лету",
+                feat4_desc: "Хочешь узнать, что собирают другие? Выбери <strong>Community</strong>. Предпочитаешь сухие цифры? Переключись на <strong>Stats</strong>. Один клик – и готово.",
+                feat5_badge: "👻 Невидимый интерфейс",
+                feat5_title: "Настрой прозрачность под себя",
+                feat5_desc: "Фон можно сделать полностью прозрачным, оставив только иконки предметов. Настрой ползунок так, чтобы оверлей не мешал обзору.",
+                feat6_badge: "⚙️ Кастомизация",
+                feat6_title: "Темы, хоткеи, прозрачность – всё для тебя",
+                feat6_desc: "Выбери цветовую тему, настрой свои горячие клавиши и внешний вид панели. KuzenBot подстраивается под твой сетап, а не наоборот.",
+                feat7_badge: "🚀 Обслуживание",
+                feat7_title: "Тихие автообновления в фоне",
+                feat7_desc: "Больше не нужно вручную искать новые версии после каждого патча Smite 2. KuzenBot сам всё скачает и предложит установить в один клик.",
+                faq_title: "Часто задаваемые вопросы",
+                faq1_q: "🛡️ Могут ли меня забанить за использование KuzenBot?",
+                faq1_a: "Нет. Приложение никак не вмешивается в файлы Smite 2 или память игры (никаких инъекций). Это обычный оверлей Windows, не нарушающий правила Hi-Rez.",
+                faq2_q: "⚠️ Почему Windows показывает предупреждение при установке?",
+                faq2_a: "Потому что это бесплатный хобби-проект без дорогого коммерческого сертификата Microsoft. Исходный код открыт на GitHub – можешь проверить сам.",
+                faq3_q: "📈 Будет ли оверлей тормозить игру или снижать FPS?",
+                faq3_a: "Нет. KuzenBot потребляет мизерное количество RAM и CPU, в отличие от тяжелых клиентов вроде Blitz или Overwolf.",
+                footer_support: "Есть проблема или идея? Пиши:",
+                footer_copy: "© 2026 KuzenBot. Сайт создан на GitHub Pages.",
+                footer_disc: "KuzenBot — независимый open-source проект. Не связан с Hi-Rez Studios или Titan Forge Games."
+            },
+            uk: {
+                nav_features: "Функції", nav_faq: "FAQ",
+                hero_badge: "🛡️ Оверлей, а не чіт. Нульовий ризик бану.",
+                hero_h1_1: "Досить альт-табатись.", hero_h1_2: "Білди прямо на екрані.",
+                hero_desc: "Оверлей для гравців Smite 2, які не мають часу шукати предмети в браузері під час тімфайту. Оптимальний білд завжди поверх гри — легко, швидко, без лагів.",
+                btn_download: "Завантажити для Windows",
+                cta_info_1: "Безкоштовно • Версія", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ Під час першого запуску Windows може показати попередження SmartScreen. Натисніть «Докладніше» → «Виконати в будь-якому разі».",
+                feat1_badge: "✨ Гнучкий режим",
+                feat1_title: "Extended і Mini – один хоткей, два режими",
+                feat1_desc: "На базі? Відкрий <strong>Extended</strong>, щоб переглянути повні статі предметів. У бою? Перемикнись на <strong>Mini</strong> – маленька плитка, яка не закриває огляд.",
+                feat2_badge: "🤖 Інтелект",
+                feat2_title: "Режим AUTO – програма знає, ким ти граєш",
+                feat2_desc: "KuzenBot бачить, якого бога ти вибрав, і миттєво завантажує білд. Нуль кліків, нуль пошуку в інтернеті.",
+                feat3_badge: "🔒 Безпека та зручність",
+                feat3_title: "Ghost Mode – оверлей зникає для курсора",
+                feat3_desc: "Один клік, і оверлей перестає реагувати на натискання – ти можеш клікати крізь нього. Більше ніяких випадкових кліків по панелі замість ульти.",
+                feat4_badge: "📊 Гнучкість даних",
+                feat4_title: "Статистика та Ком'юніті – перемикай на льоту",
+                feat4_desc: "Хочеш дізнатися, що збирають інші? Обери <strong>Community</strong>. Віддаєш перевагу сухим цифрам? Перемикнись на <strong>Stats</strong>. Один клік – і готово.",
+                feat5_badge: "👻 Невидимий інтерфейс",
+                feat5_title: "Налаштуй прозорість під себе",
+                feat5_desc: "Фон можна зробити повністю прозорим, залишивши лише іконки предметів. Налаштуй повзунок так, щоб оверлей не заважав огляду.",
+                feat6_badge: "⚙️ Кастомізація",
+                feat6_title: "Теми, хоткеї, прозорість – усе для тебе",
+                feat6_desc: "Вибери колірну тему, налаштуй свої гарячі клавіші та зовнішній вигляд панелі. KuzenBot підлаштовується під твій сетап, а не навпаки.",
+                feat7_badge: "🚀 Обслуговування",
+                feat7_title: "Тихі автооновлення у фоні",
+                feat7_desc: "Більше не потрібно вручну шукати нові версії після кожного патчу Smite 2. KuzenBot сам усе завантажить і запропонує встановити в один клік.",
+                faq_title: "Часті запитання",
+                faq1_q: "🛡️ Чи можуть мене забанити за використання KuzenBot?",
+                faq1_a: "Ні. Програма жодним чином не втручається у файли Smite 2 або пам'ять гри. Це звичайний оверлей Windows, що не порушує правила Hi-Rez.",
+                faq2_q: "⚠️ Чому Windows показує попередження під час інсталяції?",
+                faq2_a: "Бо це безкоштовний хобі-проєкт без дорогого комерційного сертифіката Microsoft. Вихідний код відкритий на GitHub – можеш перевірити сам.",
+                faq3_q: "📈 Чи буде оверлей гальмувати гру або знижувати FPS?",
+                faq3_a: "Ні. KuzenBot споживає мізерну кількість RAM і CPU, на відміну від важких клієнтів на кшталт Blitz або Overwolf.",
+                footer_support: "Є проблема чи ідея? Пиши:",
+                footer_copy: "© 2026 KuzenBot. Сайт створено на GitHub Pages.",
+                footer_disc: "KuzenBot — незалежний open-source проєкт. Не пов'язаний з Hi-Rez Studios або Titan Forge Games."
+            },
+            pt: {
+                nav_features: "Recursos", nav_faq: "FAQ",
+                hero_badge: "🛡️ Overlay, não um cheat. Zero risco de ban.",
+                hero_h1_1: "Chega de Alt+Tab.", hero_h1_2: "Builds direto na tela.",
+                hero_desc: "Um overlay para jogadores de Smite 2 que não têm tempo de buscar itens no navegador durante as lutas. A melhor build sempre visível – leve, rápido, sem lag.",
+                btn_download: "Baixar para Windows",
+                cta_info_1: "Grátis • Versão", cta_info_2: "• Open Source",
+                cta_warning: "⚠️ O Windows pode mostrar um aviso do SmartScreen na primeira execução – isso é normal para software de código aberto. Clique em 'Mais informações' → 'Executar assim mesmo'.",
+                feat1_badge: "✨ Modo Flexível",
+                feat1_title: "Extended e Mini – uma tecla, dois modos",
+                feat1_desc: "Na base? Abra o <strong>Extended</strong> para ver os atributos completos. Em combate? Mude para o <strong>Mini</strong> – um pequeno painel que não bloqueia a visão. Controle total.",
+                feat2_badge: "🤖 Inteligência",
+                feat2_title: "Modo AUTO – o app sabe com quem você joga",
+                feat2_desc: "O KuzenBot vê qual deus você escolheu e carrega a build instantaneamente. Você tem o caminho de itens pronto antes da contagem regressiva acabar.",
+                feat3_badge: "🔒 Segurança e Conforto",
+                feat3_title: "Ghost Mode – o overlay ignora cliques",
+                feat3_desc: "Com um atalho o overlay para de reagir aos cliques – você pode clicar através dele. Chega de cliques acidentais no painel no meio da luta.",
+                feat4_badge: "📊 Flexibilidade de Dados",
+                feat4_title: "Estatísticas e Comunidade – alterne rápido",
+                feat4_desc: "Prefere ver o que os outros jogadores estão comprando? Escolha <strong>Community</strong>. Prefere matemática pura? Mude para <strong>Stats</strong>. Um clique e pronto.",
+                feat5_badge: "👻 Interface Invisível",
+                feat5_title: "Ajuste a opacidade para não atrapalhar",
+                feat5_desc: "Você pode deixar o fundo totalmente transparente, deixando apenas os ícones dos itens. Ajuste o controle para deixar o painel o mais discreto possível.",
+                feat6_badge: "⚙️ Personalização",
+                feat6_title: "Temas, atalhos, opacidade – do seu jeito",
+                feat6_desc: "Escolha um tema de cores, configure suas teclas de atalho e ajuste o visual do painel. O KuzenBot se adapta ao seu setup.",
+                feat7_badge: "🚀 Manutenção",
+                feat7_title: "Atualizações silenciosas em segundo plano",
+                feat7_desc: "Não precisa procurar novas versões após cada patch do Smite 2. O KuzenBot baixa no fundo e avisa você. Um clique e está atualizado.",
+                faq_title: "Perguntas Frequentes",
+                faq1_q: "🛡️ Posso ser banido por usar o KuzenBot?",
+                faq1_a: "Não. O aplicativo não toca nos arquivos do Smite 2 nem na memória do jogo (sem injeção). O KuzenBot é um overlay padrão do Windows, totalmente de acordo com as regras da Hi-Rez.",
+                faq2_q: "⚠️ Por que o Windows mostra um aviso de segurança?",
+                faq2_a: "Porque este é um projeto feito por hobby, sem fins lucrativos, sem um certificado comercial caro da Microsoft. O código-fonte é público no GitHub.",
+                faq3_q: "📈 O overlay vai dar lag ou queda de FPS no jogo?",
+                faq3_a: "Não. O KuzenBot foi criado para não afetar o desempenho. Ele consome o mínimo de RAM e CPU, ao contrário de clientes pesados como o Blitz.",
+                footer_support: "Tem um problema ou ideia? Contato:",
+                footer_copy: "© 2026 KuzenBot. Site criado via GitHub Pages.",
+                footer_disc: "O KuzenBot é um projeto open source independente, não afiliado à Hi-Rez Studios ou Titan Forge Games."
+            },
+            zh: {
+                nav_features: "功能", nav_faq: "常见问题",
+                hero_badge: "🛡️ 悬浮窗，不是外挂。零封号风险。",
+                hero_h1_1: "告别 Alt+Tab。", hero_h1_2: "出装就在眼前。",
+                hero_desc: "专为《神之浩劫 2》玩家打造的悬浮窗。团战时无需切出游戏查装备，最佳出装始终置顶——轻量、快速、无卡顿。",
+                btn_download: "下载 Windows 版",
+                cta_info_1: "免费 • 版本", cta_info_2: "• 开源",
+                cta_warning: "⚠️ Windows 首次运行时可能会显示 SmartScreen 警告——这对于免费开源软件是正常的。请点击“更多信息” → “仍要运行”。",
+                feat1_badge: "✨ 灵活模式",
+                feat1_title: "扩展与迷你模式 – 一键切换",
+                feat1_desc: "在泉水里？打开 <strong>Extended（扩展）</strong> 模式查看完整装备属性。战斗中？切换到 <strong>Mini（迷你）</strong> 模式，小图标不挡视线。零干扰，全掌控。",
+                feat2_badge: "🤖 智能识别",
+                feat2_title: "自动模式 – 应用知道你玩的是谁",
+                feat2_desc: "KuzenBot 会自动识别你选择的神明，并瞬间加载推荐出装。倒计时结束前就已准备就绪。无需点击，无需搜索。",
+                feat3_badge: "🔒 安全与舒适",
+                feat3_title: "幽灵模式 – 悬浮窗鼠标穿透",
+                feat3_desc: "一键让悬浮窗停止响应鼠标点击——你可以直接点透它。再也不用担心打团时误触面板放错技能。",
+                feat4_badge: "📊 数据灵活",
+                feat4_title: "统计数据与社区出装 – 随时切换",
+                feat4_desc: "想看大家都在出什么？选择 <strong>Community（社区）</strong>。更喜欢硬核数据？切换到 <strong>Stats（统计）</strong>。一键搞定，无需切出游戏。",
+                feat5_badge: "👻 隐形界面",
+                feat5_title: "调整透明度，互不干扰",
+                feat5_desc: "你可以将背景透明度降到零，只保留装备图标——极简且不挡地图。通过滑块自由调整。",
+                feat6_badge: "⚙️ 个性化",
+                feat6_title: "主题、快捷键、透明度 – 随心定制",
+                feat6_desc: "选择适合你风格的主题颜色，设置自己的全局快捷键，并调整面板外观。KuzenBot 会适应你的习惯。",
+                feat7_badge: "🚀 维护",
+                feat7_title: "后台静默自动更新",
+                feat7_desc: "每次游戏更新后无需手动寻找新版本。KuzenBot 会自动检查 GitHub、在后台下载并通知你。一键安装即可。",
+                faq_title: "常见问题",
+                faq1_q: "🛡️ 使用 KuzenBot 会被封号吗？",
+                faq1_a: "不会。该应用程序绝对不会修改《神之浩劫 2》的游戏文件或内存（无注入）。KuzenBot 只是一个标准的 Windows 悬浮窗，完全符合 Hi-Rez 的规定。",
+                faq2_q: "⚠️ 为什么 Windows 安装时会显示警告？",
+                faq2_a: "因为这是一个无盈利的爱好者项目，没有购买昂贵的微软商业代码签名证书。源代码在 GitHub 上公开，你可以自行查阅以确保安全。",
+                faq3_q: "📈 悬浮窗会导致游戏卡顿或掉帧吗？",
+                faq3_a: "不会。KuzenBot 经过专门优化，不会影响游戏性能——它占用的内存和 CPU 微乎其微，与 Blitz 等重型客户端完全不同。",
+                footer_support: "有任何问题或想法？请联系：",
+                footer_copy: "© 2026 KuzenBot。本网站基于 GitHub Pages 构建。",
+                footer_disc: "KuzenBot 是一个独立的开源项目，与 Hi-Rez Studios 或 Titan Forge Games 无任何关联。Smite 2 及所有相关商标属于其各自所有者。"
+            }
+        };
+
+        const langSelect = document.getElementById('langSelect');
+        const supportedLangs = ['pl', 'en', 'fr', 'de', 'it', 'ru', 'uk', 'pt', 'zh'];
+
+        // Autodetekcja języka i odczyt z LocalStorage
+        function initLanguage() {
+            const savedLang = localStorage.getItem('kuzenbot_lang');
+            const browserLang = (navigator.language || navigator.userLanguage).split('-')[0];
+            
+            let finalLang = 'pl'; // Default fallback
+            
+            if (savedLang && supportedLangs.includes(savedLang)) {
+                finalLang = savedLang;
+            } else if (supportedLangs.includes(browserLang)) {
+                finalLang = browserLang;
+            }
+
+            langSelect.value = finalLang;
+            applyLanguage(finalLang);
+        }
+
+        // Podmiana tekstów w HTML
+        function applyLanguage(lang) {
+            const dict = translations[lang] || translations['pl'];
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (dict[key]) {
+                    element.innerHTML = dict[key]; // Używamy innerHTML aby tagi <strong> działały poprawnie
+                }
+            });
+            localStorage.setItem('kuzenbot_lang', lang);
+        }
+
+        // Nasłuchiwanie na ręczną zmianę z dropdownu
+        langSelect.addEventListener('change', (e) => applyLanguage(e.target.value));
+
+        // Uruchomienie przy starcie
+        initLanguage();
+
+        // --- KONIEC SYSTEMU WIELOJĘZYCZNOŚCI ---
+
+
+        // GitHub version fetch (Pozostaje bez zmian)
+        const githubApiUrl = 'https://api.github.com/repos/kicpir99/KuzenBot/releases/latest';
+        fetch(githubApiUrl)
+            .then(response => {
+                if (!response.ok) throw new Error('Brak publicznego API');
+                return response.json();
+            })
+            .then(data => {
+                if(data.tag_name) { document.getElementById('app-version').textContent = data.tag_name; }
+                if(data.assets && data.assets.length > 0) { document.getElementById('download-link').href = data.assets[0].browser_download_url; }
+            })
+            .catch(error => { console.log('Automatyczne pobieranie wyłączone lub błąd API:', error); });
+
+        // Scroll-reveal for feature rows (Pozostaje bez zmian)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.feature-row').forEach(row => observer.observe(row));
+
+        // FAQ accordion (Pozostaje bez zmian)
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.querySelector('h3').addEventListener('click', () => {
+                const isOpen = item.classList.contains('open');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+                if (!isOpen) item.classList.add('open');
+            });
+        });
+
+        // --- 🎨 SYSTEM MOTYWÓW WIZUALNYCH (LIVE PREVIEW) ---
+        const appThemes = {
+            "gold": { primary: "#C5A059", primary_rgb: "197, 160, 89", bg_base: "#0f172a", bg_card: "#15171e" },
+            "ruby": { primary: "#EF4444", primary_rgb: "239, 68, 68", bg_base: "#1a0f0f", bg_card: "#1f1414" },
+            "blizzard": { primary: "#3B82F6", primary_rgb: "59, 130, 246", bg_base: "#0f142a", bg_card: "#151a24" },
+            "emerald": { primary: "#10B981", primary_rgb: "16, 185, 129", bg_base: "#0f1a15", bg_card: "#13201a" },
+            "void": { primary: "#8B5CF6", primary_rgb: "139, 92, 246", bg_base: "#170f2a", bg_card: "#1d1524" },
+            "cyber": { primary: "#F472B6", primary_rgb: "244, 114, 182", bg_base: "#0f0514", bg_card: "#1a0f24" },
+            "toxic": { primary: "#A3E635", primary_rgb: "163, 230, 53", bg_base: "#0a0c08", bg_card: "#10140d" },
+            "abyss": { primary: "#FF003C", primary_rgb: "255, 0, 60", bg_base: "#050505", bg_card: "#0f0a0a" }
+        };
+
+        const swatches = document.querySelectorAll('.swatch');
+        
+        function applyTheme(themeName) {
+            const theme = appThemes[themeName];
+            if (!theme) return;
+
+            // Zmiana globalnych zmiennych CSS na żywo
+            const root = document.documentElement;
+            root.style.setProperty('--accent-cyan', theme.primary);
+            root.style.setProperty('--accent-gold', theme.primary);
+            root.style.setProperty('--brand-gold', theme.primary);
+            root.style.setProperty('--bg-color', theme.bg_base);
+            root.style.setProperty('--card-bg', theme.bg_card);
+            
+            // Rekalkulacja poświaty przy użyciu RGB
+            root.style.setProperty('--glow-cyan', `rgba(${theme.primary_rgb}, 0.15)`);
+
+            // Aktualizacja UI kafelków
+            swatches.forEach(s => {
+                s.classList.remove('active');
+                s.setAttribute('aria-checked', 'false');
+                if (s.dataset.theme === themeName) {
+                    s.classList.add('active');
+                    s.setAttribute('aria-checked', 'true');
+                }
+            });
+        }
+
+        swatches.forEach(swatch => {
+            // Obsługa myszy
+            swatch.addEventListener('click', (e) => applyTheme(e.target.dataset.theme));
+            // Obsługa klawiatury dla dostępności
+            swatch.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    applyTheme(e.target.dataset.theme);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,14 +1,30 @@
-# KuzenBot 🐢⚡
 
 <div align="center">
-  <a href="#-english-version">🇬🇧 English</a> • <a href="#-wersja-polska">🇵🇱 Polski</a>
-</div>
+  
+  <img src="docs/logo.png" alt="KuzenBot Logo" width="120">
 
-<p align="center">
-  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="Python Version">
-  <img src="https://img.shields.io/badge/UI-PyQt6-green" alt="PyQt6">
-  <img src="https://img.shields.io/badge/Game-Smite_2-orange" alt="Smite 2">
-</p>
+  # KuzenBot
+
+  **Stop Alt-Tabbing. Builds right on your screen..**
+  
+  <p align="center">
+    <a href="#-english-version">🇬🇧 English</a> • <a href="#-wersja-polska">🇵🇱 Polski</a>
+  </p>
+
+  <p align="center">
+    <img src="https://img.shields.io/badge/Status-Active-success.svg" alt="Status">
+    <img src="https://img.shields.io/badge/Game-Smite_2-orange" alt="Smite 2">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+    <img src="https://img.shields.io/github/v/release/kicpir99/KuzenBot?color=purple" alt="Latest Release">
+  </p>
+
+  <h3>
+    <a href="https://kicpir99.github.io/KuzenBot/">🌐 Visit official website (Download)</a>
+  </h3>
+
+  <i>A lightweight, undetectable overlay for Smite 2 players that delivers the best builds straight to your screen without minimizing the game.</i>
+
+</div>
 
 ---
 
@@ -18,22 +34,22 @@
 
 > ⚠️ **IMPORTANT:** For the overlay to render correctly on top of the game, Smite 2 **must** be running in **Borderless Window** or **Windowed** mode. Exclusive Fullscreen mode will block the overlay from appearing.
 
-### 📸 See it in action
-
-*(Drag and drop your GIFs/screenshots directly into the GitHub editor to generate links and replace the ones below)*
-
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/your-link-here-1" alt="Expanded view with build list" width="45%">
-  <img src="https://github.com/user-attachments/assets/your-link-here-2" alt="Mini Mode during match" width="45%">
+  <h3>🛡️ 100% Safe. Zero game files modification.</h3>
+  <p>KuzenBot is an external Windows overlay. It does not inject code into the game memory (Zero Memory Injection) and does not modify any files, making it completely safe to use with Anti-Cheat systems.</p>
 </div>
 
-### ✨ Main Features
+### ✨ Main Features & In-Game Preview
 
-* 🔄 **Two Build Engines on the Fly:** Seamlessly switch between community-created builds and mathematically calculated stats from top players (Stats: Master+ & Demigod).
-* 🎯 **God Detection (Auto Mode):** The integrated scanner can automatically detect the god you just picked and instantly load their builds.
-* 📱 **Dedicated Mini Mode:** With one click, collapse the app into a minimalist bar that discreetly displays items and skill orders during the match.
-* 🛡️ **Click-Through & Always on Top:** Ability to "lock" the overlay – making it transparent to mouse clicks, allowing for normal gameplay while it hovers over the Smite 2 UI.
-* 🌍 **Multilingual Support (i18n):** Full support for multiple languages (EN, PL, FR, DE, ES, PT, and more).
+| Feature | Preview |
+| :--- | :---: |
+| **✨ Flexible Mode (Extended & Mini)**<br>In base? Open Extended to view full item stats. In combat? Switch to Mini – a small tile that doesn't block vision. | <img width="348" height="196" alt="mini" src="https://github.com/user-attachments/assets/6dd565de-8345-4298-b434-b79b497c1bfe" /> |
+| **🤖 Intelligence (AUTO Mode)**<br>The app automatically detects the god you pick in the lobby and instantly loads the dedicated build. | <img width="512" height="588" alt="auto" src="docs/lobby.gif" /> |
+| **🔒 Ghost Mode (Click-Through)**<br>One hotkey locks the overlay – making it transparent to mouse clicks. No more accidental panel clicks instead of casting abilities. | <img width="512" height="288" alt="lock" src="https://github.com/user-attachments/assets/8c13d8de-8cf8-4270-aef5-82a5dc7b09cd" /> |
+| **📊 Data Flexibility on the Fly**<br>Seamlessly switch between raw item statistics and the most popular community builds. | <img width="371" height="209" alt="commstats" src="https://github.com/user-attachments/assets/2c666e0c-12e8-4d1c-9aaf-afcb620d71c7" /> |
+| **👻 Invisible Interface**<br>Adjust the background opacity down to zero, leaving only clean item icons on the screen. | <img width="367" height="206" alt="opacity" src="https://github.com/user-attachments/assets/5867bb18-5593-43cc-992f-622e653d6c96" /> |
+| **⚙️ Deep Customization**<br>Full control over the UI: precise settings, global hotkeys, and 8 built-in color themes. | <img width="348" height="434" alt="options" src="https://github.com/user-attachments/assets/badfa8c1-9f8e-42b7-a99d-7c6a8f0bb8e2" /> |
+| **🚀 Silent Auto-Updater**<br>After every game patch, the app automatically checks GitHub in the background, downloads updates, and offers a 1-click install. | <img width="575" height="303" alt="update" src="docs/auto-updater.png" /> |
 
 ### 🛠️ Tech Stack
 
@@ -48,48 +64,79 @@ If you want to run the project from the source:
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/TwojNick/KuzenBot.git](https://github.com/TwojNick/KuzenBot.git)
+   git clone [https://github.com/kicpir99/KuzenBot.git](https://github.com/kicpir99/KuzenBot.git)
    cd KuzenBot
-   ```
 
 ---
 
-## 🇵🇱 Wersja Polska
-
-**KuzenBot** to zaawansowana, lekka nakładka (overlay) dla graczy Smite 2, która dostarcza najlepsze buildy społeczności i statystyki meta prosto na Twój ekran, bez konieczności minimalizowania gry (Alt-Tab).
-
-> ⚠️ **WAŻNE:** Aby nakładka wyświetlała się poprawnie nad grą, Smite 2 **musi** być uruchomiony w trybie **Borderless Window** (Okno bez ramek) lub **Windowed** (W oknie). Pełny ekran (Exclusive Fullscreen) zablokuje widoczność interfejsu aplikacji.
-
-### 📸 Zobacz w akcji
-
-*(Przeciągnij i upuść swoje GIFy/screeny prosto do edytora GitHub, aby wygenerować linki i podmienić te poniżej)*
-
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/your-link-here-1" alt="Wielki widok z listą buildów" width="45%">
-  <img src="https://github.com/user-attachments/assets/your-link-here-2" alt="Tryb Mini w trakcie gry" width="45%">
+  
+  <img src="docs/logo.png" alt="KuzenBot Logo" width="120">
+
+  # KuzenBot
+
+  **Koniec z alt+tabem. Build masz przed oczami.**
+  
+  <p align="center">
+    <a href="#-english-version">🇬🇧 English</a> • <a href="#-wersja-polska">🇵🇱 Polski</a>
+  </p>
+
+  <p align="center">
+    <img src="https://img.shields.io/badge/Status-Active-success.svg" alt="Status">
+    <img src="https://img.shields.io/badge/Game-Smite_2-orange" alt="Smite 2">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License">
+    <img src="https://img.shields.io/github/v/release/kicpir99/KuzenBot?color=purple" alt="Latest Release">
+  </p>
+
+  <h3>
+    <a href="https://kicpir99.github.io/KuzenBot/">🌐 Odwiedź oficjalną stronę (Pobierz)</a>
+  </h3>
+
+  <i>Lekka, niewykrywalna nakładka (overlay) dla graczy Smite 2, która dostarcza najlepsze buildy prosto na Twój ekran, bez minimalizowania gry.</i>
+
 </div>
 
-### ✨ Główne Funkcje
+---
+## 🇵🇱 Wersja Polska
 
-* 🔄 **Dwa Silniki Buildów w Locie:** Płynne przełączanie między buildami tworzonymi przez społeczność (Community), a matematycznie wyliczanymi statystykami od najlepszych graczy (Stats: Master+ & Demigod).
-* 🎯 **Wykrywanie Boga (Auto Mode):** Zintegrowany skaner potrafi automatycznie wykryć bohatera, którego właśnie wybrałeś, i natychmiast załadować jego buildy.
-* 📱 **Dedykowany Tryb Mini:** Jednym kliknięciem zwiń aplikację do minimalistycznego paska, który dyskretnie wyświetla przedmioty i swapy podczas meczu.
-* 🛡️ **Click-Through & Always on Top:** Możliwość "zablokowania" nakładki – staje się ona przezroczysta dla kliknięć myszką, pozwalając na normalną grę, gdy wisi nad interfejsem Smite 2.
-* 🌍 **Wielojęzyczność (i18n):** Pełne wsparcie dla wielu języków (EN, PL, FR, DE, ES, PT i innych).
+**KuzenBot** to zaawansowana, lekka nakładka dla graczy Smite 2, która wyświetla najlepsze buildy społeczności i metastatystyki bezpośrednio na ekranie, bez konieczności minimalizowania gry (Alt-Tab).
 
-### 🛠️ Stack Technologiczny
+> ⚠️ **WAŻNE:** Aby nakładka poprawnie wyświetlała się na wierzchu gry, Smite 2 **musi** działać w trybie **Okna bez Ramki** lub **Okna**. Wyłączny tryb pełnoekranowy zablokuje wyświetlanie nakładki.
+
+<div align="center">
+  <h3>🛡️ W 100% bezpieczne. Zero modyfikacji plików gry.</h3>
+  <p>KuzenBot to zewnętrzna nakładka systemu Windows. Nie wstrzykuje kodu do pamięci gry (Zero Memory Injection) i nie modyfikuje żadnych plików, dzięki czemu jest całkowicie bezpieczna do użytku z systemami Anti-Cheat.</p>
+</div>
+
+---
+
+## ✨ Główne Funkcje (Features)
+
+KuzenBot został zaprojektowany z myślą o minimalizmie i wydajności. Poniżej przedstawiamy, co potrafi:
+
+| Funkcja | Podgląd w grze |
+| :--- | :---: |
+| **✨ Tryb Elastyczny (Extended & Mini)**<br>W bazie rozłóż pełne statystyki itemów. W walce przełącz się na tryb Mini – mały kafelek, który nie zasłania nic ważnego. | <img width="348" height="196" alt="mini" src="https://github.com/user-attachments/assets/6dd565de-8345-4298-b434-b79b497c1bfe" /> |
+| **🤖 Inteligencja (AUTO Mode)**<br>Program automatycznie rozpoznaje wybranego przez Ciebie boga w lobby i natychmiast ładuje dedykowany build. | <img width="512" height="588" alt="auto" src="docs/lobby.gif" /> |
+| **🔒 Ghost Mode (Click-Through)**<br>Jeden skrót zablokuje nakładkę – staje się przezroczysta dla myszki. Koniec z przypadkowym kliknięciem w panel zamiast rzucenia umiejętności. | <img width="512" height="288" alt="lock" src="https://github.com/user-attachments/assets/8c13d8de-8cf8-4270-aef5-82a5dc7b09cd" /> |
+| **📊 Elastyczność Danych w Locie**<br>Przełączaj się płynnie między statystykami przedmiotów a najpopularniejszymi kompozycjami społeczności. | <img width="371" height="209" alt="commstats" src="https://github.com/user-attachments/assets/2c666e0c-12e8-4d1c-9aaf-afcb620d71c7" /> |
+| **👻 Niewidzialny Interfejs**<br>Dostosuj suwak przezroczystości tła do zera, aby na ekranie wyświetlały się tylko czyste ikony przedmiotów. | <img width="367" height="206" alt="opacity" src="https://github.com/user-attachments/assets/5867bb18-5593-43cc-992f-622e653d6c96" /> |
+| **⚙️ Głęboka Personalizacja**<br>Pełna kontrola nad interfejsem: precyzyjne ustawienia, globalne hotkeye oraz 8 wbudowanych motywów kolorystycznych (Themes). | <img width="348" height="434" alt="options" src="https://github.com/user-attachments/assets/badfa8c1-9f8e-42b7-a99d-7c6a8f0bb8e2" /> |
+| **🚀 Cichy Auto-Updater**<br>Po każdym patchu gry aplikacja automatycznie, w tle sprawdzi GitHub, pobierze aktualizacje i zaoferuje instalację jednym kliknięciem. | <img width="575" height="303" alt="update" src="docs/auto-updater.png" /> |
+
+---
+
+## 🛠️ Informacje dla Programistów (Tech Stack)
+
+Aplikacja została zbudowana na otwartym kodzie źródłowym, co gwarantuje pełną transparentność:
 
 * **Język:** Python 3.10+
-* **Interfejs Graficzny:** PyQt6 (z zaawansowanymi animacjami `QPropertyAnimation`)
-* **Architektura:** Własny system wątków HTTP (`QThread`) z lokalnym Cache'owaniem dla natychmiastowego ładowania danych.
-* **Integracja z grą:** Analiza logów w czasie rzeczywistym.
+* **Interfejs Graficzny:** PyQt6 (z płynnymi animacjami `QPropertyAnimation`)
+* **Architektura:** Własny system wątków HTTP (`QThread`) z lokalnym Cache dla natychmiastowego ładowania statystyk.
 
-### 🚀 Jak zacząć (Dla developerów)
-
-Jeśli chcesz uruchomić projekt ze źródeł:
+### 🚀 Jak uruchomić ze źródeł (Local Setup)
 
 1. Sklonuj repozytorium:
-   ```bash
-   git clone [https://github.com/TwojNick/KuzenBot.git](https://github.com/TwojNick/KuzenBot.git)
+```bash
+   git clone [https://github.com/kicpir99/KuzenBot.git](https://github.com/kicpir99/KuzenBot.git)
    cd KuzenBot
-   ```
