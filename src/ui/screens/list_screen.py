@@ -905,15 +905,17 @@ class ListScreen(QWidget):
         # 5. PŁYNNA ANIMACJA (Przejście fade-in z punktu 2)
         self.animate_fade_in(container)
 
-    def show_empty_state(self):
+    def show_empty_state(self, is_new_god=False):
         """Shows a message when no builds are available."""
         self._is_skeleton = False
+        from ui.components.skeleton import clear_layout # Upewnij się, że masz ten import, jeśli był tam wcześniej
         clear_layout(self._list_layout)
         self.pagination.hide()
         self._list_layout.setContentsMargins(0, 0, 0, 10 if self.is_mini else 0)
 
         # Zamiast generować stary, zwykły tekst, używamy naszej nowej, pięknej graficznej karty!
-        self._show_empty()
+        # PRZEKAZUJEMY FLAGĘ DALEJ ->
+        self._show_empty(is_new_god)
         
         # Ponieważ metoda _show_empty dodaje układ: Stretch -> Kafelek -> Stretch, 
         # nasz graficzny kafelek jest przedostatnim elementem w układzie.
@@ -948,7 +950,7 @@ class ListScreen(QWidget):
         self._current_page = 0
 
     # ------------------------------------------------------------- private
-    def _show_empty(self, error_message=None):
+    def _show_empty(self, is_new_god=False, error_message=None):
         card = QFrame()
         card.setObjectName("empty_state_card")
         
@@ -993,7 +995,7 @@ class ListScreen(QWidget):
             )
             card.setStyleSheet("")
         else:
-            from PyQt6.QtGui import QPixmap, QPainter, QPainterPath # <-- Dodane importy
+            from PyQt6.QtGui import QPixmap, QPainter, QPainterPath
             import os
             
             # Wpisz dokładną nazwę pliku
@@ -1048,7 +1050,13 @@ class ListScreen(QWidget):
                     
             icon_lay.addWidget(icon_label)
 
-            msg_text = _t("no_builds_found") 
+            # --- ZMIANA: Inteligentny wybór tekstu! ---
+            if is_new_god:
+                # Używamy HTML, żeby pogrubić tytuł w jednej etykiecie bez rujnowania Twojego układu
+                msg_text = f"<b>{_t('empty_new_god_title')}</b><br>{_t('empty_new_god_sub')}"
+            else:
+                msg_text = _t("no_builds_found") 
+                
             card.setStyleSheet("""
                 QFrame#empty_state_card {
                     background-color: rgba(15, 23, 42, 0.3);

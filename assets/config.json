@@ -1,5 +1,5 @@
 {
-    "language": "en",
+    "language": "pl",
     "build_source": "builds",
     "last_used_source": "builds",
     "opacity_app": 1.0,
@@ -28,6 +28,6 @@
     "theme": "gold",
     "opacity": 0.3,
     "font_style": "standard",
-    "window_x": -401,
-    "window_y": 1279
+    "window_x": 344,
+    "window_y": 346
 }

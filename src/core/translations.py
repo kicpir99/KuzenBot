@@ -143,6 +143,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Aspect Info",
         "ratatoskr_acorn_mini": "⚠️ Info: Acorns",
         "ratatoskr_acorn_ext": "The match history source does not recognize Ratatoskr's Acorns. Acorns are typically chosen for the first 1-2 item slots; empty spaces or low pick-rate items often indicate where the Acorns were placed.",
+        "empty_new_god_title": "Recently Added God ⏳",
+        "empty_new_god_sub": "The database is collecting early match data.\nBuilds will appear in a few hours!",
 
         # Errors & Stats Info
         "err_conn_title": "Server connection error occurred :(",
@@ -308,6 +310,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Info o Aspektach",
         "ratatoskr_acorn_mini": "⚠️ Info: Żołędzie",
         "ratatoskr_acorn_ext": "Strona, z której program pobiera historię meczów, nie rozpoznaje Żołędzi Ratatoskra. Żołędzie są zazwyczaj wybierane na pierwsze 1-2 sloty przedmiotów, a puste pola lub przedmioty z niskim procentem wyboru oznaczają miejsca, w których najczęściej znajdowały się właśnie one.",
+        "empty_new_god_title": "Postać dodana niedawno ⏳",
+        "empty_new_god_sub": "Baza danych zbiera zaktualizowane buildy.\nPojawią się one w przeciągu kilku godzin!",
 
         # Errors & Stats Info
         "err_conn_title": "Wystąpił błąd połączenia z serwerem :(",
@@ -407,6 +411,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Info sur l'Aspect",
         "ratatoskr_acorn_mini": "⚠️ Info : Glands",
         "ratatoskr_acorn_ext": "La source de l'historique des matchs ne reconnaît pas les Glands de Ratatoskr. Les glands sont généralement choisis pour les 1 à 2 premiers emplacements d'objets ; les espaces vides ou les objets avec un faible taux de sélection indiquent souvent l'endroit où ils étaient placés.",
+        "empty_new_god_title": "Dieu récemment ajouté ⏳",
+        "empty_new_god_sub": "La base de données collecte les données initiales.\nLes builds apparaîtront dans quelques heures !",
 
         # Errors & Stats Info
         "err_conn_title": "Erreur de connexion au serveur :(",
@@ -494,6 +500,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Aspekt-Info",
         "ratatoskr_acorn_mini": "⚠️ Info: Eicheln",
         "ratatoskr_acorn_ext": "Die Quelle für den Spielverlauf erkennt Ratatoskrs Eicheln nicht. Eicheln werden normalerweise für die ersten 1-2 Gegenstandsplätze gewählt; leere Felder oder Gegenstände mit niedriger Auswahlrate deuten oft darauf hin, wo sich die Eicheln befanden.",
+        "empty_new_god_title": "Kürzlich hinzugefügter Gott ⏳",
+        "empty_new_god_sub": "Die Datenbank sammelt erste Spieldaten.\nBuilds werden in wenigen Stunden erscheinen!",
 
         # Errors & Stats Info
         "err_conn_title": "Server-Verbindungsfehler :(",
@@ -581,6 +589,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Info de Aspecto",
         "ratatoskr_acorn_mini": "⚠️ Info: Bellotas",
         "ratatoskr_acorn_ext": "La fuente del historial de partidas no reconoce las Bellotas de Ratatoskr. Las bellotas suelen elegirse para los primeros 1 o 2 espacios de objetos; los espacios vacíos o los objetos con una baja tasa de selección a menudo indican dónde se colocaron.",
+        "empty_new_god_title": "Dios añadido recientemente ⏳",
+        "empty_new_god_sub": "La base de datos está recopilando datos iniciales.\n¡Las builds aparecerán en unas horas!",
 
         # Errors & Stats Info
         "err_conn_title": "Error de conexión al servidor :(",
@@ -668,6 +678,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Инфо об Аспектах",
         "ratatoskr_acorn_mini": "⚠️ Инфо: Желуди",
         "ratatoskr_acorn_ext": "Источник истории матчей не распознает Желуди Рататоска. Желуди обычно выбираются в первые 1-2 слота предметов; пустые места или предметы с низким процентом выбора часто указывают на то, где именно находились Желуди.",
+        "empty_new_god_title": "Недавно добавленный бог ⏳",
+        "empty_new_god_sub": "База данных собирает первые данные матчей.\nБилды появятся через несколько часов!",
 
         # Errors & Stats Info
         "err_conn_title": "Ошибка соединения с сервером :(",
@@ -755,6 +767,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Інфо про Аспекти",
         "ratatoskr_acorn_mini": "⚠️ Інфо: Жолуді",
         "ratatoskr_acorn_ext": "Джерело історії матчів не розпізнає Жолуді Рататоска. Жолуді зазвичай вибираються в перші 1-2 слоти предметів; порожні місця або предмети з низьким відсотком вибору часто вказують на те, де саме знаходилися Жолуді.",
+        "empty_new_god_title": "Нещодавно доданий бог ⏳",
+        "empty_new_god_sub": "База даних збирає перші дані матчів.\nБілди з'являться через кілька годин!",
 
         # Errors & Stats Info
         "err_conn_title": "Помилка підключення do servera :(",
@@ -842,6 +856,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ Info do Aspecto",
         "ratatoskr_acorn_mini": "⚠️ Info: Bolotas",
         "ratatoskr_acorn_ext": "A fonte do histórico de partidas não reconhece as Bolotas de Ratatoskr. As bolotas geralmente são escolhidas para os primeiros 1-2 espaços de itens; espaços vazios ou itens com baixa taxa de escolha frequentemente indicam onde as bolotas estavam localizadas.",
+        "empty_new_god_title": "Deus adicionado recentemente ⏳",
+        "empty_new_god_sub": "O banco de dados está coletando dados das partidas.\nAs builds aparecerão em algumas horas!",
 
         # Errors & Stats Info
         "err_conn_title": "Erro de conexão com o servidor :(",
@@ -929,6 +945,8 @@ TRANSLATIONS = {
         "aspect_bug_mini": "ℹ️ 神相信息",
         "ratatoskr_acorn_mini": "⚠️ 信息：橡果",
         "ratatoskr_acorn_ext": "比赛历史记录源无法识别拉塔托斯克的橡果。橡果通常占据前1-2个物品栏位；空白栏位或低选取率的物品通常表明这些位置原本是橡果。",
+        "empty_new_god_title": "最近添加的神明 ⏳",
+        "empty_new_god_sub": "数据库正在收集早期比赛数据。\n装备推荐将在几小时后出现！",
 
         # Errors & Stats Info
         "err_conn_title": "服务器连接错误 :(",

@@ -164,7 +164,7 @@ class DetailsFetchWorker(QThread):
                 self.details_ready.emit(self.build_obj)
 
 class PortraitFetchWorker(QThread):
-    """Resolved immediately — portraits are handled by ImageManager."""
+    """Fetches missing god portraits in the background using ImageManager."""
     finished = pyqtSignal()
 
     def __init__(self, god_names):
@@ -172,6 +172,14 @@ class PortraitFetchWorker(QThread):
         self.god_names = god_names
 
     def run(self):
+        # Inicjalizujemy ImageManager, aby sprawdził i ewentualnie pobrał braki
+        image_manager = ImageManager()
+        
+        for god in self.god_names:
+            # Ta metoda sprawdzi, czy portret istnieje lokalnie. 
+            # Jeśli nie (jak w przypadku Horusa), pobierze go z CDN.
+            image_manager.get_god_portrait_path(god)
+            
         self.finished.emit()
 
 class ProcessMonitorWorker(QThread):
@@ -729,7 +737,20 @@ class SmiteController(QObject):
                 
                 self.overlay.set_status_indicator("error")
             elif data == STATE_EMPTY:
-                self.overlay.list_screen.show_empty_state()
+                # --- INTELIGENTNY PUSTY STAN (New God Check) ---
+                is_new = False
+                if hasattr(self, '_current_god_being_fetched') and self._current_god_being_fetched:
+                    god_lower = self._current_god_being_fetched.lower()
+                    new_gods_lower = [g.lower() for g in self.scanner.new_gods] if hasattr(self.scanner, 'new_gods') else []
+                    is_new = god_lower in new_gods_lower
+
+                try:
+                    # Przekazujemy informację do widoku listy
+                    self.overlay.list_screen.show_empty_state(is_new_god=is_new)
+                except TypeError:
+                    # Fallback, na wypadek gdybyś jeszcze nie zapisał list_screen.py
+                    self.overlay.list_screen.show_empty_state()
+                    
                 # Przy pustym stanie bot nadal działa, więc dajemy zieloną
                 self.overlay.set_status_indicator("idle")
             

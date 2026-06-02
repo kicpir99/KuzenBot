@@ -38,6 +38,7 @@
     "hades": "Hades",
     "hecate": "Hecate",
     "hercules": "Hercules",
+    "horus": "Horus",
     "hou-yi": "Hou Yi",
     "hun-batz": "Hun Batz",
     "ishtar": "Ishtar",
@@ -123,6 +124,7 @@
     "Hades": "hades",
     "Hecate": "hecate",
     "Hercules": "hercules",
+    "Horus": "horus",
     "Hou Yi": "hou-yi",
     "Hun Batz": "hun-batz",
     "Ishtar": "ishtar",
@@ -169,6 +171,8 @@
     "Ymir": "ymir",
     "Zeus": "zeus"
   },
-  "cached_at": 1780322348.5766335,
-  "new_gods": []
+  "cached_at": 1780426494.6408417,
+  "new_gods": [
+    "Horus"
+  ]
 }
