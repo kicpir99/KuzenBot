@@ -24,7 +24,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.7"
+CURRENT_VERSION = "1.1.8"
 API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
