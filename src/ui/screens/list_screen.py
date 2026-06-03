@@ -36,32 +36,6 @@ class ClickableLabel(QLabel):
         else:
             super().mousePressEvent(event)
 
-
-class ItemTooltip(QFrame):
-    def __init__(self, alternatives, icon_factory):
-        super().__init__()
-        self.setObjectName("item_tooltip")
-        self.setStyleSheet("""
-            QFrame#item_tooltip {
-                background-color: #1e293b;
-                border: 1px solid #334155;
-                border-radius: 8px;
-                padding: 5px;
-            }
-        """)
-        lay = QVBoxLayout(self)
-        lay.setContentsMargins(5, 5, 5, 5)
-        lay.setSpacing(5)
-        
-        for alt in alternatives:
-            row = QHBoxLayout()
-            icon = icon_factory(alt["item"], 24)
-            pct = QLabel(f"{alt['pct']}%")
-            pct.setStyleSheet("color: #94a3b8; font-size: 10px; font-weight: bold;")
-            row.addWidget(icon)
-            row.addWidget(pct)
-            lay.addLayout(row)
-
 class ListScreen(QWidget):
     """Build list screen with cards, filter bar, and pagination."""
 

@@ -14,6 +14,7 @@ a = Analysis(
         'PyQt6.QtWidgets',
         'PyQt6.QtGui',
         'requests',
+        'certifi',
     ],
     hookspath=[],
     hooksconfig={},
@@ -46,6 +47,7 @@ exe = EXE(
     splash.binaries,           # <--- DODANE: Binarne pliki splasha
     exclude_binaries=True,     # Oddzielamy pliki od pliku .exe (szybsze uruchamianie)
     name='KuzenBot_App',           # Nazwa pliku startowego
+    version='version.txt',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

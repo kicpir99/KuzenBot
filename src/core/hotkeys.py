@@ -50,19 +50,22 @@ class HotkeyListener(QThread):
                 try:
                     handler = keyboard.add_hotkey(kb_str, self.action_to_signal[action].emit)
                     self._handlers.append(handler)
-                    print(f"[Hotkeys] Zarejestrowano globalny skrót: '{kb_str}' dla '{action}'")
+                    from core.logger import logger
+                    logger.info(f"[Hotkeys] Zarejestrowano skrót: '{kb_str}' dla '{action}'")
                 except Exception as e:
-                    print(f"[Hotkeys] Błąd rejestracji skrótu '{kb_str}': {e}")
+                    from core.logger import logger
+                    logger.error(f"[Hotkeys] BŁĄD rejestracji skrótu '{kb_str}': {e}. Czy aplikacja ma uprawnienia Administratora?")
 
     def run(self):
         while self.running:
             time.sleep(0.1)
 
     def stop(self):
+        """Safely disable listener and remove hooks."""
         self.running = False
-        for h in self._handlers:
-            try:
-                keyboard.remove_hotkey(h)
-            except Exception:
-                pass
-        self._handlers.clear()
+        try:
+            import keyboard
+            keyboard.unhook_all() # Kluczowe! Odczepiamy się od klawiatury Windowsa
+        except Exception:
+            pass
+        self.wait()

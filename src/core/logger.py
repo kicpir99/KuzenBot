@@ -4,22 +4,24 @@ import logging
 import platform
 from logging.handlers import RotatingFileHandler
 
-os.makedirs("logs", exist_ok=True)
+appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+log_dir = os.path.join(appdata, "KuzenBot", "logs")
+os.makedirs(log_dir, exist_ok=True)
 
-# --- ZMIANA NAZWY ---
 logger = logging.getLogger("KuzenBot")
 logger.setLevel(logging.DEBUG)
 
 if logger.hasHandlers():
     logger.handlers.clear()
 
-# Zapisywanie logów do pliku logs/KuzenBot.log (rotacja do 5 plików po 5MB)
 file_formatter = logging.Formatter(
     '%(asctime)s - %(levelname)s - [%(threadName)s] - %(filename)s:%(lineno)d - %(message)s'
 )
-# --- ZMIANA NAZWY PLIKU ORAZ ROZMIARU (5 MB) ---
+
+# --- ZMIANA ŚCIEŻKI DO PLIKU ---
+log_file_path = os.path.join(log_dir, "KuzenBot.log")
 file_handler = RotatingFileHandler(
-    "logs/KuzenBot.log", 
+    log_file_path, 
     maxBytes=5*1024*1024, 
     backupCount=5, 
     encoding="utf-8"

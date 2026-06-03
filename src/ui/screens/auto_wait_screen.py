@@ -5,6 +5,7 @@ from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, pyqtProper
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGraphicsOpacityEffect, QFrame
 from PyQt6.QtGui import QFont, QMovie
 from core.translations import _t
+from ui.components.skeleton import clear_layout
 
 def resource_path(*paths):
     try: base_path = sys._MEIPASS
@@ -244,18 +245,8 @@ class AutoWaitScreen(QWidget):
 
         old_lay = self.container.layout()
         if old_lay:
-            while old_lay.count():
-                item = old_lay.takeAt(0)
-                if item.layout():
-                    while item.layout().count():
-                        i = item.layout().takeAt(0)
-                        if i.widget():
-                            i.widget().setParent(None)
-                elif item.widget():
-                    item.widget().setParent(None)
-            
-            from PyQt6 import sip
-            sip.delete(old_lay)
+            clear_layout(old_lay) # BEZPIECZNE CZYSZCZENIE Z TWOJEGO SKELETON.PY
+            QWidget().setLayout(old_lay) # "Wyrzucenie" layoutu z widgetu
 
         if self._expanded:
             self._setup_expanded_layout()

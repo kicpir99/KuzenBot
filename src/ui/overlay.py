@@ -1337,11 +1337,21 @@ class SmiteOverlay(QMainWindow):
                     ty = g.y() - th - 6
                     
                     # Zabezpieczenie przed wyjściem za ekran nakładki
-                    win_rect = self.geometry()
-                    if tx < win_rect.left(): 
-                        tx = win_rect.left()
-                    elif tx + tw > win_rect.right(): 
-                        tx = win_rect.right() - tw
+                    from PyQt6.QtGui import QGuiApplication
+                    screen = QGuiApplication.screenAt(g)
+                    if not screen:
+                        screen = QGuiApplication.primaryScreen()
+                    avail_rect = screen.availableGeometry()
+
+                    if tx < avail_rect.left(): 
+                        tx = avail_rect.left()
+                    elif tx + tw > avail_rect.right(): 
+                        tx = avail_rect.right() - tw
+                        
+                    # Zapobiegamy też "wcięciu" w górną krawędź ekranu (np. nad przyciskiem Home)
+                    if ty < avail_rect.top():
+                        ty = g.y() + obj.height() + 6 # Pokaż go POD elementem, jeśli nie ma miejsca nad
+                    # ------------------------------------------------------------------------
                         
                     # 5. Przesuwamy w niewidzialności na właściwą pozycję nad przyciskiem
                     self.tooltip.move(tx, ty)

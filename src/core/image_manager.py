@@ -3,7 +3,8 @@ import requests
 
 class ImageManager:
     def __init__(self):
-        self.gods_dir = os.path.join("assets", "gods")
+        appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+        self.gods_dir = os.path.join(appdata, "KuzenBot", "gods")
         os.makedirs(self.gods_dir, exist_ok=True)
         
         # Mapa unikalnych nazw w CDN SmiteSource dla niespójnych bogów
@@ -21,10 +22,10 @@ class ImageManager:
             "The Morrigan": "The_Morrigan"
         }
 
-    def get_god_portrait_path(self, god_name: str) -> str:
+    def get_god_portrait_path(self, god_name: str, download_if_missing: bool = False) -> str:
         """
-        Sprawdza czy portret boga istnieje lokalnie. 
-        Jeśli nie, pobiera go z CDN w tle i zwraca ścieżkę.
+        Checks if the god portrait exists locally.
+        If not, it fetches it from the CDN in the background and returns the path.
         """
         if not god_name:
             return ""
@@ -36,6 +37,9 @@ class ImageManager:
         # Jeśli plik już jest na dysku, po prostu go zwróć
         if os.path.exists(filepath):
             return filepath
+        
+        if not download_if_missing:
+            return ""
             
         # Jeśli pliku nie ma, pobieramy z CDN SmiteSource
         url_name = self.special_gods_map.get(god_name, god_name.replace(" ", "").replace("'", ""))

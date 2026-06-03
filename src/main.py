@@ -8,6 +8,11 @@ import time
 import urllib.request
 import tempfile
 import subprocess
+import ssl
+import certifi
+
+os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
+os.environ["SSL_CERT_FILE"] = certifi.where()
 
 def resource_path(*paths):
     try: base_path = sys._MEIPASS
@@ -20,6 +25,7 @@ from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
 CURRENT_VERSION = "1.1.7"
+API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
 STATE_DATA = "data"
@@ -75,6 +81,13 @@ def parse_god_data(json_data: dict) -> GodData:
         error=json_data.get('error')
     )
 
+def get_appdata_dir():
+    """Zwraca i ewentualnie tworzy folder KuzenBot w AppData/Local użytkownika."""
+    appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+    kuzen_dir = os.path.join(appdata, "KuzenBot")
+    os.makedirs(kuzen_dir, exist_ok=True)
+    return kuzen_dir
+
 def get_project_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -104,9 +117,8 @@ class BuildFetchWorker(QThread):
     def run(self):
         try:
             if getattr(self, 'is_obsolete', False): return
-            
-            base_url = "http://92.5.91.226:8000/api/v1"
-            endpoint = f"{base_url}/stats/{self.god_name}" if self.source == "stats" else f"{base_url}/builds/{self.god_name}"
+        
+            endpoint = f"{API_BASE_URL}/stats/{self.god_name}" if self.source == "stats" else f"{API_BASE_URL}/builds/{self.god_name}"
 
             print(f"[API] Fetching from: {endpoint}")
             response = requests.get(endpoint, timeout=15)
@@ -150,7 +162,7 @@ class DetailsFetchWorker(QThread):
         else:
             try:
                 payload = dataclasses.asdict(self.build_obj)
-                response = requests.post("http://92.5.91.226:8000/api/v1/details", json=payload, timeout=10)
+                response = requests.post(f"{API_BASE_URL}/details", json=payload, timeout=10)
                 
                 if response.status_code == 200:
                     updated_build = SmiteBuild(**response.json())
@@ -172,14 +184,10 @@ class PortraitFetchWorker(QThread):
         self.god_names = god_names
 
     def run(self):
-        # Inicjalizujemy ImageManager, aby sprawdził i ewentualnie pobrał braki
         image_manager = ImageManager()
-        
         for god in self.god_names:
-            # Ta metoda sprawdzi, czy portret istnieje lokalnie. 
-            # Jeśli nie (jak w przypadku Horusa), pobierze go z CDN.
-            image_manager.get_god_portrait_path(god)
-            
+            # Wątek w tle MOŻE używać pobierania
+            image_manager.get_god_portrait_path(god, download_if_missing=True)
         self.finished.emit()
 
 class ProcessMonitorWorker(QThread):
@@ -251,7 +259,9 @@ class UpdateDownloaderWorker(QThread):
     def run(self):
         try:
             temp_dir = tempfile.gettempdir()
-            installer_path = os.path.join(temp_dir, "KuzenBot_Update.exe")
+            import time
+            installer_name = f"KuzenBot_Update_{int(time.time())}.exe"
+            installer_path = os.path.join(temp_dir, installer_name)
             
             def report_hook(block_num, block_size, total_size):
                 if total_size > 0:
@@ -535,9 +545,9 @@ class SmiteController(QObject):
         self.tray_icon.setToolTip("KuzenBot")
 
         tray_menu = QMenu()
-        show_action = tray_menu.addAction("Show Overlay")
+        show_action = tray_menu.addAction(_t("show_overlay") if _t("show_overlay") else "Show Overlay")
         show_action.triggered.connect(self._show_from_tray)
-        exit_action = tray_menu.addAction("Exit")
+        exit_action = tray_menu.addAction(_t("tray_exit") if _t("tray_exit") else "Exit")
         exit_action.triggered.connect(self._exit_app)
 
         self.tray_icon.setContextMenu(tray_menu)
@@ -555,7 +565,7 @@ class SmiteController(QObject):
             self._show_from_tray()
 
     def _exit_app(self):
-        self.hotkey_listener.stop()
+        # Wystarczy samo quit(), Qt automatycznie wywoła _on_app_quit
         QApplication.instance().quit()
 
     def _on_app_quit(self):
@@ -564,7 +574,12 @@ class SmiteController(QObject):
         self._config["window_x"] = pos.x()
         self._config["window_y"] = pos.y()
         self._save_config()
-        print("💾 [Controller] Zapisano pozycję okna na ekranie.")
+        
+        # --- ZMIANA: Zwalnianie hooków klawiatury w momencie faktycznego zamykania ---
+        if hasattr(self, 'hotkey_listener'):
+            self.hotkey_listener.stop()
+            
+        print("💾 [Controller] Zapisano pozycję okna na ekranie i bezpiecznie odpięto skróty.")
 
     def _restore_window_position(self):
         """Restores window position with safety check for disconnected monitors."""
@@ -989,7 +1004,7 @@ class SmiteController(QObject):
 
     def _load_config(self) -> dict:
         import json
-        config_path = os.path.join(get_project_root(), "assets", "config.json")
+        config_path = os.path.join(get_appdata_dir(), "config.json")
         defaults = {
             "language": "en",
             "build_source": "builds",
@@ -1038,16 +1053,13 @@ class SmiteController(QObject):
 
     def _save_config(self):
         import json
-        assets_dir = os.path.join(get_project_root(), "assets")
-        os.makedirs(assets_dir, exist_ok=True)
-        config_path = os.path.join(assets_dir, "config.json")
+        config_path = os.path.join(get_appdata_dir(), "config.json") # ZMIANA TUTAJ
         try:
             self._config["last_used_source"] = self.build_source
             with open(config_path, "w", encoding="utf-8") as f:
                 json.dump(self._config, f, indent=4)
         except Exception as e:
             print(f"DEBUG: Error saving config: {e}")
-            pass
 
     def set_build_source(self, source):
         if self.build_source == source:
@@ -1112,7 +1124,7 @@ class SmiteController(QObject):
 
     def _save_to_cache(self, god_name, json_data):
         """Saves build data to a local JSON file, scoped by source type."""
-        cache_dir = os.path.join("assets", "cache")
+        cache_dir = os.path.join(get_appdata_dir(), "cache") # ZMIANA TUTAJ
         os.makedirs(cache_dir, exist_ok=True)
             
         slug = god_name.lower().strip().replace(" ", "_").replace("'", "")
@@ -1126,12 +1138,9 @@ class SmiteController(QObject):
 
     def _load_from_cache(self, god_name):
         """Loads build data from local JSON cache if available and not expired."""
-        import time
-        import os
-        import json
-        
+        import time, os, json
         slug = god_name.lower().strip().replace(" ", "_").replace("'", "")
-        filepath = os.path.join("assets", "cache", f"{slug}_{self.build_source}.json")
+        filepath = os.path.join(get_appdata_dir(), "cache", f"{slug}_{self.build_source}.json")
             
         if os.path.exists(filepath):
             # --- NOWOŚĆ: Sprawdzamy wiek pliku (TTL) ---

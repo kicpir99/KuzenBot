@@ -4,8 +4,17 @@ import re
 import json
 import difflib
 import requests
+import sys
 from PyQt6.QtCore import QThread, pyqtSignal
 from core.logger import logger
+
+def resource_path(*paths):
+    """Zwraca ścieżkę do zasobów rozpakowanych przez PyInstaller."""
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, *paths)
 
 class GameScanner(QThread):
     god_detected = pyqtSignal(str) 
@@ -16,8 +25,8 @@ class GameScanner(QThread):
         local_appdata = os.getenv('LOCALAPPDATA')
         self.log_path = os.path.join(local_appdata, "SMITE2Alpha", "Saved", "Logs", "Hemingway.log")
         self.running = True
-        self.gods_db_path = os.path.join("assets", "gods_db.json")
-        self.aliases_path = os.path.join("assets", "god_aliases.json") # <--- NOWE
+        self.gods_db_path = resource_path("assets", "gods_db.json")
+        self.aliases_path = resource_path("assets", "god_aliases.json")
         
         self.english_gods, self.new_gods = self._load_gods_db()
         self.aliases = self._load_aliases() # <--- NOWE

@@ -1,7 +1,7 @@
 """Search Screen — manual god search with visual god selector."""
 
 import os,sys
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui import QPixmap, QCursor
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
                              QPushButton, QLabel, QScrollArea, QGridLayout,
@@ -34,6 +34,9 @@ class SearchScreen(QWidget):
         self._last_filtered = None
         self.is_mini = False
         self._portrait_cache = {}
+        self.search_timer = QTimer()
+        self.search_timer.setSingleShot(True)
+        self.search_timer.timeout.connect(self._perform_filter)
         self._build_ui()
 
     def _build_ui(self):
@@ -163,6 +166,12 @@ class SearchScreen(QWidget):
 
     # ------------------------------------------------------------ internal
     def _on_text_changed(self, text):
+        # Za każdym naciśnięciem klawisza odsuwamy wykonanie w czasie o 250ms
+        self.search_timer.start(250) 
+
+    def _perform_filter(self):
+        # Pobieramy aktualny tekst bezpośrednio z pola input
+        text = self.input.text()
         query = text.strip().lower()
         if not query:
             if not self.is_mini: self.status_label.setText(_t("select_god"))
@@ -173,7 +182,7 @@ class SearchScreen(QWidget):
         starts_with = [g for g in self._all_gods if g.lower().startswith(query)]
         contains = [g for g in self._all_gods if query in g.lower() and not g.lower().startswith(query)]
         filtered = starts_with + contains
-        
+
         self._last_filtered = filtered
         if not self.is_mini: self.status_label.setText(_t("found_matches").format(count=len(filtered)))
         self._refresh_grid(filtered)
