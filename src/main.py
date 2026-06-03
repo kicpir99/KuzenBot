@@ -24,7 +24,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.8"
+CURRENT_VERSION = "1.1.9"
 API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
@@ -39,6 +39,29 @@ from PyQt6.QtWidgets import (QApplication, QInputDialog, QLineEdit,
                              QSystemTrayIcon, QMenu, QDialog)
 from PyQt6.QtCore import QThread, pyqtSignal, Qt, QObject, QTimer, QPoint
 from PyQt6.QtGui import QGuiApplication, QIcon
+
+def get_appdata_dir():
+    """Zwraca i ewentualnie tworzy folder KuzenBot w AppData/Local użytkownika."""
+    appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+    kuzen_dir = os.path.join(appdata, "KuzenBot")
+    os.makedirs(kuzen_dir, exist_ok=True)
+    return kuzen_dir
+
+def get_project_root():
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from core.logger import setup_logging, logger
+setup_logging()
+
+from core.hotkeys import HotkeyListener
+from ui.overlay import SmiteOverlay
+from ui.settings_dialog import SettingsDialog
+from core.scanner import GameScanner
+from data.models import GodData, SmiteBuild
+from core.image_manager import ImageManager
 
 def parse_god_data(json_data: dict) -> GodData:
     builds = []
@@ -80,29 +103,6 @@ def parse_god_data(json_data: dict) -> GodData:
         builds=builds,
         error=json_data.get('error')
     )
-
-def get_appdata_dir():
-    """Zwraca i ewentualnie tworzy folder KuzenBot w AppData/Local użytkownika."""
-    appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
-    kuzen_dir = os.path.join(appdata, "KuzenBot")
-    os.makedirs(kuzen_dir, exist_ok=True)
-    return kuzen_dir
-
-def get_project_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from core.logger import setup_logging, logger
-setup_logging()
-
-from core.hotkeys import HotkeyListener
-from ui.overlay import SmiteOverlay
-from ui.settings_dialog import SettingsDialog
-from core.scanner import GameScanner
-from data.models import GodData, SmiteBuild
-from core.image_manager import ImageManager
 
 class BuildFetchWorker(QThread):
     """Fetches build data from the remote API in a background thread."""

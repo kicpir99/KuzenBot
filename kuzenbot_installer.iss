@@ -1,14 +1,14 @@
 [Setup]
 ; --- Podstawowe informacje ---
 AppName=KuzenBot App
-AppVersion=1.1.8
+AppVersion=1.1.9
 AppPublisher=kicpir99
 DefaultDirName={autopf}\KuzenBot
 DefaultGroupName=KuzenBot
 
 ; --- Ustawienia pliku wyjściowego ---
 OutputDir=Output
-OutputBaseFilename=KuzenBot_Setup_v1_1_8
+OutputBaseFilename=KuzenBot_Setup_v1_1_9
 Compression=lzma
 SolidCompression=yes
 SetupIconFile=assets\logo.ico
