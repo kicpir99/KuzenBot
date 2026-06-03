@@ -1141,16 +1141,75 @@ class SmiteOverlay(QMainWindow):
         display = fm.elidedText(full, Qt.TextElideMode.ElideRight, limit)
         self.god_label.setText(display)
 
-
     @staticmethod
     def _get_icon_path(name):
-        # --- Wyjątek dla statycznej ikony z głównego folderu assets ---
         if name.lower().strip() == "acorn":
             return resource_path("assets", "acorn.png")
             
-        # Standardowe szukanie dla pozostałych przedmiotów
         safe = re.sub(r'[^a-z0-9]', '_', name.strip().lower()).strip('_') + ".png"
-        return resource_path("assets", "items", safe)
+        
+        local_path = resource_path("assets", "items", safe)
+        if os.path.exists(local_path):
+            return local_path
+            
+        appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+        cached_path = os.path.join(appdata, "KuzenBot", "cache", "items", safe)
+        
+        return cached_path 
+
+    def _ensure_item_icon(self, item_name, size):
+        """Downloads item icon from CDN to AppData cache if not found."""
+        appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+        cache_dir = os.path.join(appdata, "KuzenBot", "cache", "items")
+        os.makedirs(cache_dir, exist_ok=True)
+
+        safe = re.sub(r'[^a-z0-9]', '_', item_name.strip().lower()).strip('_') + ".png"
+        filepath = os.path.join(cache_dir, safe)
+
+        if os.path.exists(filepath):
+            return filepath
+
+        import requests as http_req
+        normalized = item_name.strip().replace("’", "'").lower()
+        req_timeout = 1.5 
+        if hasattr(self, 'item_db') and self.item_db:
+            info = self.item_db.get(normalized)
+            if isinstance(info, dict) and info.get("image_url"):
+                try:
+                    r = http_req.get(info["image_url"], timeout=req_timeout)
+                    if r.status_code == 200:
+                        with open(filepath, "wb") as f:
+                            f.write(r.content)
+                        return filepath
+                except Exception:
+                    pass
+
+        camel = item_name.strip().replace(" ", "").replace("'", "").replace("-", "")
+        for prefix in ["T3_", "T2_", "T1_", "Relic_", "Consumable_", "Curio_", ""]:
+            filename = f"{prefix}{camel}.png"
+            url = f"https://wiki.smite2.com/images/thumb/{filename}/80px-{filename}"
+            try:
+                r = http_req.get(url, timeout=req_timeout)
+                if r.status_code == 200:
+                    with open(filepath, "wb") as f:
+                        f.write(r.content)
+                    return filepath
+            except Exception:
+                continue
+
+        for prefix in ["T3_", "T2_", "T1_", "Relic_", "Consumable_"]:
+            cdn_name = f"Icon_{prefix}{camel}.png"
+            url = f"https://cdn.smitesource.com/Items/{prefix.strip('_')}/{cdn_name}"
+            try:
+                r = http_req.get(url, timeout=req_timeout)
+                if r.status_code == 200:
+                    with open(filepath, "wb") as f:
+                        f.write(r.content)
+                    return filepath
+            except Exception:
+                continue
+
+        return ""
 
     def _make_icon(self, item_data, size):
         name = item_data.get("to", "Unknown") if isinstance(item_data, dict) else str(item_data)
@@ -1162,6 +1221,10 @@ class SmiteOverlay(QMainWindow):
         icon.installEventFilter(self)
         
         path = self._get_icon_path(name)
+        
+        # On-demand download from CDN if file not found locally
+        if not os.path.exists(path):
+            path = self._ensure_item_icon(name, size)
         
         # --- OPTYMALIZACJA (LAZY LOADING & CACHE) ---
         # 1. Sprawdzamy czy nasza pamięć podręczna istnieje, jeśli nie - tworzymy ją

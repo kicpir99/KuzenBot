@@ -1,5 +1,11 @@
 import os
 import requests
+import sys
+
+def resource_path(*paths):
+    try: base_path = sys._MEIPASS
+    except AttributeError: base_path = os.path.abspath(".")
+    return os.path.join(base_path, *paths)
 
 class ImageManager:
     def __init__(self):
@@ -17,9 +23,8 @@ class ImageManager:
             "Ne Zha": "Ne_Zha",
             "Zhong Kui": "Zhong_Kui",
             "Ah Muzen Cab": "Ah_Muzen_Cab",
-            "Morgan Le Fay": "Morgan_Le_Fay",
-            "Maman Brigitte": "Maman_Brigitte",
-            "The Morrigan": "The_Morrigan"
+            "Maman Brigitte": "Maman_Brigitte"
+            # Morgan Le Fay i The Morrigan usunięte!
         }
 
     def get_god_portrait_path(self, god_name: str, download_if_missing: bool = False) -> str:
@@ -32,16 +37,21 @@ class ImageManager:
             
         # Standaryzacja nazwy do pliku (np. "da-ji", "zeus")
         slug = god_name.lower().strip().replace(" ", "-").replace("'", "")
-        filepath = os.path.join(self.gods_dir, f"{slug}.png")
         
-        # Jeśli plik już jest na dysku, po prostu go zwróć
+        # 1. NAJPIERW sprawdzamy pliki wbudowane w aplikację (.exe) folderze assets
+        local_path = resource_path("assets", "gods", f"{slug}.png")
+        if os.path.exists(local_path):
+            return local_path
+            
+        # 2. POTEM sprawdzamy cache w AppData
+        filepath = os.path.join(self.gods_dir, f"{slug}.png")
         if os.path.exists(filepath):
             return filepath
         
         if not download_if_missing:
             return ""
             
-        # Jeśli pliku nie ma, pobieramy z CDN SmiteSource
+        # 3. Jeśli pliku nie ma nigdzie, pobieramy z CDN SmiteSource
         url_name = self.special_gods_map.get(god_name, god_name.replace(" ", "").replace("'", ""))
         url = f"https://cdn.smitesource.com/cdn-cgi/image/width=256,format=auto,quality=75/Gods/{url_name}/Default/t_GodPortrait_{url_name}.png"
         

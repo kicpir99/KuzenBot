@@ -24,7 +24,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.9"
+CURRENT_VERSION = "1.1.10"
 API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
@@ -422,7 +422,14 @@ class SmiteController(QObject):
         self._restore_window_position()
         
         if self.scanner.english_gods:
-            self.overlay.set_god_list(self.scanner.english_gods, self.scanner.new_gods)
+            # --- ZMIANA: Przepuszczamy nowe postacie przez nasz Tracker ---
+            from core.god_tracker import GodTracker
+            final_new_gods = GodTracker.get_active_new_gods(self.scanner.new_gods)
+            
+            # Przekazujemy przefiltrowaną listę (final_new_gods) do interfejsu
+            self.overlay.set_god_list(self.scanner.english_gods, final_new_gods)
+            # -------------------------------------------------------------
+            
             self.portrait_worker = PortraitFetchWorker(self.scanner.english_gods)
             self._active_threads.add(self.portrait_worker)
             self.portrait_worker.finished.connect(self._on_thread_finished)

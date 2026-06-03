@@ -307,10 +307,14 @@ class SearchScreen(QWidget):
         icon.setFixedSize(sz, sz)
         icon.setObjectName("god_portrait_img")
         
-        slug = name.lower().strip().replace(" ", "-").replace("'", "")
-        path = resource_path("assets", "gods", f"{slug}.png")
+        from core.image_manager import ImageManager
+        path = ImageManager().get_god_portrait_path(name)
         
-        # Sprawdzamy cache
+        if not path or not os.path.exists(path):
+            slug = name.lower().strip().replace(" ", "-").replace("'", "")
+            path = resource_path("assets", "gods", f"{slug}.png")
+        # -----------------------------------------------------------
+        
         cache_key = (name, sz)
         if cache_key in self._portrait_cache:
             pix = self._portrait_cache[cache_key]
