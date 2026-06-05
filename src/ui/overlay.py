@@ -10,7 +10,7 @@ Slim orchestrator (~300 lines) that owns:
 
 import os
 import re
-from PyQt6.QtCore import Qt, pyqtSignal, QEvent, QPropertyAnimation, QEasingCurve, QRect, QSize, QByteArray, QTimer, QUrl
+from PyQt6.QtCore import Qt, pyqtSignal, QEvent, QPropertyAnimation, QEasingCurve, QRect, QSize, QByteArray, QTimer, QUrl, QThread
 from PyQt6.QtGui import QPixmap, QCursor, QFont, QIcon, QDesktopServices
 from PyQt6.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QHBoxLayout,
                              QWidget, QPushButton, QFrame, QStackedWidget,
@@ -40,6 +40,21 @@ def resource_path(*paths):
     except AttributeError:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, *paths)
+
+class AsyncIconDownloader(QThread):
+    icon_ready = pyqtSignal(str, str, object, int)
+
+    def __init__(self, overlay, name, size, icon_widget):
+        super().__init__()
+        self.overlay = overlay
+        self.name = name
+        self.size = size
+        self.icon_widget = icon_widget
+
+    def run(self):
+        # Pobieranie odbywa się w tle, omijając główne okno!
+        path = self.overlay._ensure_item_icon(self.name, self.size)
+        self.icon_ready.emit(self.name, path, self.icon_widget, self.size)
 
 class SmiteOverlay(QMainWindow):
     # ---- Signals consumed by SmiteController ----
@@ -1170,13 +1185,22 @@ class SmiteOverlay(QMainWindow):
             return filepath
 
         import requests as http_req
+        import time # <--- DODANO
         normalized = item_name.strip().replace("’", "'").lower()
         req_timeout = 1.5 
+        
+        # Unikalny znacznik czasu omijający cache serwerów (Cache Buster)
+        buster = int(time.time())
+
+        # 1. Próba z lokalnej bazy danych (item_db)
         if hasattr(self, 'item_db') and self.item_db:
             info = self.item_db.get(normalized)
             if isinstance(info, dict) and info.get("image_url"):
                 try:
-                    r = http_req.get(info["image_url"], timeout=req_timeout)
+                    url = info["image_url"]
+                    # Dodajemy buster do URL-a z bazy
+                    url += f"&v={buster}" if "?" in url else f"?v={buster}"
+                    r = http_req.get(url, timeout=req_timeout)
                     if r.status_code == 200:
                         with open(filepath, "wb") as f:
                             f.write(r.content)
@@ -1185,9 +1209,11 @@ class SmiteOverlay(QMainWindow):
                     pass
 
         camel = item_name.strip().replace(" ", "").replace("'", "").replace("-", "")
+        
+        # 2. Próba z Wiki CDN
         for prefix in ["T3_", "T2_", "T1_", "Relic_", "Consumable_", "Curio_", ""]:
             filename = f"{prefix}{camel}.png"
-            url = f"https://wiki.smite2.com/images/thumb/{filename}/80px-{filename}"
+            url = f"https://wiki.smite2.com/images/thumb/{filename}/80px-{filename}?v={buster}" # <--- DODANO BUSTER
             try:
                 r = http_req.get(url, timeout=req_timeout)
                 if r.status_code == 200:
@@ -1197,9 +1223,10 @@ class SmiteOverlay(QMainWindow):
             except Exception:
                 continue
 
+        # 3. Próba ze SmiteSource CDN
         for prefix in ["T3_", "T2_", "T1_", "Relic_", "Consumable_"]:
             cdn_name = f"Icon_{prefix}{camel}.png"
-            url = f"https://cdn.smitesource.com/Items/{prefix.strip('_')}/{cdn_name}"
+            url = f"https://cdn.smitesource.com/Items/{prefix.strip('_')}/{cdn_name}?v={buster}" # <--- DODANO BUSTER
             try:
                 r = http_req.get(url, timeout=req_timeout)
                 if r.status_code == 200:
@@ -1222,38 +1249,81 @@ class SmiteOverlay(QMainWindow):
         
         path = self._get_icon_path(name)
         
-        # On-demand download from CDN if file not found locally
-        if not os.path.exists(path):
-            path = self._ensure_item_icon(name, size)
-        
-        # --- OPTYMALIZACJA (LAZY LOADING & CACHE) ---
-        # 1. Sprawdzamy czy nasza pamięć podręczna istnieje, jeśli nie - tworzymy ją
         if not hasattr(self, '_icon_cache'):
             self._icon_cache = {}
             
-        # 2. Tworzymy unikalny klucz cache'u (Nazwa przedmiotu + jego docelowy rozmiar)
         cache_key = (name, size)
         
         if os.path.exists(path):
-            # 3. Jeśli mamy już ten obrazek z tym rozmiarem w RAM, po prostu go wyciągamy!
             if cache_key in self._icon_cache:
                 pix = self._icon_cache[cache_key]
             else:
-                # 4. Jeśli go nie ma, wykonujemy ciężką operację (wczytanie pliku i skalowanie)
-                # TYLKO TEN JEDEN RAZ, a następnie zapisujemy wynik w cache.
                 pix = QPixmap(path).scaled(
                     size, size,
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation,
                 )
                 self._icon_cache[cache_key] = pix
-                
             icon.setPixmap(pix)
         else:
-            # --- OBSŁUGA BRAKUJĄCYCH/USUNIĘTYCH PRZEDMIOTÓW ---
+            # 1. Natychmiast pokaż stan ładowania (UI się nie zawiesza!)
+            icon.setText("⏳")
+            icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            icon.setStyleSheet(f"""
+                background-color: #1e293b;
+                border: 1px solid #334155;
+                border-radius: 4px;
+                color: #94a3b8;
+                font-size: {int(size * 0.4)}px;
+                font-weight: bold;
+            """)
+            
+            # 2. Odpal asynchroniczne pobieranie w tle
+            if not hasattr(self, '_async_workers'):
+                self._async_workers = set()
+                
+            worker = AsyncIconDownloader(self, name, size, icon)
+            self._async_workers.add(worker)
+            worker.icon_ready.connect(self._on_async_icon_ready)
+            # Usuwamy workera z pamięci po zakończeniu, by nie wyciekał RAM
+            worker.finished.connect(lambda w=worker: self._async_workers.discard(w) if w in getattr(self, '_async_workers', set()) else None)
+            worker.start()
+
+        # Przezroczystość (aplikowana na koniec)
+        from PyQt6.QtWidgets import QGraphicsOpacityEffect
+        config = getattr(self, '_config', {})
+        items_val = config.get("opacity_items", 1.0)
+        effect = QGraphicsOpacityEffect(icon)
+        effect.setOpacity(items_val)
+        icon.setGraphicsEffect(effect)
+
+        return icon
+
+    def _on_async_icon_ready(self, name, path, icon, size):
+        try:
+            # Zabezpieczenie: jeśli gracz zdążył zmienić zakładkę podczas pobierania, 
+            # widget mógł zostać usunięty z pamięci.
+            icon.objectName()
+        except RuntimeError:
+            return
+
+        if path and os.path.exists(path):
+            # Sukces - wgrywamy pobrany obrazek
+            cache_key = (name, size)
+            pix = QPixmap(path).scaled(
+                size, size,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            self._icon_cache[cache_key] = pix
+            
+            icon.setText("")
+            icon.setStyleSheet("") # Resetujemy tło loadera
+            icon.setPixmap(pix)
+        else:
+            # Fallback - Przedmiot usunięty lub nie istnieje na serwerze
             is_removed = True
             if hasattr(self, 'item_db') and self.item_db:
-                # DODANA LINIJKA: Wyjątek dla sztucznego żołędzia, by nie traktować go jako usuniętego!
                 if name.lower().strip().replace("’", "'") in self.item_db or name.lower().strip() == "acorn":
                     is_removed = False
             
@@ -1268,12 +1338,6 @@ class SmiteOverlay(QMainWindow):
                     font-size: {int(size * 0.4)}px;
                     font-weight: bold;
                 """)
-                if isinstance(item_data, dict):
-                    item_data = item_data.copy()
-                    item_data["to"] = f"{name} (⚠️ {_t('removed_item')})"
-                    icon.setProperty("item_data", item_data)
-                else:
-                    icon.setProperty("item_data", f"{name} (⚠️ {_t('removed_item')})")
             else:
                 icon.setText("?")
                 icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1286,16 +1350,13 @@ class SmiteOverlay(QMainWindow):
                     font-weight: bold;
                 """)
                 
-        # Zapewnienie poprawnej przezroczystości nowo generowanym ikonom
+        # Odświeżenie przezroczystości po załadowaniu grafiki
         from PyQt6.QtWidgets import QGraphicsOpacityEffect
         config = getattr(self, '_config', {})
         items_val = config.get("opacity_items", 1.0)
-        
         effect = QGraphicsOpacityEffect(icon)
         effect.setOpacity(items_val)
         icon.setGraphicsEffect(effect)
-
-        return icon
 
     def _on_card_clicked(self, index):
         """Proxy: list card click triggers build_selected signal."""

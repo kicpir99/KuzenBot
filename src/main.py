@@ -24,7 +24,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.10"
+CURRENT_VERSION = "1.1.11"
 API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
@@ -50,6 +50,32 @@ def get_appdata_dir():
 def get_project_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+def clean_old_cache(days_old=7):
+    """Usuwa pliki cache grafik starsze niż podana liczba dni."""
+    import time, os
+    
+    appdata = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+    
+    # Lista folderów, w których przetrzymujemy pobrane w locie grafiki
+    dirs_to_clean = [
+        os.path.join(appdata, "KuzenBot", "cache", "items"),
+        os.path.join(appdata, "KuzenBot", "gods")           
+    ]
+    
+    now = time.time()
+    max_age_seconds = days_old * 24 * 3600
+    
+    for directory in dirs_to_clean:
+        if os.path.exists(directory):
+            for filename in os.listdir(directory):
+                filepath = os.path.join(directory, filename)
+                if os.path.isfile(filepath):
+                    file_age = now - os.path.getmtime(filepath)
+                    if file_age > max_age_seconds:
+                        try:
+                            os.remove(filepath)
+                        except Exception:
+                            pass
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -1289,6 +1315,8 @@ if __name__ == "__main__":
     import signal
     import traceback 
     
+    clean_old_cache(days_old=7)
+
     # 1. Definiujemy безопасный sys.excepthook
     def safe_excepthook(exctype, value, traceback_obj):
         err_msg = "".join(traceback.format_exception(exctype, value, traceback_obj))

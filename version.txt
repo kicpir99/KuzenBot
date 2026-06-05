@@ -1,8 +1,8 @@
 # UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 1, 10, 0),
-    prodvers=(1, 1, 10, 0),
+    filevers=(1, 1, 11, 0),
+    prodvers=(1, 1, 11, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -17,12 +17,12 @@ VSVersionInfo(
         '040904B0',
         [StringStruct('CompanyName', 'kicpir99'),
         StringStruct('FileDescription', 'KuzenBot - Smite 2 Overlay'),
-        StringStruct('FileVersion', '1.1.10.0'),
+        StringStruct('FileVersion', '1.1.11.0'),
         StringStruct('InternalName', 'KuzenBot'),
-        StringStruct('LegalCopyright', 'Copyright (c) 2024 kicpir99'),
+        StringStruct('LegalCopyright', 'Copyright (c) 2026 kicpir99'),
         StringStruct('OriginalFilename', 'KuzenBot_App.exe'),
         StringStruct('ProductName', 'KuzenBot'),
-        StringStruct('ProductVersion', '1.1.10.0')])
+        StringStruct('ProductVersion', '1.1.11.0')])
       ]), 
     VarFileInfo([VarStruct('Translation', [1033, 1200])])
   ]
