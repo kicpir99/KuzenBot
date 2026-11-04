@@ -123,7 +123,7 @@ class SearchScreen(QWidget):
                 self.results_box.style().unpolish(self.results_box)
                 self.results_box.style().polish(self.results_box)
                 
-                self.scroll_area.setFixedHeight(68)
+                self.scroll_area.setFixedHeight(72)
                 self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
                 self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
                 self.scroll_area.viewport().installEventFilter(self)

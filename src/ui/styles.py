@@ -531,18 +531,25 @@ def get_stylesheet(theme_name: str = "gold", font_key: str = "standard") -> str:
         /* Override for horizontal god scroll */
         #god_scroll_area QScrollBar:horizontal {{
             border: none;
-            background: rgba(15, 23, 42, 0.3);
+            background: rgba(15, 23, 42, 0.4);
             height: 6px;
-            margin: 2px 10px 1px 10px;
+            margin: 0px 6px 0px 6px;
             border-radius: 3px;
         }}
         #god_scroll_area QScrollBar::handle:horizontal {{
-            background: rgba({c["primary_rgb"]}, 0.45);
+            background: rgba({c["primary_rgb"]}, 0.6);
             min-width: 45px;
             border-radius: 3px;
         }}
         #god_scroll_area QScrollBar::handle:horizontal:hover {{
             background: {c["primary"]};
+        }}
+        #god_scroll_area QScrollBar::add-line:horizontal,
+        #god_scroll_area QScrollBar::sub-line:horizontal {{
+            width: 0px;
+            height: 0px;
+            border: none;
+            background: transparent;
         }}
 
         /* ========== TOOLTIP ========== */

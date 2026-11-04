@@ -65,7 +65,7 @@ class SmiteOverlay(QMainWindow):
 
     # ---- Constants ----
     EXPANDED_SIZE = (600, 840)
-    MINI_SIZE = (420, 165)
+    MINI_SIZE = (420, 180)
 
     def __init__(self):
         super().__init__()
@@ -1899,8 +1899,9 @@ class SmiteOverlay(QMainWindow):
         accent_hex = theme_colors.get(accent, "#C5A059")
         
         colored_logo = self._colorize_logo(accent_hex)
-        # Zostawiamy dopasowanie rozmiaru
-        self.god_label.setPixmap(colored_logo.pixmap(QSize(200, 50)))
+        h = 24 if not self.is_expanded else 45
+        w = int(h * 3.5)
+        self.god_label.setPixmap(colored_logo.pixmap(QSize(w, h)))
 
     def set_status_indicator(self, state="idle"):
         """Zmienia kolor diody statusu: 'idle', 'fetching', 'error'."""
