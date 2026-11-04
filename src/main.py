@@ -675,22 +675,44 @@ class SmiteController(QObject):
         print("💾 [Controller] Zapisano pozycję okna, bezpiecznie zatrzymano wątki i odpięto skróty.")
 
     def _restore_window_position(self):
-        """Restores window position with safety check for disconnected monitors."""
+        """Restores window position with clamp so the window is never cut off offscreen."""
         x = self._config.get("window_x")
         y = self._config.get("window_y")
         
         if x is not None and y is not None:
-            from PyQt6.QtCore import QRect
-            # Tworzymy wirtualny kwadrat tam, gdzie okno ma się pojawić
-            target_rect = QRect(x, y, self.overlay.width(), self.overlay.height())
+            w = self.overlay.width()
+            h = self.overlay.height()
             
-            # Sprawdzamy czy ten kwadrat przecina się z JAKIMKOLWIEK fizycznym ekranem
-            is_visible = any(screen.availableGeometry().intersects(target_rect) for screen in QGuiApplication.screens())
+            from PyQt6.QtCore import QPoint, QRect
+            from PyQt6.QtGui import QGuiApplication
             
-            if is_visible:
+            screen = QGuiApplication.screenAt(QPoint(x, y))
+            if not screen:
+                screen = QGuiApplication.screenAt(QPoint(x + w // 2, y + h // 2))
+            if not screen:
+                target_rect = QRect(x, y, w, h)
+                for s in QGuiApplication.screens():
+                    if s.availableGeometry().intersects(target_rect):
+                        screen = s
+                        break
+            if not screen:
+                screen = QGuiApplication.primaryScreen()
+                
+            if screen:
+                avail = screen.availableGeometry()
+                # KULOODPORNY CLAMP: Okno ZAWSZE w 100% mieści się w obszarze roboczym ekranu
+                if x + w > avail.right():
+                    x = avail.right() - w
+                if x < avail.left():
+                    x = avail.left()
+                    
+                if y + h > avail.bottom():
+                    y = avail.bottom() - h
+                if y < avail.top():
+                    y = avail.top()
+                    
                 self.overlay.move(x, y)
             else:
-                print("⚠️ [Controller] Zapisana pozycja jest poza ekranem! Wracam na główny monitor.")
                 self._move_to_monitor(self._config.get("monitor_id", 0))
         else:
             # Pierwsze uruchomienie (brak configu)
