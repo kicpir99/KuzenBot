@@ -435,7 +435,7 @@ class SmiteOverlay(QMainWindow):
     # ---------------------------------------- PAGES (QStackedWidget)
     def _build_pages(self):
         self.home_screen = HomeScreen()
-        self.search_screen = SearchScreen()
+        self.search_screen = SearchScreen(tooltip_filter=self)
         self.list_screen = ListScreen(
             icon_factory=self._make_icon,
             role_click_cb=self._set_role_filter,

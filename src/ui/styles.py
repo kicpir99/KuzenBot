@@ -447,16 +447,16 @@ def get_stylesheet(theme_name: str = "gold", font_key: str = "standard") -> str:
 
         /* --- MINI RIBBON STYLE --- */
         #god_portrait_container[mini="true"] {{
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 23px;
-            border: 1px solid rgba(148, 163, 184, 0.15);
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 7px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
         }}
         #god_portrait_container[mini="true"]:hover {{
             border-color: {c["primary"]};
-            background: rgba({c["primary_rgb"]}, 0.2);
+            background: rgba({c["primary_rgb"]}, 0.25);
         }}
         #god_portrait_container[mini="true"] #god_portrait_img {{
-            border-radius: 19px;
+            border-radius: 5px;
             border: none;
         }}
 
@@ -531,18 +531,18 @@ def get_stylesheet(theme_name: str = "gold", font_key: str = "standard") -> str:
         /* Override for horizontal god scroll */
         #god_scroll_area QScrollBar:horizontal {{
             border: none;
-            background: rgba(15, 23, 42, 0.1);
+            background: rgba(15, 23, 42, 0.3);
             height: 6px;
-            margin: 0px 40px 2px 40px;
+            margin: 2px 10px 1px 10px;
             border-radius: 3px;
         }}
         #god_scroll_area QScrollBar::handle:horizontal {{
-            background: rgba({c["primary_rgb"]}, 0.3);
-            min-width: 60px;
+            background: rgba({c["primary_rgb"]}, 0.45);
+            min-width: 45px;
             border-radius: 3px;
         }}
         #god_scroll_area QScrollBar::handle:horizontal:hover {{
-            border-color: {c["primary"]};
+            background: {c["primary"]};
         }}
 
         /* ========== TOOLTIP ========== */

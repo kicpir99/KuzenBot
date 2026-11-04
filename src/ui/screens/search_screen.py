@@ -26,12 +26,13 @@ class SearchScreen(QWidget):
     search_requested = pyqtSignal(str)
     escape_pressed = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, tooltip_filter=None, parent=None):
         super().__init__(parent)
         self._all_gods = []
         self._last_filtered = None
         self.is_mini = False
         self._portrait_cache = {}
+        self._tooltip_filter = tooltip_filter
         self.search_timer = QTimer()
         self.search_timer.setSingleShot(True)
         self.search_timer.timeout.connect(self._perform_filter)
@@ -122,9 +123,9 @@ class SearchScreen(QWidget):
                 self.results_box.style().unpolish(self.results_box)
                 self.results_box.style().polish(self.results_box)
                 
-                self.scroll_area.setFixedHeight(62)
+                self.scroll_area.setFixedHeight(68)
                 self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-                self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+                self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
                 self.scroll_area.viewport().installEventFilter(self)
             else:
                 self.main_layout.setContentsMargins(15, 20, 15, 10)
@@ -303,7 +304,12 @@ class SearchScreen(QWidget):
             container.setProperty("mini", "false")
             
         container.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        container.setToolTip(name)
+        if hasattr(self, '_tooltip_filter') and self._tooltip_filter:
+            container.setProperty("tooltip_html", f"<div style='text-align: center;'><b style='color: #f8fafc; font-size: 11px;'>{name}</b></div>")
+            container.setMouseTracking(True)
+            container.installEventFilter(self._tooltip_filter)
+        else:
+            container.setToolTip(name)
         container.style().unpolish(container)
         container.style().polish(container)
         
@@ -319,6 +325,7 @@ class SearchScreen(QWidget):
         icon = QLabel()
         icon.setFixedSize(sz, sz)
         icon.setObjectName("god_portrait_img")
+        icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         
         from core.image_manager import ImageManager
         path = ImageManager().get_god_portrait_path(name)
