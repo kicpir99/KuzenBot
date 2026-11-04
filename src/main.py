@@ -617,6 +617,7 @@ class SmiteController(QObject):
 
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.activated.connect(self._on_tray_activated)
+        self.tray_icon.messageClicked.connect(self._show_from_tray)
 
     def _show_from_tray(self):
         # Zerujemy przezroczystość ZANIM okno się pojawi (zapobiega mruganiu)
@@ -626,7 +627,7 @@ class SmiteController(QObject):
         self.overlay.activateWindow()
 
     def _on_tray_activated(self, reason):
-        if reason == QSystemTrayIcon.ActivationReason.DoubleClick:
+        if reason in (QSystemTrayIcon.ActivationReason.Trigger, QSystemTrayIcon.ActivationReason.DoubleClick):
             self._show_from_tray()
 
     def _exit_app(self):
@@ -1268,6 +1269,15 @@ class SmiteController(QObject):
         # Niezależnie od tego czy overlay był widoczny, wymuszamy pokazanie ikony w trayu
         if not self.tray_icon.isVisible():
             self.tray_icon.show()
+
+        if not getattr(self, '_has_notified_tray', False):
+            self._has_notified_tray = True
+            self.tray_icon.showMessage(
+                _t("tray_running_title"),
+                _t("tray_running_msg"),
+                QSystemTrayIcon.MessageIcon.Information,
+                4500
+            )
 
     def _on_returned_to_auto_wait(self):
         """Called when the user navigates back to Auto mode."""
