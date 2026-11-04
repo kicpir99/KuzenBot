@@ -1165,23 +1165,59 @@ class SmiteOverlay(QMainWindow):
         for from_item, group in grouped.items():
             pill = QFrame()
             pill.setObjectName("mini_swap_pill")
+            pill.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            pill.setMouseTracking(True)
+            pill.installEventFilter(self)
+
+            # Build tooltip HTML with swap reasons
+            swaps_label = _t("swaps").upper()
+            if len(group) == 1:
+                to_item = group[0].get('to', 'Unknown')
+                reason = (group[0].get('reason') or '').strip()
+                tt_html = "<div style='text-align: center; line-height: 140%;'>"
+                tt_html += f"<div style='color: #94a3b8; font-size: 9px; font-weight: 700; letter-spacing: 0.5px;'>{swaps_label}</div>"
+                tt_html += f"<div style='color: #f8fafc; font-size: 11px; margin: 2px 0;'><b>{from_item}</b> <span style='color: #f59e0b;'>➔</span> <b>{to_item}</b></div>"
+                if reason:
+                    tt_html += f"<div style='color: #38bdf8; font-size: 10px; font-weight: 600; margin-top: 2px;'>💡 <i>{reason}</i></div>"
+                tt_html += "</div>"
+            else:
+                tt_html = "<div style='text-align: left; line-height: 140%;'>"
+                tt_html += f"<div style='color: #94a3b8; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-align: center;'>{swaps_label}</div>"
+                tt_html += f"<div style='color: #f8fafc; font-size: 11px; margin: 2px 0; text-align: center;'><b>{from_item}</b> <span style='color: #f59e0b;'>➔</span></div>"
+                for s in group:
+                    to_item = s.get('to', 'Unknown')
+                    reason = (s.get('reason') or '').strip()
+                    if reason:
+                        tt_html += f"<div style='margin-top: 2px;'>• <b>{to_item}</b>: <span style='color: #38bdf8;'>💡 <i>{reason}</i></span></div>"
+                    else:
+                        tt_html += f"<div style='margin-top: 2px;'>• <b>{to_item}</b></div>"
+                tt_html += "</div>"
+
+            pill.setProperty("tooltip_html", tt_html)
+
             pl = QHBoxLayout(pill)
             pl.setContentsMargins(6, 3, 6, 3)
             pl.setSpacing(5)
             pl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-            pl.addWidget(self._make_icon(from_item, 28))
+            from_icon = self._make_icon(from_item, 28)
+            from_icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+            pl.addWidget(from_icon)
 
             arrow = QLabel("➔")
             arrow.setObjectName("mini_swap_arrow")
+            arrow.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
             pl.addWidget(arrow)
 
             for i, s in enumerate(group):
                 if i > 0:
                     slash = QLabel("/")
                     slash.setStyleSheet("color: #64748b; font-weight: bold; font-size: 11px;")
+                    slash.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
                     pl.addWidget(slash)
-                pl.addWidget(self._make_icon(s, 28))
+                to_icon = self._make_icon(s, 28)
+                to_icon.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+                pl.addWidget(to_icon)
 
             rl.addWidget(pill)
 
