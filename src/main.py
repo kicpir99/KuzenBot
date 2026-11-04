@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 import requests
 import dataclasses
 import json
@@ -24,7 +25,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.11"
+CURRENT_VERSION = "1.1.12"
 API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
@@ -121,7 +122,10 @@ def parse_god_data(json_data: dict) -> GodData:
     
     builds.extend(seen_stats_roles.values())
     
-    builds.sort(key=lambda x: (1 if getattr(x, 'insufficient_data', False) else 0, -getattr(x, 'upvotes', 0)))
+    # Sortujemy po upvotes (liczbie gier) wyłącznie buildy statystyczne;
+    # dla buildów ze SmiteSource zachowujemy chronologiczną kolejność sort=recent!
+    if seen_stats_roles:
+        builds.sort(key=lambda x: (1 if getattr(x, 'insufficient_data', False) else 0, -getattr(x, 'upvotes', 0)))
 
     return GodData(
         god_name=json_data.get('god_name', 'Unknown'),
@@ -148,6 +152,14 @@ class BuildFetchWorker(QThread):
 
             print(f"[API] Fetching from: {endpoint}")
             response = requests.get(endpoint, timeout=15)
+
+            if response.status_code == 404:
+                alias_map = {"princess bari": "Bari", "hua mulan": "Mulan"}
+                alt_name = alias_map.get(self.god_name.lower().strip())
+                if alt_name:
+                    alt_endpoint = f"{API_BASE_URL}/stats/{alt_name}" if self.source == "stats" else f"{API_BASE_URL}/builds/{alt_name}"
+                    print(f"[API] Retrying with alias: {alt_endpoint}")
+                    response = requests.get(alt_endpoint, timeout=15)
             
             if getattr(self, 'is_obsolete', False): return
             
@@ -489,7 +501,9 @@ class SmiteController(QObject):
         theme = config.get("theme", "gold")
         font_style = config.get("font_style", "standard")
         from ui.styles import get_stylesheet
-        self.overlay.setStyleSheet(get_stylesheet(theme, font_style))
+        stylesheet = get_stylesheet(theme, font_style)
+        self.overlay.setStyleSheet(stylesheet)
+        self.app.setStyleSheet(stylesheet)
         
         always_top = config.get("always_on_top", True)
         self.overlay.set_always_on_top(always_top)
@@ -738,6 +752,8 @@ class SmiteController(QObject):
         print(f"🚀 [Controller] Rozpoczynam pobieranie dla: {god_name} (Źródło: {self.build_source})")
         if not hasattr(self, '_last_fetched_god') or self._last_fetched_god != god_name.upper():
             self.data_cache = {"builds": None, "stats": None}
+            self.current_god_data = None
+            self.all_builds = []
             self._last_fetched_god = god_name.upper()
         self._current_god_being_fetched = god_name
         self.last_fetched_source = self.build_source
@@ -867,24 +883,21 @@ class SmiteController(QObject):
             ]
             
         # Sortowanie: dla stats → green (current) → yellow (older) → red (insufficient),
-        # w każdej grupie po games malejąco. Dla community → po patchu (najnowszy) i upvotes.
+        # w każdej grupie po games malejąco. Dla community → zachowujemy oryginalną kolejność (sort=recent ze SmiteSource).
         import re
         current_patch_num = 0
         if self.current_god_data and self.current_god_data.current_patch:
             m = re.search(r'OB(\d+)', self.current_god_data.current_patch.upper())
             if m:
                 current_patch_num = int(m.group(1))
-        def sort_key(b):
-            patch_m = re.search(r'OB(\d+)', b.patch.upper()) if b.patch else None
-            bpn = int(patch_m.group(1)) if patch_m else 0
-            insufficient = getattr(b, 'insufficient_data', False)
-            is_stats = getattr(b, 'is_stats', False)
-            if is_stats:
+        if any(getattr(b, 'is_stats', False) for b in filtered):
+            def sort_key(b):
+                patch_m = re.search(r'OB(\d+)', b.patch.upper()) if b.patch else None
+                bpn = int(patch_m.group(1)) if patch_m else 0
+                insufficient = getattr(b, 'insufficient_data', False)
                 tier = 2 if insufficient else (1 if bpn < current_patch_num else 0)
                 return (0, tier, -getattr(b, 'upvotes', 0))
-            else:
-                return (1, -bpn, -getattr(b, 'upvotes', 0))
-        filtered.sort(key=sort_key)
+            filtered.sort(key=sort_key)
         
         self.current_god_data.builds = filtered
         self.current_index = 0
@@ -915,9 +928,14 @@ class SmiteController(QObject):
         # Aktualizujemy dane w tle (swapy itp.)
         if self.current_god_data and 0 <= self.current_index < len(self.current_god_data.builds):
             if self.current_god_data.builds[self.current_index].build_url == updated_build.build_url:
+                existing_build = self.current_god_data.builds[self.current_index]
+                # Jeśli serwer zwrócił puste statystyki (starsza wersja API), zachowaj aktualne statystyki
+                for field in ('tier', 'win_rate', 'wins', 'losses', 'total_matches', 'cost'):
+                    if not getattr(updated_build, field, None) and getattr(existing_build, field, None):
+                        setattr(updated_build, field, getattr(existing_build, field))
                 self.current_god_data.builds[self.current_index] = updated_build
                 
-                # --- 🔥 DODAJ TĘ LINIJKĘ: Zapisujemy świeżo pobrane detale do cache'u! ---
+                # Zapisujemy świeżo pobrane detale do cache'u
                 self._save_to_cache(self.current_god_data.god_name, dataclasses.asdict(self.current_god_data))
                 # -----------------------------------------------------------------------
                 

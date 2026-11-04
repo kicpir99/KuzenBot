@@ -21,6 +21,12 @@ class SmiteBuild:
     is_stats: bool = False
     stats_data: dict = field(default_factory=dict)
     insufficient_data: bool = False
+    tier: str = ""              # np. "A+", "S", "B"
+    win_rate: str = ""          # np. "56%"
+    wins: int = 0
+    losses: int = 0
+    total_matches: int = 0      # matchEvidenceGames
+    cost: int = 0               # łączny koszt w goldzie
 
     def is_outdated(self, current_patch: str) -> bool:
         """Sprawdza czy build jest ze starszego patcha."""
@@ -30,7 +36,6 @@ class SmiteBuild:
         """Returns True if the build has all required data for display."""
         if self.title is None:
             return False
-        
         
         if getattr(self, 'insufficient_data', False):
             return True

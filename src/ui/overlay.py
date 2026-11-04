@@ -936,36 +936,6 @@ class SmiteOverlay(QMainWindow):
             return
         
         if getattr(self.current_build, 'is_stats', False):
-            # --- NOWOŚĆ: Baner Ratatoskra dla wersji Mini ---
-            if self._current_god_name.lower() == "ratatoskr":
-                banner = QFrame()
-                banner.setStyleSheet("background: transparent; border: none; margin: 0px; padding: 0px;")
-                banner_lay = QHBoxLayout(banner)
-                banner_lay.setContentsMargins(0, 0, 0, 2)
-                
-                badge = QLabel(_t("ratatoskr_acorn_mini"))
-                badge.setStyleSheet("""
-                    background-color: rgba(245, 158, 11, 0.15);
-                    border: 1px dashed rgba(245, 158, 11, 0.4);
-                    border-radius: 6px;
-                    color: #fbbf24;
-                    font-size: 10px;
-                    font-weight: bold;
-                    padding: 2px 8px;
-                """)
-                
-                badge.setObjectName("mode_info_btn")
-                badge.setProperty("info_text", _t("ratatoskr_acorn_ext"))
-                # Podpinamy EventFilter do SmiteOverlay, dzięki czemu od razu zadziała globalny tooltip!
-                badge.installEventFilter(self) 
-                badge.setCursor(Qt.CursorShape.WhatsThisCursor)
-                
-                banner_lay.addStretch()
-                banner_lay.addWidget(badge)
-                banner_lay.addStretch()
-                
-                self.mini_layout.addWidget(banner)
-            # ------------------------------------------------
             # Stats build in Mini view
             s_data = self.current_build.stats_data or {}
             
@@ -1185,11 +1155,12 @@ class SmiteOverlay(QMainWindow):
             return filepath
 
         import requests as http_req
-        import time # <--- DODANO
+        import time
         normalized = item_name.strip().replace("’", "'").lower()
-        req_timeout = 1.5 
-        
-        # Unikalny znacznik czasu omijający cache serwerów (Cache Buster)
+        req_timeout = 4.0
+        req_headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        }
         buster = int(time.time())
 
         # 1. Próba z lokalnej bazy danych (item_db)
@@ -1198,10 +1169,8 @@ class SmiteOverlay(QMainWindow):
             if isinstance(info, dict) and info.get("image_url"):
                 try:
                     url = info["image_url"]
-                    # Dodajemy buster do URL-a z bazy
-                    url += f"&v={buster}" if "?" in url else f"?v={buster}"
-                    r = http_req.get(url, timeout=req_timeout)
-                    if r.status_code == 200:
+                    r = http_req.get(url, headers=req_headers, timeout=req_timeout)
+                    if r.status_code == 200 and len(r.content) > 100:
                         with open(filepath, "wb") as f:
                             f.write(r.content)
                         return filepath
@@ -1209,27 +1178,35 @@ class SmiteOverlay(QMainWindow):
                     pass
 
         camel = item_name.strip().replace(" ", "").replace("'", "").replace("-", "")
-        
-        # 2. Próba z Wiki CDN
-        for prefix in ["T3_", "T2_", "T1_", "Relic_", "Consumable_", "Curio_", ""]:
-            filename = f"{prefix}{camel}.png"
-            url = f"https://wiki.smite2.com/images/thumb/{filename}/80px-{filename}?v={buster}" # <--- DODANO BUSTER
+
+        # 2. Próba ze SmiteSource CDN (obsługa Icon_ oraz Icons_ i dodatkowych katalogów)
+        ss_candidates = []
+        for folder, prefix in [
+            ("T3", "T3_"), ("T2", "T2_"), ("T1", "T1_"),
+            ("T3", "Relic_"), ("T3", "Curios_"),
+            ("AspectsInfluences", "Starter_"),
+            ("Consumables", "Consumable_"),
+            ("Utility", "Utility_"),
+        ]:
+            for icon_tag in ("Icon_", "Icons_", "T_Icon_"):
+                ss_candidates.append(f"https://cdn.smitesource.com/Items/{folder}/{icon_tag}{prefix}{camel}.png")
+        for url in ss_candidates:
             try:
-                r = http_req.get(url, timeout=req_timeout)
-                if r.status_code == 200:
+                r = http_req.get(url, headers=req_headers, timeout=2.0)
+                if r.status_code == 200 and len(r.content) > 100:
                     with open(filepath, "wb") as f:
                         f.write(r.content)
                     return filepath
             except Exception:
                 continue
 
-        # 3. Próba ze SmiteSource CDN
-        for prefix in ["T3_", "T2_", "T1_", "Relic_", "Consumable_"]:
-            cdn_name = f"Icon_{prefix}{camel}.png"
-            url = f"https://cdn.smitesource.com/Items/{prefix.strip('_')}/{cdn_name}?v={buster}" # <--- DODANO BUSTER
+        # 3. Próba z Wiki CDN
+        for prefix in ["T3_", "T2_", "T1_", "Relic_", "Consumable_", "Curio_", ""]:
+            filename = f"{prefix}{camel}.png"
+            url = f"https://wiki.smite2.com/images/thumb/{filename}/80px-{filename}?v={buster}"
             try:
-                r = http_req.get(url, timeout=req_timeout)
-                if r.status_code == 200:
+                r = http_req.get(url, headers=req_headers, timeout=2.0)
+                if r.status_code == 200 and len(r.content) > 100:
                     with open(filepath, "wb") as f:
                         f.write(r.content)
                     return filepath

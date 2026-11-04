@@ -227,7 +227,7 @@ class ListScreen(QWidget):
         print(f"[DEBUG] populate: current_patch={current_patch}")
         if current_patch and current_patch.lower() != "unknown":
             self.current_patch = current_patch
-        else:
+        elif not self.current_patch:
             # Fallback - automatyczne wykrycie najwyższego patcha z listy buildów
             max_num = 0
             best_patch = None
@@ -249,68 +249,7 @@ class ListScreen(QWidget):
 
         # --- JEDYNE TWORZENIE BANERA (brak duplikatów) ---
         if builds and getattr(builds[0], 'is_stats', False):
-            if god_name.lower() == "ratatoskr":
-                banner = QFrame()
-                banner.setObjectName("ratatoskr_banner")
-                banner_lay = QHBoxLayout(banner)
-                
-                info_text = _t("ratatoskr_acorn_ext")
-                mini_text = _t("ratatoskr_acorn_mini")
-                
-                if self.is_mini:
-                    banner.setStyleSheet("background: transparent; border: none; margin: 0px; padding: 0px;")
-                    banner_lay.setContentsMargins(0, 0, 0, 2)
-                    
-                    badge = QLabel(mini_text)
-                    badge.setStyleSheet("""
-                        background-color: rgba(245, 158, 11, 0.15);
-                        border: 1px dashed rgba(245, 158, 11, 0.4);
-                        border-radius: 6px;
-                        color: #fbbf24;
-                        font-size: 10px;
-                        font-weight: bold;
-                        padding: 2px 8px;
-                    """)
-                    
-                    badge.setObjectName("mode_info_btn")
-                    badge.setProperty("info_text", info_text) 
-                    badge.installEventFilter(self.window())
-                    badge.setCursor(Qt.CursorShape.WhatsThisCursor)
-                    
-                    banner_lay.addStretch()
-                    banner_lay.addWidget(badge)
-                    banner_lay.addStretch()
-                    
-                else:
-                    banner.setStyleSheet("""
-                        QFrame#ratatoskr_banner {
-                            background-color: rgba(245, 158, 11, 0.15);
-                            border: 1px dashed rgba(245, 158, 11, 0.4);
-                            border-radius: 8px;
-                        }
-                    """)
-                    banner_lay.setContentsMargins(10, 8, 10, 8)
-                    banner_lay.setSpacing(10)
-                    
-                    if self._icon_factory:
-                        icon_lbl = self._icon_factory("Acorn", 32)
-                        icon_lbl.setStyleSheet("background: transparent; border: none;")
-                    else:
-                        icon_lbl = QLabel("🌰") 
-                        icon_lbl.setStyleSheet("font-size: 20px; background: transparent; border: none;")
-                        icon_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                        
-                    banner_lay.addWidget(icon_lbl)
-                    
-                    text_lbl = QLabel(info_text)
-                    text_lbl.setStyleSheet("color: #fbbf24; font-size: 11px; font-weight: bold; background: transparent; border: none;")
-                    text_lbl.setWordWrap(True)
-                    banner_lay.addWidget(text_lbl, 1)
-                
-                self._list_layout.addWidget(banner)
-                
-            # NOWOŚĆ: Baner informacyjny dla całej reszty postaci (jeśli nie został zamknięty "X")
-            elif not self._aspect_banner_dismissed:
+            if not self._aspect_banner_dismissed:
                 banner = QFrame()
                 banner.setObjectName("aspect_warning_banner")
                 banner_lay = QHBoxLayout(banner)
@@ -492,6 +431,80 @@ class ListScreen(QWidget):
             font-weight: bold;
             padding: 1px 5px;
         """)
+
+    def style_tier_badge(self, label, tier_str, font_size_px=10, is_mini=False):
+        """Styluje odznakę oceny buildu (S+, S, A+, A, B, C, D) w spójnej skali kolorystycznej."""
+        t = (tier_str or "").strip().upper()
+        if t in ("S+", "S"):
+            # Szmaragdowy zielony (najlepsza ocena, spójna z aktualnym patchem)
+            bg_color = "rgba(16, 185, 129, 0.15)"
+            border_color = "rgba(16, 185, 129, 0.45)"
+            text_color = "#34d399"
+        elif t in ("A+", "A"):
+            # Jasnozielony / limonkowy (bardzo dobra ocena)
+            bg_color = "rgba(132, 204, 22, 0.15)"
+            border_color = "rgba(132, 204, 22, 0.45)"
+            text_color = "#a3e635"
+        elif t == "B":
+            # Żółty / bursztynowy (średnia/solidna ocena)
+            bg_color = "rgba(245, 158, 11, 0.15)"
+            border_color = "rgba(245, 158, 11, 0.45)"
+            text_color = "#fbbf24"
+        elif t == "C":
+            # Pomarańczowy (poniżej średniej)
+            bg_color = "rgba(249, 115, 22, 0.15)"
+            border_color = "rgba(249, 115, 22, 0.45)"
+            text_color = "#fb923c"
+        elif t == "D":
+            # Czerwony (najsłabsza ocena)
+            bg_color = "rgba(239, 68, 68, 0.15)"
+            border_color = "rgba(239, 68, 68, 0.45)"
+            text_color = "#f87171"
+        else:
+            # Ciemny granat z subtelnym błękitem (spójny z motywem aplikacji)
+            bg_color = "rgba(30, 41, 59, 0.6)"
+            border_color = "rgba(59, 130, 246, 0.35)"
+            text_color = "#93c5fd"
+
+        radius = 3 if is_mini else 4
+        pad_h = 3 if is_mini else 5
+        label.setStyleSheet(f"""
+            QLabel {{
+                background: {bg_color};
+                border: 1px solid {border_color};
+                border-radius: {radius}px;
+                color: {text_color};
+                font-size: {font_size_px}px;
+                font-weight: 800;
+                padding: 1px {pad_h}px;
+            }}
+        """)
+
+    def get_build_tooltip_html(self, build) -> str:
+        """Zwraca jednolity, elegancki tooltip HTML dla buildów ze statystykami oraz Unranked w kolorystyce ciemnego granatu."""
+        has_wr = bool(getattr(build, 'win_rate', None) and build.win_rate)
+        cost_val = getattr(build, 'cost', 0)
+        cost_str = f"{cost_val:,}g".replace(",", " ") if cost_val else ""
+
+        if has_wr:
+            tier_str = getattr(build, 'tier', '') or ''
+            tier_html = f" <span style='color: #60a5fa; font-weight: bold;'>[{tier_str}]</span>" if tier_str else ""
+            total_matches_str = _t("tt_total").format(count=build.total_matches)
+            lines = [
+                f"<div style='margin-bottom: 2px;'><b style='color: #93c5fd;'>{_t('tt_win_rate')}</b> <span style='color: #10b981; font-weight: bold;'>{build.win_rate}</span>{tier_html}</div>",
+                f"<div style='margin-bottom: 2px;'><b style='color: #93c5fd;'>{_t('tt_matches')}</b> <span style='color: #34d399; font-weight: bold;'>{build.wins}W</span> - <span style='color: #f87171; font-weight: bold;'>{build.losses}L</span> <span style='color: #94a3b8;'>({total_matches_str})</span></div>"
+            ]
+        else:
+            lines = [
+                f"<div style='margin-bottom: 2px;'><b style='color: #93c5fd;'>{_t('tt_status')}</b> <span style='color: #60a5fa; font-weight: bold;'>{_t('tt_unranked')}</span></div>",
+                f"<div style='margin-bottom: 2px;'><b style='color: #93c5fd;'>{_t('tt_matches')}</b> <span style='color: #e2e8f0;'>{_t('tt_unranked_desc')}</span></div>"
+            ]
+
+        if cost_str:
+            lines.append(f"<div><b style='color: #93c5fd;'>{_t('tt_build_cost')}</b> <span style='color: #fbbf24; font-weight: bold;'>{cost_str}</span></div>")
+
+        return f"<div style='background-color: #0A0F19; color: #FFFFFF; font-family: Segoe UI, sans-serif; font-size: 11px; line-height: 145%; padding: 4px 6px;'>{''.join(lines)}</div>"
+
 
     def _make_mini_build_row(self, build):
         """Creates a compact build card for Mini mode (68px height)."""
@@ -686,6 +699,10 @@ class ListScreen(QWidget):
                                 for upg in upgrades:
                                     filter_item_names.add(upg.lower().strip().replace("’", "'"))
                 
+                if hasattr(build, 'relics') and build.relics:
+                    for r in build.relics:
+                        filter_item_names.add(r.lower().strip().replace("’", "'"))
+                
                 filtered_final = []
                 for item_name in (build.final_items or []):
                     item_low = item_name.lower().strip().replace("’", "'")
@@ -735,10 +752,25 @@ class ListScreen(QWidget):
                 up = QLabel(f"🎮 {build.upvotes}")
                 up.setStyleSheet("font-size: 9px; font-weight: 800; color: #60a5fa;")
                 up.setToolTip(_t("stats_info_tooltip"))
+                meta_lay.addWidget(up)
             else:
-                up = QLabel(f"👍 {build.upvotes}")
-                up.setStyleSheet("font-size: 9px; font-weight: 800; color: #10b981;")
-            meta_lay.addWidget(up)
+                tt_html = self.get_build_tooltip_html(build)
+                if getattr(build, 'win_rate', None) and build.win_rate:
+                    if getattr(build, 'tier', None) and build.tier and build.tier != "-":
+                        tier_lbl = QLabel(build.tier)
+                        self.style_tier_badge(tier_lbl, build.tier, font_size_px=9, is_mini=True)
+                        tier_lbl.setToolTip(tt_html)
+                        meta_lay.addWidget(tier_lbl)
+                    
+                    up = QLabel(f"{build.win_rate} WR")
+                    up.setStyleSheet("font-size: 9px; font-weight: 800; color: #10b981;")
+                    up.setToolTip(tt_html)
+                    meta_lay.addWidget(up)
+                else:
+                    unranked_lbl = QLabel(_t("unranked_badge"))
+                    self.style_tier_badge(unranked_lbl, "Unranked", font_size_px=9, is_mini=True)
+                    unranked_lbl.setToolTip(tt_html)
+                    meta_lay.addWidget(unranked_lbl)
             
             bottom_row.addLayout(meta_lay)
             layout.addLayout(bottom_row)
@@ -1289,6 +1321,10 @@ class ListScreen(QWidget):
                                 for upg in upgrades:
                                     filter_item_names.add(upg.lower().strip().replace("’", "'"))
                 
+                if hasattr(build, 'relics') and build.relics:
+                    for r in build.relics:
+                        filter_item_names.add(r.lower().strip().replace("’", "'"))
+                
                 filtered_final = []
                 for item_name in (build.final_items or []):
                     item_low = item_name.lower().strip().replace("’", "'")
@@ -1326,12 +1362,32 @@ class ListScreen(QWidget):
             up.setObjectName("upvotes_count")
             up.setStyleSheet("font-size: 11px; font-weight: bold; color: #60a5fa;")
             up.setToolTip(_t("stats_info_tooltip"))
+            bottom.addWidget(up, 0, Qt.AlignmentFlag.AlignBottom)
         else:
-            up = QLabel(f"👍 {build.upvotes}")
-            up.setObjectName("upvotes_count")
-            up.setStyleSheet("font-size: 11px; font-weight: bold; color: #10b981;")
-            
-        bottom.addWidget(up, 0, Qt.AlignmentFlag.AlignBottom)
+            tt_html = self.get_build_tooltip_html(build)
+            if getattr(build, 'win_rate', None) and build.win_rate:
+                stats_box = QHBoxLayout()
+                stats_box.setSpacing(6)
+                stats_box.setAlignment(Qt.AlignmentFlag.AlignBottom)
+                
+                if getattr(build, 'tier', None) and build.tier and build.tier != "-":
+                    tier_badge = QLabel(f" {build.tier} ")
+                    self.style_tier_badge(tier_badge, build.tier, font_size_px=10, is_mini=False)
+                    tier_badge.setToolTip(tt_html)
+                    stats_box.addWidget(tier_badge)
+                    
+                up = QLabel(f"{build.win_rate} WR")
+                up.setObjectName("upvotes_count")
+                up.setStyleSheet("font-size: 11px; font-weight: bold; color: #10b981;")
+                up.setToolTip(tt_html)
+                stats_box.addWidget(up)
+                bottom.addLayout(stats_box)
+            else:
+                unranked_badge = QLabel(f" {_t('unranked_badge')} ")
+                unranked_badge.setObjectName("upvotes_count")
+                self.style_tier_badge(unranked_badge, "Unranked", font_size_px=10, is_mini=False)
+                unranked_badge.setToolTip(tt_html)
+                bottom.addWidget(unranked_badge, 0, Qt.AlignmentFlag.AlignBottom)
         layout.addLayout(bottom)
 
         # Click handler

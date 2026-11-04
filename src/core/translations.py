@@ -187,6 +187,14 @@ TRANSLATIONS = {
         "tt_settings": "Settings",
         "tt_comm": "Community Builds\nClick to switch",
         "tt_stats": "Stats Builds\nClick to switch",
+        "tt_win_rate": "Win Rate:",
+        "tt_matches": "Matches:",
+        "tt_total": "Total: {count}",
+        "tt_status": "Status:",
+        "tt_unranked": "Unranked",
+        "tt_unranked_desc": "Not enough matches in patch",
+        "tt_build_cost": "Build cost:",
+        "unranked_badge": "Unranked"
     },
     "pl": {
         "lang_name": "Polski",
@@ -355,6 +363,14 @@ TRANSLATIONS = {
         "tt_settings": "Ustawienia",
         "tt_comm": "Buildy Społeczności\nKliknij by zmienić",
         "tt_stats": "Buildy Statystyczne\nKliknij by zmienić",
+        "tt_win_rate": "Win Rate:",
+        "tt_matches": "Mecze:",
+        "tt_total": "Łącznie: {count}",
+        "tt_status": "Status:",
+        "tt_unranked": "Unranked",
+        "tt_unranked_desc": "Brak wystarczającej liczby gier w patchu",
+        "tt_build_cost": "Koszt buildu:",
+        "unranked_badge": "Unranked"
     },
     "fr": {
         "lang_name": "Français",
@@ -445,7 +461,15 @@ TRANSLATIONS = {
         "aspect_badge": "ASPECT",
         "partner_badge": "PARTENAIRE",
         
-        "tt_home": "Accueil", "tt_role": "Rôle: {role}", "tt_aspect_on": "Aspect: ON", "tt_aspect_off": "Aspect: OFF", "tt_back": "Retour", "tt_expand": "Agrandir", "tt_collapse": "Réduire", "tt_locked": "VERROUILLÉ", "tt_unlocked": "DÉVERROUILLÉ", "tt_close": "Fermer", "tt_settings": "Paramètres", "tt_comm": "Communauté", "tt_stats": "Statistiques"
+        "tt_home": "Accueil", "tt_role": "Rôle: {role}", "tt_aspect_on": "Aspect: ON", "tt_aspect_off": "Aspect: OFF", "tt_back": "Retour", "tt_expand": "Agrandir", "tt_collapse": "Réduire", "tt_locked": "VERROUILLÉ", "tt_unlocked": "DÉVERROUILLÉ", "tt_close": "Fermer", "tt_settings": "Paramètres", "tt_comm": "Communauté", "tt_stats": "Statistiques",
+        "tt_win_rate": "Taux de victoire :",
+        "tt_matches": "Matchs :",
+        "tt_total": "Total : {count}",
+        "tt_status": "Statut :",
+        "tt_unranked": "Non classé",
+        "tt_unranked_desc": "Pas assez de matchs dans ce patch",
+        "tt_build_cost": "Coût du build :",
+        "unranked_badge": "Non classé"
     },
     "de": {
         "lang_name": "Deutsch",
@@ -536,7 +560,15 @@ TRANSLATIONS = {
         "aspect_badge": "ASPEKT",
         "partner_badge": "PARTNER",
         
-        "tt_home": "Startseite", "tt_role": "Rolle: {role}", "tt_aspect_on": "Aspekt: AN", "tt_aspect_off": "Aspekt: AUS", "tt_back": "Zurück", "tt_expand": "Erweitern", "tt_collapse": "Minimieren", "tt_locked": "GESPERRT", "tt_unlocked": "ENTSPERRT", "tt_close": "Schließen", "tt_settings": "Einstellungen", "tt_comm": "Community", "tt_stats": "Statistiken"
+        "tt_home": "Startseite", "tt_role": "Rolle: {role}", "tt_aspect_on": "Aspekt: AN", "tt_aspect_off": "Aspekt: AUS", "tt_back": "Zurück", "tt_expand": "Erweitern", "tt_collapse": "Minimieren", "tt_locked": "GESPERRT", "tt_unlocked": "ENTSPERRT", "tt_close": "Schließen", "tt_settings": "Einstellungen", "tt_comm": "Community", "tt_stats": "Statistiken",
+        "tt_win_rate": "Siegesrate:",
+        "tt_matches": "Matches:",
+        "tt_total": "Gesamt: {count}",
+        "tt_status": "Status:",
+        "tt_unranked": "Unranked",
+        "tt_unranked_desc": "Nicht genügend Matches im aktuellen Patch",
+        "tt_build_cost": "Build-Kosten:",
+        "unranked_badge": "Unranked"
     },
     "es": {
         "lang_name": "Español",
@@ -627,7 +659,15 @@ TRANSLATIONS = {
         "aspect_badge": "ASPECTO",
         "partner_badge": "SOCIO",
         
-        "tt_home": "Inicio", "tt_role": "Rol: {role}", "tt_aspect_on": "Aspecto: ON", "tt_aspect_off": "Aspecto: OFF", "tt_back": "Volver", "tt_expand": "Expandir", "tt_collapse": "Minimizar", "tt_locked": "BLOQUEADO", "tt_unlocked": "DESBLOQUEADO", "tt_close": "Cerrar", "tt_settings": "Ajustes", "tt_comm": "Comunidad", "tt_stats": "Estadísticas"
+        "tt_home": "Inicio", "tt_role": "Rol: {role}", "tt_aspect_on": "Aspecto: ON", "tt_aspect_off": "Aspecto: OFF", "tt_back": "Volver", "tt_expand": "Expandir", "tt_collapse": "Minimizar", "tt_locked": "BLOQUEADO", "tt_unlocked": "DESBLOQUEADO", "tt_close": "Cerrar", "tt_settings": "Ajustes", "tt_comm": "Comunidad", "tt_stats": "Estadísticas",
+        "tt_win_rate": "Tasa de victoria:",
+        "tt_matches": "Partidas:",
+        "tt_total": "Total: {count}",
+        "tt_status": "Estado:",
+        "tt_unranked": "Sin clasificar",
+        "tt_unranked_desc": "No hay suficientes partidas en el parche",
+        "tt_build_cost": "Coste de la build:",
+        "unranked_badge": "Sin clasificar"
     },
     "ru": {
         "lang_name": "Русский",
@@ -718,7 +758,15 @@ TRANSLATIONS = {
         "aspect_badge": "АСПЕКТ",
         "partner_badge": "ПАРТНЕР",
         
-        "tt_home": "Домой", "tt_role": "Роль: {role}", "tt_aspect_on": "Аспект: ВКЛ", "tt_aspect_off": "Аспект: ВЫКЛ", "tt_back": "Назад", "tt_expand": "Развернуть", "tt_collapse": "Свернуть", "tt_locked": "ЗАБЛОКИРОВАНО", "tt_unlocked": "РАЗБЛОКИРОВАНО", "tt_close": "Закрыть", "tt_settings": "Настройки", "tt_comm": "Сообщество", "tt_stats": "Статистика"
+        "tt_home": "Домой", "tt_role": "Роль: {role}", "tt_aspect_on": "Аспект: ВКЛ", "tt_aspect_off": "Аспект: ВЫКЛ", "tt_back": "Назад", "tt_expand": "Развернуть", "tt_collapse": "Свернуть", "tt_locked": "ЗАБЛОКИРОВАНО", "tt_unlocked": "РАЗБЛОКИРОВАНО", "tt_close": "Закрыть", "tt_settings": "Настройки", "tt_comm": "Сообщество", "tt_stats": "Статистика",
+        "tt_win_rate": "Винрейт:",
+        "tt_matches": "Матчи:",
+        "tt_total": "Всего: {count}",
+        "tt_status": "Статус:",
+        "tt_unranked": "Без ранга",
+        "tt_unranked_desc": "Недостаточно матчей в текущем патче",
+        "tt_build_cost": "Стоимость сборки:",
+        "unranked_badge": "Без ранга"
     },
     "uk": {
         "lang_name": "Українська",
@@ -809,7 +857,15 @@ TRANSLATIONS = {
         "aspect_badge": "АСПЕКТ",
         "partner_badge": "ПАРТНЕР",
         
-        "tt_home": "Додому", "tt_role": "Роль: {role}", "tt_aspect_on": "Аспект: УВІМК", "tt_aspect_off": "Аспект: ВИМК", "tt_back": "Назад", "tt_expand": "Розгорнути", "tt_collapse": "Згорнути", "tt_locked": "ЗАБЛОКОВАНО", "tt_unlocked": "РОЗБЛОКОВАНО", "tt_close": "Закрити", "tt_settings": "Налаштування", "tt_comm": "Спільнота", "tt_stats": "Статистика"
+        "tt_home": "Додому", "tt_role": "Роль: {role}", "tt_aspect_on": "Аспект: УВІМК", "tt_aspect_off": "Аспект: ВИМК", "tt_back": "Назад", "tt_expand": "Розгорнути", "tt_collapse": "Згорнути", "tt_locked": "ЗАБЛОКОВАНО", "tt_unlocked": "РОЗБЛОКОВАНО", "tt_close": "Закрити", "tt_settings": "Налаштування", "tt_comm": "Спільнота", "tt_stats": "Статистика",
+        "tt_win_rate": "Вінрейт:",
+        "tt_matches": "Матчі:",
+        "tt_total": "Всього: {count}",
+        "tt_status": "Статус:",
+        "tt_unranked": "Без рангу",
+        "tt_unranked_desc": "Недостатньо матчів у поточному патчі",
+        "tt_build_cost": "Вартість білду:",
+        "unranked_badge": "Без рангу"
     },
     "pt": {
         "lang_name": "Português",
@@ -900,9 +956,17 @@ TRANSLATIONS = {
         "aspect_badge": "ASPECTO",
         "partner_badge": "PARCEIRO",
         
-        "tt_home": "Início", "tt_role": "Função: {role}", "tt_aspect_on": "Aspecto: ON", "tt_aspect_off": "Aspecto: OFF", "tt_back": "Voltar", "tt_expand": "Expandir", "tt_collapse": "Minimizar", "tt_locked": "BLOQUEADO", "tt_unlocked": "DESBLOQUEADO", "tt_close": "Fechar", "tt_settings": "Configurações", "tt_comm": "Comunidade", "tt_stats": "Estatísticas"
+        "tt_home": "Início", "tt_role": "Função: {role}", "tt_aspect_on": "Aspecto: ON", "tt_aspect_off": "Aspecto: OFF", "tt_back": "Voltar", "tt_expand": "Expandir", "tt_collapse": "Minimizar", "tt_locked": "BLOQUEADO", "tt_unlocked": "DESBLOQUEADO", "tt_close": "Fechar", "tt_settings": "Configurações", "tt_comm": "Comunidade", "tt_stats": "Estatísticas",
+        "tt_win_rate": "Taxa de vitória:",
+        "tt_matches": "Partidas:",
+        "tt_total": "Total: {count}",
+        "tt_status": "Status:",
+        "tt_unranked": "Sem classificação",
+        "tt_unranked_desc": "Partidas insuficientes no patch atual",
+        "tt_build_cost": "Custo da build:",
+        "unranked_badge": "Sem classificação"
     },
-    "": {
+    "zh": {
         "lang_name": "中文",
         "settings_title": "设置",
         "general": "常规",
@@ -991,7 +1055,15 @@ TRANSLATIONS = {
         "aspect_badge": "光环",
         "partner_badge": "伙伴",
         
-        "tt_home": "返回主页", "tt_role": "位置: {role}", "tt_aspect_on": "光环: 开启", "tt_aspect_off": "光环: 关闭", "tt_back": "返回列表", "tt_expand": "展开", "tt_collapse": "折叠", "tt_locked": "已锁定", "tt_unlocked": "未锁定", "tt_close": "关闭", "tt_settings": "设置", "tt_comm": "社区出装", "tt_stats": "统计出装"
+        "tt_home": "返回主页", "tt_role": "位置: {role}", "tt_aspect_on": "光环: 开启", "tt_aspect_off": "光环: 关闭", "tt_back": "返回列表", "tt_expand": "展开", "tt_collapse": "折叠", "tt_locked": "已锁定", "tt_unlocked": "未锁定", "tt_close": "关闭", "tt_settings": "设置", "tt_comm": "社区出装", "tt_stats": "统计出装",
+        "tt_win_rate": "胜率:",
+        "tt_matches": "比赛:",
+        "tt_total": "总计: {count}",
+        "tt_status": "状态:",
+        "tt_unranked": "未定级",
+        "tt_unranked_desc": "当前补丁中比赛场次不足",
+        "tt_build_cost": "出装花费:",
+        "unranked_badge": "未定级"
     }
 }
 

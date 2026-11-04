@@ -245,8 +245,9 @@ class AutoWaitScreen(QWidget):
 
         old_lay = self.container.layout()
         if old_lay:
-            clear_layout(old_lay) # BEZPIECZNE CZYSZCZENIE Z TWOJEGO SKELETON.PY
-            QWidget().setLayout(old_lay) # "Wyrzucenie" layoutu z widgetu
+            self._detach_widgets_from_layout(old_lay)
+            from PyQt6 import sip
+            sip.delete(old_lay)
 
         if self._expanded:
             self._setup_expanded_layout()
@@ -281,8 +282,23 @@ class AutoWaitScreen(QWidget):
         
         self._rebuild_layout()
 
+    def _detach_widgets_from_layout(self, layout):
+        if layout is None:
+            return
+        while layout.count():
+            item = layout.takeAt(0)
+            w = item.widget()
+            if w:
+                w.setParent(self.container)
+            else:
+                child_lay = item.layout()
+                if child_lay:
+                    self._detach_widgets_from_layout(child_lay)
+                    from PyQt6 import sip
+                    sip.delete(child_lay)
+
     def set_status(self, text):
-        self.status.setText(text.upper())
+        self.status_lbl.setText(text.upper())
 
     def _dismiss_lang_banner(self):
         """Zamyka baner językowy do końca cyklu życia apki."""

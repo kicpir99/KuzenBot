@@ -29,7 +29,7 @@ class GameScanner(QThread):
         self.aliases_path = resource_path("assets", "god_aliases.json")
         
         self.english_gods, self.new_gods = self._load_gods_db()
-        self.aliases = self._load_aliases() # <--- NOWE
+        self.aliases = self._load_aliases()
         self.current_god = None
         self.last_emitted_god = None
         self.last_internal_model = None
@@ -67,24 +67,38 @@ class GameScanner(QThread):
         if old_names is None:
             old_names = []
         try:
-            r = requests.get('https://smitesource.com/gods', headers={'User-Agent': 'Mozilla/5.0'}, timeout=10)
-            frags = re.findall(r'self\.__next_f\.push\(\[1,"(.*?)"\]\)', r.text)
-            stream = ''.join(frags).replace('\\"', '"')
-            slugs = sorted(set(re.findall(r'"slug":"([a-z0-9-]+)"', stream)))
-            
-            slug_to_name = {}
-            special = {
-                'the-morrigan': 'The Morrigan', 'baron-samedi': 'Baron Samedi',
-                'da-ji': 'Da Ji', 'guan-yu': 'Guan Yu', 'hou-yi': 'Hou Yi',
-                'hun-batz': 'Hun Batz', 'jing-wei': 'Jing Wei',
-                'morgan-le-fay': 'Morgan Le Fay', 'ne-zha': 'Ne Zha',
-                'nu-wa': 'Nu Wa', 'sun-wukong': 'Sun Wukong',
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             }
-            for slug in slugs:
-                slug_to_name[slug] = special.get(slug, slug.replace('-', ' ').title())
+            slug_to_name = {}
+            r = requests.get('https://smitesource.com/builds', headers=headers, timeout=10)
+            m = re.search(r'\\"initialGods\\":(\[\{.+?\}\])(?:,\\"|\})', r.text)
+            if m:
+                raw = m.group(1).replace(chr(92) + chr(34), chr(34)).replace(chr(92) + chr(92), chr(92))
+                gods_list = json.loads(raw)
+                for g in gods_list:
+                    s = g.get("slug")
+                    n = g.get("name")
+                    if s and n:
+                        slug_to_name[s] = n
+            else:
+                r_gods = requests.get('https://smitesource.com/gods', headers=headers, timeout=10)
+                slugs = sorted(set(re.findall(r'"slug":"([a-z0-9-]+)"', r_gods.text)))
+                special = {
+                    'the-morrigan': 'The Morrigan', 'baron-samedi': 'Baron Samedi',
+                    'da-ji': 'Da Ji', 'guan-yu': 'Guan Yu', 'hou-yi': 'Hou Yi',
+                    'hun-batz': 'Hun Batz', 'jing-wei': 'Jing Wei',
+                    'morgan-le-fay': 'Morgan Le Fay', 'ne-zha': 'Ne Zha',
+                    'nu-wa': 'Nu Wa', 'sun-wukong': 'Sun Wukong',
+                    'bari': 'Princess Bari', 'mulan': 'Hua Mulan',
+                }
+                for slug in slugs:
+                    if slug in ("gods", "builds", "items"): continue
+                    slug_to_name[slug] = special.get(slug, slug.replace('-', ' ').title())
             
             names = sorted(slug_to_name.values())
-            old_set = set(n.lower() for n in old_names)
+            old_set = set(n.lower() for n in old_names) | {"princess bari", "hua mulan"}
             new_gods = [n for n in names if n.lower() not in old_set]
             
             os.makedirs("assets", exist_ok=True)
@@ -200,20 +214,11 @@ class GameScanner(QThread):
                             self.last_emitted_god = None
                             self.lobby_joined.emit()
                     
-                    # --------------------------------------------------------------------
-                    # Usunięto podsłuch na modele "BP_" - powodował błędy przy pickach sojuszników
-                    # --------------------------------------------------------------------
-                    
                     if "Ally 0 Skin" in line:
                         match = re.search(r"Ally 0 Skin (.+?)$", line)
                         if match and match.group(1).strip():
                             raw_local = match.group(1).strip()
-                            
-                            # Przekazujemy CZYSTY tekst z UI do dopasowania
                             god_name = self._match_god_name(raw_local)
-                            
-                            # Jeśli funkcja zwróci None (bo np. gracz założył skina "Mroczne Serce"),
-                            # program bezpiecznie to zignoruje i zatrzyma Twojego oryginalnego boga.
                             if god_name and god_name != self.last_emitted_god:
                                 logger.info(f"[Scanner] Wykryto wybór gracza: {god_name} (Odczyt z gry: {raw_local})")
                                 self.last_emitted_god = god_name
@@ -224,3 +229,4 @@ class GameScanner(QThread):
 
     def stop(self):
         self.running = False
+

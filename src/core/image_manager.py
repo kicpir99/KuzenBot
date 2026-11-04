@@ -16,6 +16,8 @@ class ImageManager:
         # Mapa unikalnych nazw w CDN SmiteSource dla niespójnych bogów
         self.special_gods_map = {
             "Da Ji": "Daji",
+            "Princess Bari": "Bari",
+            "Hua Mulan": "Mulan",
             "Sun Wukong": "Sun_Wukong",
             "Guan Yu": "Guan_Yu",
             "Hou Yi": "Hou_Yi",

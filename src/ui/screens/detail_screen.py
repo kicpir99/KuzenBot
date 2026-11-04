@@ -51,39 +51,7 @@ class DetailScreen(QWidget):
             # Render statistical build representation
             self._detail_layout.setSpacing(15)
             
-            # --- NOWOŚĆ: Baner Ratatoskra dla wersji Extended ---
-            if god_name.lower() == "ratatoskr":
-                banner = QFrame()
-                banner.setStyleSheet("""
-                    QFrame {
-                        background-color: rgba(245, 158, 11, 0.15);
-                        border: 1px dashed rgba(245, 158, 11, 0.4);
-                        border-radius: 8px;
-                    }
-                """)
-                banner_lay = QHBoxLayout(banner)
-                banner_lay.setContentsMargins(10, 8, 10, 8)
-                banner_lay.setSpacing(10)
-                
-                if self._icon_factory:
-                    icon_lbl = self._icon_factory("Acorn", 32)
-                    icon_lbl.setStyleSheet("background: transparent; border: none;")
-                else:
-                    icon_lbl = QLabel("🌰") 
-                    icon_lbl.setStyleSheet("font-size: 20px; background: transparent; border: none;")
-                    icon_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    
-                banner_lay.addWidget(icon_lbl)
-                
-                text_lbl = QLabel(_t("ratatoskr_acorn_ext"))
-                text_lbl.setStyleSheet("color: #fbbf24; font-size: 11px; font-weight: bold; background: transparent; border: none;")
-                text_lbl.setWordWrap(True)
-                banner_lay.addWidget(text_lbl, 1)
-                
-                self._detail_layout.addWidget(banner)
-            # ----------------------------------------------------
-            
-            # Subtitle
+# Subtitle
             uses_obsidian = build.stats_data.get("uses_obsidian", False) if build.stats_data else False
             ranks_str = "Obsidian+, Master+ & Demigod" if uses_obsidian else "Master+ & Demigod"
             
@@ -205,24 +173,57 @@ class DetailScreen(QWidget):
             ml.setContentsMargins(0, 0, 0, 0)
             ml.setSpacing(10)
             ml.addStretch()
+
+            if build.is_partner:
+                pb = QLabel(_t("partner_badge"))
+                pb.setProperty("class", "partner_badge")
+                ml.addWidget(pb)
+
+            al = QLabel(_t("by_author").format(author=build.author))
+            al.setObjectName("card_author")
+            al.setStyleSheet("font-size: 12px;")
+            ml.addWidget(al)
+
+            if getattr(build, 'win_rate', None) and build.win_rate:
+                if getattr(build, 'tier', None) and build.tier and build.tier != "-":
+                    tb = QLabel(f"TIER {build.tier}")
+                    tb.setStyleSheet(self._get_tier_badge_style(build.tier))
+                    ml.addWidget(tb)
+                    
+                wr_lbl = QLabel(f"{build.win_rate} WR ({build.wins}W - {build.losses}L)")
+                wr_lbl.setStyleSheet("font-size: 12px; font-weight: bold; color: #10b981;")
+                ml.addWidget(wr_lbl)
+                
+                if getattr(build, 'cost', 0):
+                    cost_lbl = QLabel(f"💰 {build.cost:,}g".replace(",", " "))
+                    cost_lbl.setStyleSheet("font-size: 12px; color: #fbbf24; font-weight: bold;")
+                    ml.addWidget(cost_lbl)
+            else:
+                unranked_badge = QLabel(_t("unranked_badge"))
+                unranked_badge.setStyleSheet(self._get_tier_badge_style("Unranked"))
+                ml.addWidget(unranked_badge)
+                if getattr(build, 'cost', 0):
+                    cost_lbl = QLabel(f"💰 {build.cost:,}g".replace(",", " "))
+                    cost_lbl.setStyleSheet("font-size: 12px; color: #fbbf24; font-weight: bold;")
+                    ml.addWidget(cost_lbl)
+
             self._detail_layout.addWidget(meta)
 
-        if build.is_partner:
-            pb = QLabel("PARTNER")
-            pb.setProperty("class", "partner_badge")
-            ml.addWidget(pb)
-
-        al = QLabel(_t("by_author").format(author=build.author))
-        al.setObjectName("card_author")
-        al.setStyleSheet("font-size: 12px;")
-        ml.addWidget(al)
-
-        ul = QLabel(f"👍 {build.upvotes}")
-        ul.setObjectName("upvotes_count")
-        ul.setStyleSheet("font-size: 12px;")
-        ml.addWidget(ul)
-
-        self._detail_layout.addWidget(meta)
+    def _get_tier_badge_style(self, tier_str: str) -> str:
+        t = (tier_str or "").strip().upper()
+        if t in ("S+", "S"):
+            bg, border, text = "rgba(16, 185, 129, 0.15)", "rgba(16, 185, 129, 0.45)", "#34d399"
+        elif t in ("A+", "A"):
+            bg, border, text = "rgba(132, 204, 22, 0.15)", "rgba(132, 204, 22, 0.45)", "#a3e635"
+        elif t == "B":
+            bg, border, text = "rgba(245, 158, 11, 0.15)", "rgba(245, 158, 11, 0.45)", "#fbbf24"
+        elif t == "C":
+            bg, border, text = "rgba(249, 115, 22, 0.15)", "rgba(249, 115, 22, 0.45)", "#fb923c"
+        elif t == "D":
+            bg, border, text = "rgba(239, 68, 68, 0.15)", "rgba(239, 68, 68, 0.45)", "#f87171"
+        else:
+            bg, border, text = "rgba(30, 41, 59, 0.6)", "rgba(59, 130, 246, 0.35)", "#93c5fd"
+        return f"QLabel {{ font-size: 11px; font-weight: 800; color: {text}; background: {bg}; border: 1px solid {border}; border-radius: 4px; padding: 2px 6px; }}"
 
     def show_skeleton(self):
         """Animated skeletons shown during detail loading."""
@@ -368,9 +369,37 @@ class DetailScreen(QWidget):
                 "background: #1e293b; border: 1px solid #334155; border-radius: 4px;"
             )
             local_path = info.get("local_path", "")
-            loaded = False
+            img_rel = info.get("img", "")
+            resolved_path = ""
             if local_path and os.path.exists(local_path):
-                pix = QPixmap(local_path)
+                resolved_path = local_path
+            elif local_path or img_rel:
+                fname = os.path.basename((local_path or img_rel).replace("\\", "/"))
+                cand1 = os.path.join("assets", "abilities", fname)
+                appdata_dir = os.environ.get("LOCALAPPDATA", os.path.expanduser("~"))
+                cache_ab_dir = os.path.join(appdata_dir, "KuzenBot", "cache", "abilities")
+                cand2 = os.path.join(cache_ab_dir, fname)
+                if os.path.exists(cand1):
+                    resolved_path = cand1
+                elif os.path.exists(cand2):
+                    resolved_path = cand2
+                elif img_rel:
+                    try:
+                        import requests
+                        os.makedirs(cache_ab_dir, exist_ok=True)
+                        clean_img = img_rel.lstrip("/")
+                        url = f"https://cdn.smitesource.com/cdn-cgi/image/width=128,format=auto,quality=75/{clean_img}"
+                        resp = requests.get(url, timeout=4)
+                        if resp.status_code == 200:
+                            with open(cand2, "wb") as f:
+                                f.write(resp.content)
+                            resolved_path = cand2
+                    except Exception:
+                        pass
+
+            loaded = False
+            if resolved_path and os.path.exists(resolved_path):
+                pix = QPixmap(resolved_path)
                 if not pix.isNull():
                     icon.setPixmap(pix.scaled(
                         32, 32,
