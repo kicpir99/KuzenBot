@@ -1024,10 +1024,22 @@ class SmiteOverlay(QMainWindow):
             build = self.current_build
             if not build.final_items and not getattr(build, 'starter_items', None):
                 return
-            self._add_mini_staged_build_row(build, 36)
-            if build.swap_items:
-                self._add_mini_swap_row(build.swap_items)
-            self.mini_layout.addStretch()
+            
+            has_swaps = bool(getattr(build, 'swap_items', None))
+            has_special = bool(getattr(build, 'special_equipment', None))
+
+            if not has_swaps and not has_special:
+                self.mini_layout.addStretch()
+                self._add_mini_staged_build_row(build, 38)
+                self.mini_layout.addStretch()
+            else:
+                row_size = 32 if (has_swaps and has_special) else 36
+                self._add_mini_staged_build_row(build, row_size)
+                if has_swaps:
+                    self._add_mini_swap_row(build.swap_items)
+                if has_special:
+                    self._add_mini_special_equipment_row(build.special_equipment)
+                self.mini_layout.addStretch()
 
     def _populate_mini_empty(self, error_message=None):
         clear_layout(self.mini_layout)
@@ -1121,7 +1133,7 @@ class SmiteOverlay(QMainWindow):
 
         self.mini_layout.addWidget(row)
 
-    def _add_mini_divider(self, text=""):
+    def _add_mini_divider(self, text="", icon="⇄"):
         div = QWidget()
         dl = QHBoxLayout(div)
         dl.setContentsMargins(4, 2, 4, 2)
@@ -1134,7 +1146,8 @@ class SmiteOverlay(QMainWindow):
         dl.addWidget(line1)
 
         if text:
-            lbl = QLabel(f"⇄  {text}")
+            prefix = f"{icon}  " if icon else ""
+            lbl = QLabel(f"{prefix}{text}")
             lbl.setObjectName("mini_swap_divider_text")
             dl.addWidget(lbl)
 
@@ -1220,6 +1233,22 @@ class SmiteOverlay(QMainWindow):
                 pl.addWidget(to_icon)
 
             rl.addWidget(pill)
+
+        self.mini_layout.addWidget(row)
+
+    def _add_mini_special_equipment_row(self, special_items):
+        self._add_mini_divider(_t("special_equipment").upper(), icon="⚒")
+
+        row = QWidget()
+        rl = QHBoxLayout(row)
+        rl.setContentsMargins(0, 0, 0, 0)
+        rl.setSpacing(8)
+        rl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        for item_name in special_items:
+            icon = self._make_icon(item_name, 30)
+            icon.setStyleSheet("border: 1px solid #f97316; border-radius: 4px;")
+            rl.addWidget(icon)
 
         self.mini_layout.addWidget(row)
 
@@ -1347,6 +1376,22 @@ class SmiteOverlay(QMainWindow):
                     pass
 
         camel = item_name.strip().replace(" ", "").replace("'", "").replace("-", "")
+
+        # Vulcan Special Equipment Mods CDN
+        if item_name.strip().lower().endswith(" mod"):
+            mod_prefix = item_name.strip().split()[0].capitalize()
+            for cand_url in [
+                f"https://cdn.smitesource.com/Gods/Vulcan/Abilities/Items/t_Item_Vulcan_{mod_prefix}.png",
+                f"https://cdn.smitesource.com/Gods/Vulcan/Abilities/Items/t_Item_Vulcan_{camel}.png"
+            ]:
+                try:
+                    r = http_req.get(cand_url, headers=req_headers, timeout=2.0)
+                    if r.status_code == 200 and len(r.content) > 100:
+                        with open(filepath, "wb") as f:
+                            f.write(r.content)
+                        return filepath
+                except Exception:
+                    pass
 
         # 2. Próba ze SmiteSource CDN (obsługa Icon_ oraz Icons_ i dodatkowych katalogów)
         ss_candidates = []

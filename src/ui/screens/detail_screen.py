@@ -159,6 +159,8 @@ class DetailScreen(QWidget):
                                spacer_before_last=True)
         if build.swap_items:
             self._add_swap_rows(build.swap_items)
+        if getattr(build, 'special_equipment', None):
+            self._add_item_row(_t("special_equipment"), build.special_equipment, 42)
 
         if (hasattr(build, 'ability_priority') and build.ability_priority
                 and hasattr(build, 'ability_details')):
