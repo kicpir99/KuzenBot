@@ -75,11 +75,11 @@ class SearchScreen(QWidget):
         self.main_layout.addWidget(self.status_label)
 
         # 3. God Grid Area
-        self.scroll = QScrollArea()
-        self.scroll.setWidgetResizable(True)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.scroll.setObjectName("god_scroll_area")
-        self.scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setObjectName("god_scroll_area")
+        self.scroll_area.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         
         # Przezroczysty kontener główny scrolla
         self.scroll_content = QWidget()
@@ -101,8 +101,8 @@ class SearchScreen(QWidget):
         
         self.scroll_layout.addWidget(self.results_box)
 
-        self.scroll.setWidget(self.scroll_content)
-        self.main_layout.addWidget(self.scroll, 1)
+        self.scroll_area.setWidget(self.scroll_content)
+        self.main_layout.addWidget(self.scroll_area, 1)
 
     # ------------------------------------------------------------- public
     def set_mini_mode(self, is_mini):
@@ -119,11 +119,11 @@ class SearchScreen(QWidget):
                 self.search_btn.setFixedSize(40, 26)
                 self.grid_layout.setContentsMargins(0, 0, 0, 0)
                 
-                self.scroll.setFixedHeight(52) # Sztywna wysokość pola ikon
-                self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-                self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+                self.scroll_area.setFixedHeight(52) # Sztywna wysokość pola ikon
+                self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+                self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
                 # Instalujemy filtr, aby kółko myszy przewijało w poziomie
-                self.scroll.viewport().installEventFilter(self)
+                self.scroll_area.viewport().installEventFilter(self)
             else:
                 self.main_layout.setContentsMargins(15, 20, 15, 10)
                 self.main_layout.setSpacing(15)
@@ -133,11 +133,11 @@ class SearchScreen(QWidget):
                 self.search_btn.setFixedSize(70, 40)
                 self.grid_layout.setContentsMargins(10, 10, 10, 10)
                 
-                self.scroll.setFixedHeight(16777215) # QWIDGETSIZE_MAX
-                self.scroll.setMaximumHeight(16777215)
-                self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-                self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-                self.scroll.viewport().removeEventFilter(self)
+                self.scroll_area.setFixedHeight(16777215) # QWIDGETSIZE_MAX
+                self.scroll_area.setMaximumHeight(16777215)
+                self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+                self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+                self.scroll_area.viewport().removeEventFilter(self)
             
             self._refresh_grid(self._last_filtered or self._all_gods)
 
@@ -213,7 +213,7 @@ class SearchScreen(QWidget):
                 self.grid_layout.addWidget(portrait, 0, i)
         else:
             # TRYB EXPANDED: Siatka
-            self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
             cols = 6
             for i, name in enumerate(gods_to_show):
                 portrait = self._make_god_portrait(name)
@@ -242,18 +242,6 @@ class SearchScreen(QWidget):
         
         self.grid_layout.addWidget(msg, 0, 0)
         self.grid_layout.addWidget(sub, 1, 0)
-
-    def eventFilter(self, watched, event):
-        from PyQt6.QtCore import QEvent
-        if watched == self.input and event.type() == QEvent.Type.KeyPress:
-            if event.key() == Qt.Key.Key_Escape:
-                if self.input.text():
-                    self.input.clear()
-                    return True
-                else:
-                    self.escape_pressed.emit()
-                    return True
-        return super().eventFilter(watched, event)
 
     def _on_search(self):
         text = self.input.text().strip()
@@ -402,10 +390,17 @@ class SearchScreen(QWidget):
 
     def eventFilter(self, obj, event):
         from PyQt6.QtCore import QEvent
-        if obj == self.scroll.viewport() and event.type() == QEvent.Type.Wheel:
-            # Przekieruj kółko myszy na przewijanie poziome
-            self.scroll.horizontalScrollBar().setValue(
-                self.scroll.horizontalScrollBar().value() - event.angleDelta().y()
+        if hasattr(self, 'input') and obj == self.input and event.type() == QEvent.Type.KeyPress:
+            if event.key() == Qt.Key.Key_Escape:
+                if self.input.text():
+                    self.input.clear()
+                    return True
+                else:
+                    self.escape_pressed.emit()
+                    return True
+        if hasattr(self, 'scroll_area') and isinstance(self.scroll_area, QScrollArea) and obj == self.scroll_area.viewport() and event.type() == QEvent.Type.Wheel:
+            self.scroll_area.horizontalScrollBar().setValue(
+                self.scroll_area.horizontalScrollBar().value() - event.angleDelta().y()
             )
             return True
         return super().eventFilter(obj, event)

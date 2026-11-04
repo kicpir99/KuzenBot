@@ -13,3 +13,4 @@ def resource_path(*paths):
             return candidate
         base_path = _PROJECT_ROOT
     return os.path.join(base_path, *paths)
+
