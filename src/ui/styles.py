@@ -470,6 +470,34 @@ def get_stylesheet(theme_name: str = "gold", font_key: str = "standard") -> str:
             font-family: {f};
         }}
 
+        /* --- MINI SWAP PILLS & DIVIDER --- */
+        #mini_swap_pill {{
+            background-color: rgba(30, 41, 59, 0.55);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 6px;
+        }}
+        #mini_swap_pill:hover {{
+            background-color: rgba(30, 41, 59, 0.85);
+            border-color: rgba({c["primary_rgb"]}, 0.4);
+        }}
+        #mini_swap_arrow {{
+            color: {c["primary"]};
+            font-weight: bold;
+            font-size: 11px;
+        }}
+        #mini_swap_divider_line {{
+            background: rgba(148, 163, 184, 0.18);
+            min-height: 1px;
+            max-height: 1px;
+            border: none;
+        }}
+        #mini_swap_divider_text {{
+            color: #64748b;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }}
+
         /* ========== GLOBAL SCROLLBARS ========== */
         QScrollBar:vertical {{
             border: none;

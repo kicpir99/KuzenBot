@@ -65,7 +65,7 @@ class SmiteOverlay(QMainWindow):
 
     # ---- Constants ----
     EXPANDED_SIZE = (600, 840)
-    MINI_SIZE = (400, 160)
+    MINI_SIZE = (420, 165)
 
     def __init__(self):
         super().__init__()
@@ -739,7 +739,7 @@ class SmiteOverlay(QMainWindow):
         if self.is_expanded:
             self.main_vbox.setContentsMargins(15, 12, 15, 15)
         else:
-            self.main_vbox.setContentsMargins(15, 8, 5, 10)
+            self.main_vbox.setContentsMargins(12, 8, 10, 10)
 
         # Przełączamy ekran - layout spróbuje skoczyć, ale zablokowaliśmy go w kroku 2!
         self.navigate_to(self._current_page, save_history=False, force=True)
@@ -800,7 +800,7 @@ class SmiteOverlay(QMainWindow):
         if self.is_expanded:
             self.main_vbox.setContentsMargins(15, 12, 15, 15)
         else:
-            self.main_vbox.setContentsMargins(15, 8, 5, 10)
+            self.main_vbox.setContentsMargins(12, 8, 10, 10)
 
     # ============================================================ SETTINGS
     def _on_settings_clicked(self):
@@ -1018,6 +1018,7 @@ class SmiteOverlay(QMainWindow):
                     rl.addWidget(self._make_mini_separator(26))
             
             self.mini_layout.addWidget(row)
+            self.mini_layout.addStretch()
         else:
             # Regular community build with Starter | 6 Core Items | Relic stages
             build = self.current_build
@@ -1026,6 +1027,7 @@ class SmiteOverlay(QMainWindow):
             self._add_mini_staged_build_row(build, 36)
             if build.swap_items:
                 self._add_mini_swap_row(build.swap_items)
+            self.mini_layout.addStretch()
 
     def _populate_mini_empty(self, error_message=None):
         clear_layout(self.mini_layout)
@@ -1052,7 +1054,7 @@ class SmiteOverlay(QMainWindow):
         rl = QHBoxLayout(row)
         rl.setContentsMargins(0, 0, 0, 0)
         rl.setSpacing(6)
-        rl.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        rl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         has_starter = False
         # 1. Starter
@@ -1119,30 +1121,70 @@ class SmiteOverlay(QMainWindow):
 
         self.mini_layout.addWidget(row)
 
+    def _add_mini_divider(self, text=""):
+        div = QWidget()
+        dl = QHBoxLayout(div)
+        dl.setContentsMargins(4, 2, 4, 2)
+        dl.setSpacing(8)
+
+        line1 = QFrame()
+        line1.setObjectName("mini_swap_divider_line")
+        line1.setFrameShape(QFrame.Shape.HLine)
+        line1.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        dl.addWidget(line1)
+
+        if text:
+            lbl = QLabel(f"⇄  {text}")
+            lbl.setObjectName("mini_swap_divider_text")
+            dl.addWidget(lbl)
+
+            line2 = QFrame()
+            line2.setObjectName("mini_swap_divider_line")
+            line2.setFrameShape(QFrame.Shape.HLine)
+            line2.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+            dl.addWidget(line2)
+
+        self.mini_layout.addWidget(div)
+
     def _add_mini_swap_row(self, swaps):
+        self._add_mini_divider(_t("swaps").upper())
+
         row = QWidget()
         rl = QHBoxLayout(row)
         rl.setContentsMargins(0, 0, 0, 0)
-        rl.setSpacing(4)
-        rl.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        rl.setSpacing(8)
+        rl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         grouped = {}
         for s in swaps:
             f = s.get('from')
             if f not in grouped:
                 grouped[f] = []
             grouped[f].append(s)
+
         for from_item, group in grouped.items():
-            rl.addWidget(self._make_icon(from_item, 32))
+            pill = QFrame()
+            pill.setObjectName("mini_swap_pill")
+            pl = QHBoxLayout(pill)
+            pl.setContentsMargins(6, 3, 6, 3)
+            pl.setSpacing(5)
+            pl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+            pl.addWidget(self._make_icon(from_item, 28))
+
             arrow = QLabel("➔")
-            arrow.setProperty("class", "swap_arrow")
-            rl.addWidget(arrow)
+            arrow.setObjectName("mini_swap_arrow")
+            pl.addWidget(arrow)
+
             for i, s in enumerate(group):
                 if i > 0:
                     slash = QLabel("/")
-                    slash.setStyleSheet("color: #8E9AAF; font-weight: bold; font-size: 14px;")
-                    rl.addWidget(slash)
-                rl.addWidget(self._make_icon(s, 32))
-            rl.addSpacing(15)
+                    slash.setStyleSheet("color: #64748b; font-weight: bold; font-size: 11px;")
+                    pl.addWidget(slash)
+                pl.addWidget(self._make_icon(s, 28))
+
+            rl.addWidget(pill)
+
         self.mini_layout.addWidget(row)
 
     # ============================================================ HELPERS
