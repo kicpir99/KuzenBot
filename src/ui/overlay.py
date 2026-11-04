@@ -1299,6 +1299,7 @@ class SmiteOverlay(QMainWindow):
         header_size = 40 if not self.is_expanded else 50
 
         if self._current_page == "home":
+            self.god_label.setProperty("full_title", None)
             if os.path.exists(logo_path):
                 self.update_logo()
             else:
@@ -1307,6 +1308,7 @@ class SmiteOverlay(QMainWindow):
             return
             
         elif self._current_page == "search":
+            self.god_label.setProperty("full_title", None)
             if os.path.exists(logo_path):
                 self.update_logo()
             else:
@@ -1334,6 +1336,7 @@ class SmiteOverlay(QMainWindow):
                 full = f"{self._current_god_name}: {_t('loading')}".upper()
 
         else:
+            self.god_label.setProperty("full_title", None)
             # === POPRAWKA: Tryb Auto Wait wpada tutaj. Teraz poprawnie wywołujemy update_logo! ===
             if os.path.exists(logo_path):
                 self.update_logo()
@@ -1644,7 +1647,7 @@ class SmiteOverlay(QMainWindow):
                 if has_custom_tt:
                     text = obj.property("tooltip_html")
                 elif obj == getattr(self, 'god_label', None):
-                    text = obj.property("full_title")
+                    text = obj.property("full_title") if self._current_page in ("list", "detail") else ""
                 elif obj == getattr(self, 'btn_home', None):
                     text = _t("tt_home")
                 elif obj == getattr(self, 'btn_mini_role', None):
@@ -1984,7 +1987,7 @@ class SmiteOverlay(QMainWindow):
         accent_hex = theme_colors.get(accent, "#C5A059")
         
         colored_logo = self._colorize_logo(accent_hex)
-        h = 24 if not self.is_expanded else 45
+        h = 30 if not self.is_expanded else 45
         w = int(h * 3.5)
         self.god_label.setPixmap(colored_logo.pixmap(QSize(w, h)))
 
