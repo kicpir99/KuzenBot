@@ -1259,7 +1259,7 @@ class SmiteOverlay(QMainWindow):
         self.mini_layout.addWidget(row)
 
     def _add_mini_swaps_and_special_row(self, swaps, special_items):
-        combined_title = f"{_t('swaps').upper()}   •   {_t('special_equipment').upper()}"
+        combined_title = f"{_t('swaps').upper()}   •   ⚒  {_t('special_equipment').upper()}"
         self._add_mini_divider(combined_title, icon="⇄")
 
         row = QWidget()

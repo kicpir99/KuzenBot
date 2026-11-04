@@ -1009,6 +1009,8 @@ class SmiteController(QObject):
                         setattr(updated_build, field, exist_val)
                     elif val is None and exist_val is not None:
                         setattr(updated_build, field, exist_val)
+                if not getattr(updated_build, 'special_equipment', None) and getattr(existing_build, 'special_equipment', None):
+                    updated_build.special_equipment = existing_build.special_equipment
                 self.current_god_data.builds[self.current_index] = updated_build
                 
                 # Zapisujemy świeżo pobrane detale do cache'u
@@ -1192,6 +1194,7 @@ class SmiteController(QObject):
         # Aktualizacja wizualna przełączników
         self.overlay.home_screen.toggle.set_value(source, animate=False)
         self.overlay.list_screen.toggle.set_value(source, animate=False)
+        self.overlay.set_source_button(source)
         
         # Ponowne podłączenie sygnałów
         self.overlay.home_screen.toggle.valueChanged.connect(self.set_build_source)
