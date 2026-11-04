@@ -19,6 +19,7 @@ def resource_path(*paths):
 class GameScanner(QThread):
     god_detected = pyqtSignal(str) 
     lobby_joined = pyqtSignal()
+    match_started = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -213,6 +214,10 @@ class GameScanner(QThread):
                         if "Setup" in line:
                             self.last_emitted_god = None
                             self.lobby_joined.emit()
+
+                    if "Bringing World /Game/Maps/" in line and "/Game/Maps/Lobbies/" not in line:
+                        logger.info("[Scanner] Wykryto załadowanie mapy meczowej (Start meczu).")
+                        self.match_started.emit()
                     
                     if "Ally 0 Skin" in line:
                         match = re.search(r"Ally 0 Skin (.+?)$", line)

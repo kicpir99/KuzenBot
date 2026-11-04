@@ -150,11 +150,18 @@ class SearchScreen(QWidget):
         self._last_filtered = None
         self._refresh_grid(self._all_gods)
 
+    def retranslate_ui(self):
+        """Updates placeholder, button text, and status label on language change."""
+        if hasattr(self, 'input'):
+            self.input.setPlaceholderText(_t("search_ph"))
+        if hasattr(self, 'search_btn'):
+            self.search_btn.setText(_t("btn_go"))
+        self._reset_status_label()
+
     def activate(self):
-        """Focuses the search input when entering the screen."""
+        """Focuses the search input when entering the screen and refreshes translations."""
+        self.retranslate_ui()
         from PyQt6.QtCore import QTimer
-        # Używamy QTimer.singleShot, aby bezpiecznie przenieść focus po zakończeniu
-        # propagacji bieżących zdarzeń (np. mouseRelease z ekranu startowego).
         QTimer.singleShot(50, self._focus_input)
 
     def _focus_input(self):

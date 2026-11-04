@@ -23,7 +23,7 @@ from ui.screens.search_screen import SearchScreen
 from ui.screens.list_screen import ListScreen
 from ui.screens.detail_screen import DetailScreen
 from ui.screens.auto_wait_screen import AutoWaitScreen
-from core.translations import _t
+from core.translations import _t, get_role_translation
 
 # Page indices in QStackedWidget
 PAGE_HOME = 0
@@ -68,6 +68,7 @@ class SmiteOverlay(QMainWindow):
     settings_requested = pyqtSignal()
     update_accepted = pyqtSignal()
     returned_to_auto_wait = pyqtSignal()
+    position_changed = pyqtSignal(int, int)
 
     # ---- Constants ----
     EXPANDED_SIZE = (600, 840)
@@ -89,6 +90,8 @@ class SmiteOverlay(QMainWindow):
         self._history_stack = []
         self._forward_stack = []
         self._reconfiguring = False
+        self._failed_icons = set()
+        self._pending_icon_waiters = {}
 
         # Wczytujemy bazę przedmiotów do wykrywania usuniętych przedmiotów
         self.item_db = {}
@@ -159,32 +162,47 @@ class SmiteOverlay(QMainWindow):
             # by dioda nie stykała się z samą krawędzią ramki.
             self.status_diode.move(10, self.height() - 22)
 
+    def hideEvent(self, event):
+        """Ensures floating tooltip is hidden whenever the overlay hides."""
+        super().hideEvent(event)
+        if hasattr(self, 'tooltip'):
+            self.tooltip.hide()
+
     def toggle_click_through(self):
+        if hasattr(self, 'tooltip'):
+            self.tooltip.hide()
+        self._is_locked = not getattr(self, '_is_locked', False)
+        if self._is_locked:
+            print("🔒 Overlay locked (click-through)")
+        else:
+            print("🔓 Overlay unlocked (clickable)")
+        self._apply_win32_lock_styles()
+
+    def _apply_win32_lock_styles(self):
         import ctypes
-        
+
         GWL_EXSTYLE = -20
         WS_EX_TRANSPARENT = 0x00000020
+        WS_EX_NOACTIVATE = 0x08000000
         SWP_FRAMECHANGED = 0x0020
         SWP_NOMOVE = 0x0002
         SWP_NOSIZE = 0x0001
         SWP_NOZORDER = 0x0004
-        SWP_FLAGS = SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER
+        SWP_NOACTIVATE = 0x0010
+        SWP_FLAGS = SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE
 
         hwnd = int(self.winId())
         style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-        
         is_locked = getattr(self, '_is_locked', False)
-        
+
         if is_locked:
-            style &= ~WS_EX_TRANSPARENT
-            self._is_locked = False
-            print("🔓 Overlay unlocked (clickable)")
-            self.btn_lock.setIcon(self._colorize_icon(resource_path("assets", "unlock_mask.svg"), "#94a3b8"))
+            style |= (WS_EX_TRANSPARENT | WS_EX_NOACTIVATE)
+            if hasattr(self, 'btn_lock'):
+                self.btn_lock.setIcon(self._colorize_icon(resource_path("assets", "lock_mask.svg"), "#f59e0b"))
         else:
-            style |= WS_EX_TRANSPARENT
-            self._is_locked = True
-            print("🔒 Overlay locked (click-through)")
-            self.btn_lock.setIcon(self._colorize_icon(resource_path("assets", "lock_mask.svg"), "#f59e0b"))
+            style &= ~(WS_EX_TRANSPARENT | WS_EX_NOACTIVATE)
+            if hasattr(self, 'btn_lock'):
+                self.btn_lock.setIcon(self._colorize_icon(resource_path("assets", "unlock_mask.svg"), "#94a3b8"))
 
         ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
         ctypes.windll.user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, SWP_FLAGS)
@@ -213,7 +231,7 @@ class SmiteOverlay(QMainWindow):
         self.status_diode = QLabel(self) # Rodzic 'self' odkleja element od gridów/layoutów
         self.status_diode.setFixedSize(10, 10)
         self.status_diode.setStyleSheet("background-color: #10b981; border-radius: 5px;")
-        self.status_diode.setToolTip("Gotowy")
+        self.status_diode.setToolTip(_t("status_ready"))
         self.status_diode.show()
 
     # ---------------------------------------- HEADER
@@ -429,9 +447,13 @@ class SmiteOverlay(QMainWindow):
             icon_factory=self._make_icon,
             role_click_cb=self._set_role_filter,
             aspect_click_cb=self._set_aspect_filter,
-            colorizer=self._colorize_icon # <--- Przekazujemy funkcję
+            colorizer=self._colorize_icon,
+            tooltip_filter=self
         )
-        self.detail_screen = DetailScreen(icon_factory=self._make_icon)
+        self.detail_screen = DetailScreen(
+            icon_factory=self._make_icon,
+            tooltip_filter=self
+        )
         self.auto_wait_screen = AutoWaitScreen(
             switch_manual_cb=lambda: self.navigate_to("search")
         )
@@ -467,9 +489,13 @@ class SmiteOverlay(QMainWindow):
     def _build_tooltip(self):
         self.tooltip = QWidget(self)
         self.tooltip.setWindowFlags(
-            Qt.WindowType.ToolTip | Qt.WindowType.FramelessWindowHint
+            Qt.WindowType.ToolTip
+            | Qt.WindowType.FramelessWindowHint
+            | Qt.WindowType.WindowDoesNotAcceptFocus
         )
         self.tooltip.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.tooltip.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
+        self.tooltip.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating, True)
         self.tooltip_frame = QFrame(self.tooltip)
         self.tooltip_frame.setObjectName("float_tooltip_frame")
         
@@ -484,7 +510,7 @@ class SmiteOverlay(QMainWindow):
         self.tooltip_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.tooltip_label.setWordWrap(True)
         
-        self.tooltip_label.setMaximumWidth(220) 
+        self.tooltip_label.setMaximumWidth(280) 
         
         tfl = QVBoxLayout(self.tooltip_frame)
         tfl.setContentsMargins(15, 6, 15, 6)
@@ -503,6 +529,9 @@ class SmiteOverlay(QMainWindow):
             return
 
         # Zarządzanie historią (tylko jeśli to nowa nawigacja, a nie back/forward)
+        if hasattr(self, 'tooltip'):
+            self.tooltip.hide()
+
         if save_history and self._current_page:
             self._history_stack.append(self._current_page)
             self._forward_stack.clear()
@@ -825,15 +854,20 @@ class SmiteOverlay(QMainWindow):
         self.setWindowOpacity(value)
 
     def set_always_on_top(self, enabled):
-        """Toggle always-on-top flag."""
+        """Toggle always-on-top flag without losing Win32 click-through state."""
         flags = self.windowFlags()
+        currently_on_top = bool(flags & Qt.WindowType.WindowStaysOnTopHint)
+        if currently_on_top == bool(enabled):
+            return
         if enabled:
             flags |= Qt.WindowType.WindowStaysOnTopHint
         else:
             flags &= ~Qt.WindowType.WindowStaysOnTopHint
+        was_visible = self.isVisible()
         self.setWindowFlags(flags)
-        if not self.isVisible():
+        if was_visible:
             self.show()
+        self._apply_win32_lock_styles()
 
     # ============================================================ FILTERS
     def _cycle_role_filter(self):
@@ -864,13 +898,12 @@ class SmiteOverlay(QMainWindow):
         # Kolorujemy pobraną maskę na szaro
         colored_icon = self._colorize_icon(icon_path, "#94a3b8")
         
-        display_role = _t("role_any") if role == "Any" else role
+        display_role = get_role_translation(role)
         
         # Przekazujemy pokolorowaną ikonę do listy i guzika
         self.list_screen.set_role(colored_icon, display_role)
         self.btn_mini_role.setIcon(colored_icon)
         
-        self.btn_mini_role.setToolTip(_t("tt_role").format(role=display_role))
         self.list_screen.reset_page()
         self.filter_changed.emit()
 
@@ -901,7 +934,6 @@ class SmiteOverlay(QMainWindow):
             
             # Przekazujemy gotowy pokolorowany obiekt na listę
             self.list_screen.set_aspect(colored_icon, text, "")
-            self.btn_mini_aspect.setToolTip(_t("tt_aspect_on"))
         else:
             # TRYB 1: Zwykłe buildy (Wyszarzony piorun)
             icon_path = resource_path("assets", "aspect_off.png")
@@ -909,7 +941,6 @@ class SmiteOverlay(QMainWindow):
             
             self.btn_mini_aspect.setStyleSheet("")
             self.list_screen.set_aspect(icon_path, text, "")
-            self.btn_mini_aspect.setToolTip(_t("tt_aspect_off"))
             
         self.list_screen.reset_page()
         self.filter_changed.emit()
@@ -930,6 +961,12 @@ class SmiteOverlay(QMainWindow):
         self.btn_mini_aspect.setStyleSheet("")
 
     # ============================================================ MINI BAR
+    def _make_mini_separator(self, height=24):
+        sep = QFrame()
+        sep.setFixedSize(1, height)
+        sep.setStyleSheet("background: rgba(148, 163, 184, 0.28); margin: 0 2px;")
+        return sep
+
     def _populate_mini(self):
         clear_layout(self.mini_layout)
         if not self.current_build:
@@ -938,12 +975,8 @@ class SmiteOverlay(QMainWindow):
         if getattr(self.current_build, 'is_stats', False):
             # Stats build in Mini view
             s_data = self.current_build.stats_data or {}
-            
-            # Starter
             starters = s_data.get("starter", [])
-            # Slots
             slots = s_data.get("slots", [[] for _ in range(6)])
-            # Relic
             relics = s_data.get("relic", [])
             
             all_slots_data = [("Starter", starters)]
@@ -954,17 +987,20 @@ class SmiteOverlay(QMainWindow):
             row = QWidget()
             rl = QHBoxLayout(row)
             rl.setContentsMargins(0, 0, 0, 0)
-            rl.setSpacing(8)
+            rl.setSpacing(6)
             rl.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
             used = set()
+            has_core_or_starter = False
             for slot_label, slot_data in all_slots_data:
                 if not slot_data:
                     continue
-                # Dedup: wybierz pierwszy niewykorzystany przedmiot
+                if slot_label == "Relic" and has_core_or_starter:
+                    rl.addWidget(self._make_mini_separator(26))
+
                 chosen = slot_data[0]
-                for i, c in enumerate(slot_data):
-                    name = c["item"].lower().strip().replace("'", "'")
+                for c in slot_data:
+                    name = c["item"].lower().strip().replace("’", "'")
                     if name not in used:
                         chosen = c
                         used.add(name)
@@ -979,7 +1015,11 @@ class SmiteOverlay(QMainWindow):
                 item_cont_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
                 item_data = {"to": item_name, "alts": [s for s in slot_data if s["item"] != item_name]}
-                icon = self._make_icon(item_data, 38)
+                icon = self._make_icon(item_data, 36)
+                if slot_label == "Starter":
+                    icon.setStyleSheet("border: 1px solid #3b82f6; border-radius: 4px;")
+                elif slot_label == "Relic":
+                    icon.setStyleSheet("border: 1px solid #C5A059; border-radius: 4px;")
                 item_cont_lay.addWidget(icon)
                 
                 pct_lbl = QLabel(f"{pct}%")
@@ -988,15 +1028,19 @@ class SmiteOverlay(QMainWindow):
                 item_cont_lay.addWidget(pct_lbl)
                 
                 rl.addWidget(item_container)
+                has_core_or_starter = True
+                if slot_label == "Starter":
+                    rl.addWidget(self._make_mini_separator(26))
             
             self.mini_layout.addWidget(row)
         else:
-            # Regular community build
-            if not self.current_build.final_items:
+            # Regular community build with Starter | 6 Core Items | Relic stages
+            build = self.current_build
+            if not build.final_items and not getattr(build, 'starter_items', None):
                 return
-            self._add_mini_item_row(self.current_build.final_items[:8], 38)
-            if self.current_build.swap_items:
-                self._add_mini_swap_row(self.current_build.swap_items)
+            self._add_mini_staged_build_row(build, 36)
+            if build.swap_items:
+                self._add_mini_swap_row(build.swap_items)
 
     def _populate_mini_empty(self, error_message=None):
         clear_layout(self.mini_layout)
@@ -1017,6 +1061,78 @@ class SmiteOverlay(QMainWindow):
         self.mini_layout.addStretch()
         self.mini_layout.addWidget(card)
         self.mini_layout.addStretch()
+
+    def _add_mini_staged_build_row(self, build, size):
+        row = QWidget()
+        rl = QHBoxLayout(row)
+        rl.setContentsMargins(0, 0, 0, 0)
+        rl.setSpacing(6)
+        rl.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        has_starter = False
+        # 1. Starter
+        if hasattr(build, 'starter_items') and build.starter_items:
+            starter_name = build.starter_items[0]
+            if hasattr(self, 'item_db') and self.item_db:
+                s_low = starter_name.lower().strip().replace("’", "'")
+                info = self.item_db.get(s_low)
+                if isinstance(info, dict) and info.get("is_starter_t1"):
+                    upgrades = info.get("upgrades") or []
+                    upgrades_lower = {u.lower().strip().replace("’", "'") for u in upgrades}
+                    for item in (build.final_items or []):
+                        item_low = item.lower().strip().replace("’", "'")
+                        if item_low in upgrades_lower:
+                            for u in upgrades:
+                                if u.lower().strip().replace("’", "'") == item_low:
+                                    starter_name = u
+                                    break
+                            break
+            starter_icon = self._make_icon(starter_name, size)
+            starter_icon.setStyleSheet("border: 1px solid #3b82f6; border-radius: 4px;")
+            rl.addWidget(starter_icon)
+            has_starter = True
+
+        # 2. Core 6 items (filtering out starter & relics)
+        filter_item_names = set()
+        if hasattr(build, 'starter_items') and build.starter_items:
+            for s in build.starter_items:
+                s_low = s.lower().strip().replace("’", "'")
+                filter_item_names.add(s_low)
+                if hasattr(self, 'item_db') and self.item_db:
+                    item_info = self.item_db.get(s_low)
+                    if isinstance(item_info, dict):
+                        for upg in (item_info.get("upgrades") or []):
+                            filter_item_names.add(upg.lower().strip().replace("’", "'"))
+        if hasattr(build, 'relics') and build.relics:
+            for r in build.relics:
+                filter_item_names.add(r.lower().strip().replace("’", "'"))
+
+        filtered_final = []
+        for item_name in (build.final_items or []):
+            item_low = item_name.lower().strip().replace("’", "'")
+            if item_low in filter_item_names:
+                continue
+            if hasattr(self, 'item_db') and self.item_db:
+                item_info = self.item_db.get(item_low)
+                if isinstance(item_info, dict) and item_info.get("category") == "starter":
+                    continue
+            filtered_final.append(item_name)
+
+        if has_starter and filtered_final:
+            rl.addWidget(self._make_mini_separator(24))
+
+        for item_name in filtered_final[:6]:
+            rl.addWidget(self._make_icon(item_name, size))
+
+        # 3. Relic
+        if hasattr(build, 'relics') and build.relics:
+            if has_starter or filtered_final:
+                rl.addWidget(self._make_mini_separator(24))
+            relic_icon = self._make_icon(build.relics[0], size)
+            relic_icon.setStyleSheet("border: 1px solid #C5A059; border-radius: 4px;")
+            rl.addWidget(relic_icon)
+
+        self.mini_layout.addWidget(row)
 
     def _add_mini_item_row(self, items, size):
         row = QWidget()
@@ -1215,6 +1331,47 @@ class SmiteOverlay(QMainWindow):
 
         return ""
 
+    def _apply_icon_opacity(self, icon):
+        from PyQt6.QtWidgets import QGraphicsOpacityEffect
+        config = getattr(self, '_config', {})
+        items_val = config.get("opacity_items", 1.0)
+        if items_val >= 0.99:
+            icon.setGraphicsEffect(None)
+        else:
+            effect = icon.graphicsEffect()
+            if not effect or not isinstance(effect, QGraphicsOpacityEffect):
+                effect = QGraphicsOpacityEffect(icon)
+                icon.setGraphicsEffect(effect)
+            effect.setOpacity(items_val)
+
+    def _style_missing_icon(self, icon, name, size):
+        is_removed = True
+        if hasattr(self, 'item_db') and self.item_db:
+            if name.lower().strip().replace("’", "'") in self.item_db or name.lower().strip() == "acorn":
+                is_removed = False
+        if is_removed:
+            icon.setText("❌")
+            icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            icon.setStyleSheet(f"""
+                background-color: rgba(239, 68, 68, 0.1);
+                border: 1px dashed #ef4444;
+                border-radius: 4px;
+                color: #ef4444;
+                font-size: {int(size * 0.4)}px;
+                font-weight: bold;
+            """)
+        else:
+            icon.setText("?")
+            icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            icon.setStyleSheet(f"""
+                background-color: #1e293b;
+                border: 1px solid #334155;
+                border-radius: 4px;
+                color: #C5A059;
+                font-size: {int(size * 0.5)}px;
+                font-weight: bold;
+            """)
+
     def _make_icon(self, item_data, size):
         name = item_data.get("to", "Unknown") if isinstance(item_data, dict) else str(item_data)
         icon = QLabel()
@@ -1228,8 +1385,13 @@ class SmiteOverlay(QMainWindow):
         
         if not hasattr(self, '_icon_cache'):
             self._icon_cache = {}
+        if not hasattr(self, '_failed_icons'):
+            self._failed_icons = set()
+        if not hasattr(self, '_pending_icon_waiters'):
+            self._pending_icon_waiters = {}
             
         cache_key = (name, size)
+        norm_name = name.lower().strip()
         
         if os.path.exists(path):
             if cache_key in self._icon_cache:
@@ -1242,8 +1404,9 @@ class SmiteOverlay(QMainWindow):
                 )
                 self._icon_cache[cache_key] = pix
             icon.setPixmap(pix)
+        elif norm_name in self._failed_icons:
+            self._style_missing_icon(icon, name, size)
         else:
-            # 1. Natychmiast pokaż stan ładowania (UI się nie zawiesza!)
             icon.setText("⏳")
             icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
             icon.setStyleSheet(f"""
@@ -1255,85 +1418,51 @@ class SmiteOverlay(QMainWindow):
                 font-weight: bold;
             """)
             
-            # 2. Odpal asynchroniczne pobieranie w tle
-            if not hasattr(self, '_async_workers'):
-                self._async_workers = set()
-                
-            worker = AsyncIconDownloader(self, name, size, icon)
-            self._async_workers.add(worker)
-            worker.icon_ready.connect(self._on_async_icon_ready)
-            # Usuwamy workera z pamięci po zakończeniu, by nie wyciekał RAM
-            worker.finished.connect(lambda w=worker: self._async_workers.discard(w) if w in getattr(self, '_async_workers', set()) else None)
-            worker.start()
+            if norm_name in self._pending_icon_waiters:
+                self._pending_icon_waiters[norm_name].append((icon, size))
+            else:
+                self._pending_icon_waiters[norm_name] = [(icon, size)]
+                if not hasattr(self, '_async_workers'):
+                    self._async_workers = set()
+                worker = AsyncIconDownloader(self, name, size, icon)
+                self._async_workers.add(worker)
+                worker.icon_ready.connect(self._on_async_icon_ready)
+                worker.finished.connect(lambda w=worker: self._async_workers.discard(w) if w in getattr(self, '_async_workers', set()) else None)
+                worker.start()
 
-        # Przezroczystość (aplikowana na koniec)
-        from PyQt6.QtWidgets import QGraphicsOpacityEffect
-        config = getattr(self, '_config', {})
-        items_val = config.get("opacity_items", 1.0)
-        effect = QGraphicsOpacityEffect(icon)
-        effect.setOpacity(items_val)
-        icon.setGraphicsEffect(effect)
-
+        self._apply_icon_opacity(icon)
         return icon
 
     def _on_async_icon_ready(self, name, path, icon, size):
-        try:
-            # Zabezpieczenie: jeśli gracz zdążył zmienić zakładkę podczas pobierania, 
-            # widget mógł zostać usunięty z pamięci.
-            icon.objectName()
-        except RuntimeError:
-            return
+        norm_name = name.lower().strip()
+        waiters = self._pending_icon_waiters.pop(norm_name, [(icon, size)])
+        if not path or not os.path.exists(path):
+            self._failed_icons.add(norm_name)
 
-        if path and os.path.exists(path):
-            # Sukces - wgrywamy pobrany obrazek
-            cache_key = (name, size)
-            pix = QPixmap(path).scaled(
-                size, size,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation,
-            )
-            self._icon_cache[cache_key] = pix
-            
-            icon.setText("")
-            icon.setStyleSheet("") # Resetujemy tło loadera
-            icon.setPixmap(pix)
-        else:
-            # Fallback - Przedmiot usunięty lub nie istnieje na serwerze
-            is_removed = True
-            if hasattr(self, 'item_db') and self.item_db:
-                if name.lower().strip().replace("’", "'") in self.item_db or name.lower().strip() == "acorn":
-                    is_removed = False
-            
-            if is_removed:
-                icon.setText("❌")
-                icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                icon.setStyleSheet(f"""
-                    background-color: rgba(239, 68, 68, 0.1);
-                    border: 1px dashed #ef4444;
-                    border-radius: 4px;
-                    color: #ef4444;
-                    font-size: {int(size * 0.4)}px;
-                    font-weight: bold;
-                """)
+        for w_icon, w_size in waiters:
+            try:
+                w_icon.objectName()
+            except RuntimeError:
+                continue
+
+            if path and os.path.exists(path):
+                cache_key = (name, w_size)
+                if cache_key in self._icon_cache:
+                    pix = self._icon_cache[cache_key]
+                else:
+                    pix = QPixmap(path).scaled(
+                        w_size, w_size,
+                        Qt.AspectRatioMode.KeepAspectRatio,
+                        Qt.TransformationMode.SmoothTransformation,
+                    )
+                    self._icon_cache[cache_key] = pix
+                w_icon.setText("")
+                w_icon.setStyleSheet("")
+                w_icon.setPixmap(pix)
             else:
-                icon.setText("?")
-                icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                icon.setStyleSheet(f"""
-                    background-color: #1e293b;
-                    border: 1px solid #334155;
-                    border-radius: 4px;
-                    color: #C5A059;
-                    font-size: {int(size * 0.5)}px;
-                    font-weight: bold;
-                """)
-                
-        # Odświeżenie przezroczystości po załadowaniu grafiki
-        from PyQt6.QtWidgets import QGraphicsOpacityEffect
-        config = getattr(self, '_config', {})
-        items_val = config.get("opacity_items", 1.0)
-        effect = QGraphicsOpacityEffect(icon)
-        effect.setOpacity(items_val)
-        icon.setGraphicsEffect(effect)
+                self._style_missing_icon(w_icon, name, w_size)
+
+            self._apply_icon_opacity(w_icon)
 
     def _on_card_clicked(self, index):
         """Proxy: list card click triggers build_selected signal."""
@@ -1370,16 +1499,18 @@ class SmiteOverlay(QMainWindow):
         if obj is None:
             return super().eventFilter(obj, event)
 
-        if obj.objectName() in ["item_icon", "mode_info_btn"] or obj in tooltip_widgets:
+        has_custom_tt = bool(obj.property("tooltip_html"))
+        if obj.objectName() in ["item_icon", "mode_info_btn", "build_stats_badge"] or obj in tooltip_widgets or has_custom_tt:
             if event.type() == QEvent.Type.Enter:
                 text = ""
-                if obj == getattr(self, 'god_label', None):
+                if has_custom_tt:
+                    text = obj.property("tooltip_html")
+                elif obj == getattr(self, 'god_label', None):
                     text = obj.property("full_title")
                 elif obj == getattr(self, 'btn_home', None):
                     text = _t("tt_home")
                 elif obj == getattr(self, 'btn_mini_role', None):
-                    # Tłumaczymy rolę przed wrzuceniem do formatowania
-                    role_display = _t("role_any") if self._role_filter == "Any" else self._role_filter
+                    role_display = get_role_translation(self._role_filter)
                     text = _t("tt_role").format(role=role_display)
                 elif obj == getattr(self, 'btn_mini_aspect', None):
                     text = _t("tt_aspect_on") if self._aspect_filter == 2 else _t("tt_aspect_off")
@@ -1418,6 +1549,10 @@ class SmiteOverlay(QMainWindow):
                 
                 if text:
                     self.tooltip_label.setText(text)
+                    if "<div" in text or "<br" in text:
+                        self.tooltip_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    else:
+                        self.tooltip_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     
                     # --- NAJWIĘKSZY SEKRET PYQT v2: Zapobiegamy mruganiu na środku ekranu! ---
                     # Windows czasem ignoruje ujemne koordynaty przy pierwszym rysowaniu.
@@ -1530,6 +1665,7 @@ class SmiteOverlay(QMainWindow):
                 self._snap_anim.setEndValue(QPoint(target_x, target_y))
                 self._snap_anim.setEasingCurve(QEasingCurve.Type.OutQuad)
                 self._snap_anim.start()
+            self.position_changed.emit(int(target_x), int(target_y))
 
     def update_mini_buttons_visibility(self):
         """Dynamically manages control visibility based on mode and config."""
@@ -1609,23 +1745,28 @@ class SmiteOverlay(QMainWindow):
         """)
 
         # Kanał 3: Przezroczystość wszystkich ikon przedmiotów znajdujących się aktualnie na ekranie
-        from PyQt6.QtWidgets import QGraphicsOpacityEffect, QLabel
+        from PyQt6.QtWidgets import QLabel
         icons = self.findChildren(QLabel, "item_icon")
         for icon in icons:
-            effect = icon.graphicsEffect()
-            if not effect or not isinstance(effect, QGraphicsOpacityEffect):
-                effect = QGraphicsOpacityEffect(icon)
-                icon.setGraphicsEffect(effect)
-            effect.setOpacity(items_val)
+            self._apply_icon_opacity(icon)
 
     def retranslate_ui(self):
-        """Propagates translation refresh to all child screens."""
-        if hasattr(self, 'home_screen'):
+        """Propagates translation refresh to all child screens and updates header controls."""
+        if hasattr(self, 'home_screen') and hasattr(self.home_screen, 'retranslate_ui'):
             self.home_screen.retranslate_ui()
-        if hasattr(self, 'search_screen'):
-            # Jeśli SearchScreen ma metodę resetującą/tłumaczącą, też ją tu wywołaj:
-            if hasattr(self.search_screen, '_reset_status_label'):
-                self.search_screen._reset_status_label()
+        if hasattr(self, 'search_screen') and hasattr(self.search_screen, 'retranslate_ui'):
+            self.search_screen.retranslate_ui()
+        if hasattr(self, 'auto_wait_screen') and hasattr(self.auto_wait_screen, 'retranslate_ui'):
+            self.auto_wait_screen.retranslate_ui()
+        if hasattr(self, 'list_screen') and hasattr(self.list_screen, 'retranslate_ui'):
+            self.list_screen.retranslate_ui()
+        if hasattr(self, 'btn_mini_role'):
+            role_display = get_role_translation(self._role_filter)
+            self.btn_mini_role.setToolTip(_t("tt_role").format(role=role_display))
+            if hasattr(self, 'list_screen') and hasattr(self.list_screen, 'btn_role'):
+                self.list_screen.btn_role.setText(f" {role_display}")
+        if hasattr(self, 'btn_mini_aspect'):
+            self.btn_mini_aspect.setToolTip(_t("tt_aspect_on") if self._aspect_filter == 2 else _t("tt_aspect_off"))
 
     def _colorize_icon(self, image_path, hex_color):
         """Dynamically applies color tint to images (SVG via XML, PNG via mask)."""
@@ -1709,10 +1850,10 @@ class SmiteOverlay(QMainWindow):
         
         if state == "fetching":
             self.status_diode.setStyleSheet(f"{base_style} background-color: #f59e0b;") 
-            self.status_diode.setToolTip("Pobieranie danych...")
+            self.status_diode.setToolTip(_t("status_fetching"))
         elif state == "error":
             self.status_diode.setStyleSheet(f"{base_style} background-color: #ef4444;")
-            self.status_diode.setToolTip("Błąd komunikacji")
+            self.status_diode.setToolTip(_t("status_error"))
         else:
             self.status_diode.setStyleSheet(f"{base_style} background-color: #10b981;")
-            self.status_diode.setToolTip("Gotowy")
+            self.status_diode.setToolTip(_t("status_ready"))

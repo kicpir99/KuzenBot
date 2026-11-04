@@ -300,6 +300,19 @@ class AutoWaitScreen(QWidget):
     def set_status(self, text):
         self.status_lbl.setText(text.upper())
 
+    def retranslate_ui(self):
+        """Updates static labels when language changes."""
+        if hasattr(self, 'lang_banner_text'):
+            self.lang_banner_text.setText(_t("lang_warning_ext"))
+        if hasattr(self, 'title_lbl'):
+            self.title_lbl.setText(_t("auto_active"))
+        if hasattr(self, 'btn_manual'):
+            self.btn_manual.setText(_t("manual_mode"))
+        if hasattr(self, 'btn_yes'):
+            self.btn_yes.setText(_t("yes"))
+        if hasattr(self, 'btn_no'):
+            self.btn_no.setText(_t("no"))
+
     def _dismiss_lang_banner(self):
         """Zamyka baner językowy do końca cyklu życia apki."""
         self._lang_banner_dismissed = True

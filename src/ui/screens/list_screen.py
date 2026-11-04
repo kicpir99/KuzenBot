@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
 
 from ui.components.skeleton import QSkeleton, clear_layout
 from ui.components.segmented_toggle import SegmentedToggle
-from core.translations import _t
+from core.translations import _t, get_role_translation
 
 def resource_path(*paths):
     try: base_path = sys._MEIPASS
@@ -45,11 +45,12 @@ class ListScreen(QWidget):
     source_changed = pyqtSignal(str)
     retry_requested = pyqtSignal()
 
-    def __init__(self, icon_factory=None, role_click_cb=None, aspect_click_cb=None, parent=None, colorizer=None):
+    def __init__(self, icon_factory=None, role_click_cb=None, aspect_click_cb=None, parent=None, colorizer=None, tooltip_filter=None):
         super().__init__(parent)
         self._icon_factory = icon_factory
         self._colorizer = colorizer
         self._icon_factory = icon_factory
+        self._tooltip_filter = tooltip_filter
         self._all_builds = []
         self._current_page = 0
         self._items_per_page = 5
@@ -480,6 +481,15 @@ class ListScreen(QWidget):
             }}
         """)
 
+    def _attach_tooltip(self, widget, tooltip_html):
+        if not widget or not tooltip_html:
+            return
+        widget.setProperty("tooltip_html", tooltip_html)
+        widget.setObjectName("build_stats_badge")
+        widget.setMouseTracking(True)
+        if hasattr(self, '_tooltip_filter') and self._tooltip_filter:
+            widget.installEventFilter(self._tooltip_filter)
+
     def get_build_tooltip_html(self, build) -> str:
         """Zwraca jednolity, elegancki tooltip HTML dla buildów ze statystykami oraz Unranked w kolorystyce ciemnego granatu."""
         has_wr = bool(getattr(build, 'win_rate', None) and build.win_rate)
@@ -503,7 +513,7 @@ class ListScreen(QWidget):
         if cost_str:
             lines.append(f"<div><b style='color: #93c5fd;'>{_t('tt_build_cost')}</b> <span style='color: #fbbf24; font-weight: bold;'>{cost_str}</span></div>")
 
-        return f"<div style='background-color: #0A0F19; color: #FFFFFF; font-family: Segoe UI, sans-serif; font-size: 11px; line-height: 145%; padding: 4px 6px;'>{''.join(lines)}</div>"
+        return f"<div style='line-height: 140%; padding: 2px 4px;'>{''.join(lines)}</div>"
 
 
     def _make_mini_build_row(self, build):
@@ -528,18 +538,31 @@ class ListScreen(QWidget):
             layout.setContentsMargins(15, 6, 15, 6)
             layout.setSpacing(2)
             
-            display_title = build.title
+            raw_role = build.roles[0] if build.roles else ""
+            role_val = get_role_translation(raw_role) if raw_role else _t('role_any')
             if getattr(build, 'is_stats', False):
-                display_title = build.title.split(" (Meta Stats -")[0]
+                if getattr(build, 'is_aspect', False):
+                    display_title = f"{role_val} ({_t('aspect_badge')})"
+                else:
+                    display_title = role_val
+            else:
+                display_title = build.title
+
             title = QLabel(display_title)
             title.setStyleSheet("font-size: 11px; font-weight: bold; color: #f8fafc;")
             title.setAlignment(Qt.AlignmentFlag.AlignCenter)
             title.setWordWrap(True)
             
-            reason = build.stats_data.get("insufficient_reason_mini") if build.stats_data else None
-            if not reason:
-                role_val = build.roles[0] if build.roles else _t('role_any')
+            s_data = build.stats_data or {}
+            reason_type = s_data.get("reason_type")
+            raw_reason = str(s_data.get("insufficient_reason", "")).lower()
+            is_variety = reason_type == "low_variety" or "różnorodn" in raw_reason or "variety" in raw_reason
+            
+            if is_variety:
+                reason = _t("err_low_variety_mini").format(role=role_val)
+            else:
                 reason = _t("err_low_stats_mini").format(role=role_val, count=build.upvotes)
+
             msg = QLabel(reason)
             msg.setStyleSheet("font-size: 10px; color: #f87171; font-weight: bold;")
             msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -594,7 +617,7 @@ class ListScreen(QWidget):
 
         # Role (skrócone)
         if build.roles:
-            role_text = "/".join(build.roles)
+            role_text = "/".join(get_role_translation(r) for r in build.roles)
             role_lbl = QLabel(role_text)
             role_lbl.setStyleSheet("font-size: 9px; color: #94a3b8; font-weight: bold;")
             top_row.addWidget(role_lbl)
@@ -619,45 +642,42 @@ class ListScreen(QWidget):
                 display_items = []
                 used = set()
                 # Starter
+                has_prev_stage = False
                 if build.stats_data.get("starter"):
                     best = build.stats_data["starter"][0]
-                    used.add(best["item"].lower().strip().replace("'", "'"))
-                    display_items.append({"icon": self._icon_factory(best["item"], 28), "pct": best["pct"], "alts": build.stats_data["starter"][1:]})
+                    used.add(best["item"].lower().strip().replace("’", "'"))
+                    st_icon = self._icon_factory({"to": best["item"], "alts": build.stats_data["starter"][1:]}, 28)
+                    st_icon.setStyleSheet("border: 1px solid #3b82f6; border-radius: 4px;")
+                    items_lay.addWidget(st_icon)
+                    sep_st = QFrame()
+                    sep_st.setFixedSize(1, 18)
+                    sep_st.setStyleSheet("background: rgba(148, 163, 184, 0.25); margin: 0 2px;")
+                    items_lay.addWidget(sep_st)
+                    has_prev_stage = True
                 # Slots
                 for slot in build.stats_data.get("slots", []):
                     if slot:
                         chosen = slot[0]
-                        for i, c in enumerate(slot):
-                            name = c["item"].lower().strip().replace("'", "'")
+                        for c in slot:
+                            name = c["item"].lower().strip().replace("’", "'")
                             if name not in used:
                                 chosen = c
                                 used.add(name)
                                 break
-                        display_items.append({"icon": self._icon_factory(chosen["item"], 28), "pct": chosen["pct"], "alts": [s for s in slot if s["item"] != chosen["item"]]})
+                        alts = [s for s in slot if s["item"] != chosen["item"]]
+                        items_lay.addWidget(self._icon_factory({"to": chosen["item"], "alts": alts}, 28))
+                        has_prev_stage = True
                 # Relic
                 if build.stats_data.get("relic"):
+                    if has_prev_stage:
+                        sep_rel = QFrame()
+                        sep_rel.setFixedSize(1, 18)
+                        sep_rel.setStyleSheet("background: rgba(148, 163, 184, 0.25); margin: 0 2px;")
+                        items_lay.addWidget(sep_rel)
                     best = build.stats_data["relic"][0]
-                    display_items.append({"icon": self._icon_factory(best["item"], 28), "pct": best["pct"], "alts": build.stats_data["relic"][1:]})
-
-                for item_info in display_items:
-                    item_container = QWidget()
-                    item_cont_lay = QVBoxLayout(item_container)
-                    item_cont_lay.setContentsMargins(0, 0, 0, 0)
-                    item_cont_lay.setSpacing(1)
-                    item_cont_lay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    
-                    item_cont_lay.addWidget(item_info["icon"])
-                    
-                    # pct_lbl = QLabel(f"{item_info['pct']}%")
-                    # pct_lbl.setStyleSheet("font-size: 8px; color: #94a3b8; font-weight: bold;")
-                    # pct_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    # item_cont_lay.addWidget(pct_lbl)
-                    
-                    if item_info["alts"]:
-                        tt = f"{_t('alternatives')}<br>" + "<br>".join([f"{a['item']}: {a['pct']}%" for a in item_info["alts"]])
-                        item_container.setToolTip(tt)
-                        
-                    items_lay.addWidget(item_container)
+                    rel_icon = self._icon_factory({"to": best["item"], "alts": build.stats_data["relic"][1:]}, 28)
+                    rel_icon.setStyleSheet("border: 1px solid #C5A059; border-radius: 4px;")
+                    items_lay.addWidget(rel_icon)
             else:
                 # Regular view (Mini)
                 has_starter_or_items = False
@@ -715,9 +735,14 @@ class ListScreen(QWidget):
                             continue
                     filtered_final.append(item_name)
                         
+                if has_starter_or_items and filtered_final:
+                    sep_st = QFrame()
+                    sep_st.setFixedSize(1, 18)
+                    sep_st.setStyleSheet("background: rgba(148, 163, 184, 0.25); margin: 0 2px;")
+                    items_lay.addWidget(sep_st)
+
                 for item_name in filtered_final[:6]:
                     icon = self._icon_factory(item_name, 28)
-                    icon.setToolTip(item_name)
                     items_lay.addWidget(icon)
                 has_starter_or_items = True
 
@@ -725,14 +750,13 @@ class ListScreen(QWidget):
                 if has_starter_or_items and hasattr(build, 'relics') and build.relics:
                     sep = QFrame()
                     sep.setFixedSize(1, 18)
-                    sep.setStyleSheet("background: rgba(148, 163, 184, 0.2); margin: 0 2px;")
+                    sep.setStyleSheet("background: rgba(148, 163, 184, 0.25); margin: 0 2px;")
                     items_lay.addWidget(sep)
 
                 # 4. Relikt (na samym końcu)
                 if hasattr(build, 'relics') and build.relics:
                     relic_icon = self._icon_factory(build.relics[0], 28)
                     relic_icon.setStyleSheet("border: 1px solid #C5A059; border-radius: 4px;")
-                    relic_icon.setToolTip(build.relics[0])
                     items_lay.addWidget(relic_icon)
             
             bottom_row.addLayout(items_lay)
@@ -751,7 +775,7 @@ class ListScreen(QWidget):
                 meta_lay.addWidget(author_mini)
                 up = QLabel(f"🎮 {build.upvotes}")
                 up.setStyleSheet("font-size: 9px; font-weight: 800; color: #60a5fa;")
-                up.setToolTip(_t("stats_info_tooltip"))
+                self._attach_tooltip(up, _t("stats_info_tooltip"))
                 meta_lay.addWidget(up)
             else:
                 tt_html = self.get_build_tooltip_html(build)
@@ -759,17 +783,17 @@ class ListScreen(QWidget):
                     if getattr(build, 'tier', None) and build.tier and build.tier != "-":
                         tier_lbl = QLabel(build.tier)
                         self.style_tier_badge(tier_lbl, build.tier, font_size_px=9, is_mini=True)
-                        tier_lbl.setToolTip(tt_html)
+                        self._attach_tooltip(tier_lbl, tt_html)
                         meta_lay.addWidget(tier_lbl)
                     
                     up = QLabel(f"{build.win_rate} WR")
                     up.setStyleSheet("font-size: 9px; font-weight: 800; color: #10b981;")
-                    up.setToolTip(tt_html)
+                    self._attach_tooltip(up, tt_html)
                     meta_lay.addWidget(up)
                 else:
                     unranked_lbl = QLabel(_t("unranked_badge"))
                     self.style_tier_badge(unranked_lbl, "Unranked", font_size_px=9, is_mini=True)
-                    unranked_lbl.setToolTip(tt_html)
+                    self._attach_tooltip(unranked_lbl, tt_html)
                     meta_lay.addWidget(unranked_lbl)
             
             bottom_row.addLayout(meta_lay)
@@ -952,6 +976,17 @@ class ListScreen(QWidget):
             
         self.btn_aspect.setStyleSheet(style)
 
+    def retranslate_ui(self):
+        """Updates filters and re-renders build cards when language changes."""
+        if hasattr(self, 'toggle'):
+            self.toggle.label_builds.setText(_t("builds_toggle"))
+            self.toggle.label_stats.setText(_t("stats_toggle"))
+        if hasattr(self, 'btn_aspect'):
+            aspect_text = _t('aspect_only') if getattr(self, '_aspect_filter', 1) == 2 else _t('aspect_off')
+            self.btn_aspect.setText(f" {aspect_text}")
+        if hasattr(self, '_all_builds') and self._all_builds:
+            self._render_current_page()
+
     def reset_page(self):
         self._current_page = 0
 
@@ -1116,18 +1151,31 @@ class ListScreen(QWidget):
             layout.setContentsMargins(30, 12, 30, 12)
             layout.setSpacing(4)
             
-            display_title = build.title
+            raw_role = build.roles[0] if build.roles else ""
+            role_val = get_role_translation(raw_role) if raw_role else _t('role_any')
             if getattr(build, 'is_stats', False):
-                display_title = build.title.split(" (Meta Stats -")[0]
+                if getattr(build, 'is_aspect', False):
+                    display_title = f"{role_val} ({_t('aspect_badge')})"
+                else:
+                    display_title = role_val
+            else:
+                display_title = build.title
+
             title = QLabel(display_title)
             title.setStyleSheet("font-size: 13px; font-weight: bold; color: #f8fafc;")
             title.setAlignment(Qt.AlignmentFlag.AlignCenter)
             title.setWordWrap(True)
             
-            reason = build.stats_data.get("insufficient_reason") if build.stats_data else None
-            if not reason:
-                role_val = build.roles[0] if build.roles else _t('role_any')
+            s_data = build.stats_data or {}
+            reason_type = s_data.get("reason_type")
+            raw_reason = str(s_data.get("insufficient_reason", "")).lower()
+            is_variety = reason_type == "low_variety" or "różnorodn" in raw_reason or "variety" in raw_reason
+            
+            if is_variety:
+                reason = _t("err_low_variety_ext").format(role=role_val)
+            else:
                 reason = _t("err_low_stats_ext").format(role=role_val, count=build.upvotes)
+
             msg = QLabel(reason)
             msg.setStyleSheet("font-size: 11px; color: #f87171; font-weight: 600;")
             msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1213,7 +1261,7 @@ class ListScreen(QWidget):
         meta_row.setSpacing(4)
         roles = build.roles if build.roles else ["Any"]
         for i, role in enumerate(roles):
-            rl = ClickableLabel(role)
+            rl = ClickableLabel(get_role_translation(role))
             rl.setProperty("class", "role_link")
             rl.setCursor(Qt.CursorShape.PointingHandCursor)
             if self._set_role_filter_cb:
@@ -1258,28 +1306,45 @@ class ListScreen(QWidget):
         
         if self._icon_factory:
             if getattr(build, 'is_stats', False):
-                # Stats view logic (Top 1 only, dedup across slots)
+                # Stats view logic (Top 1 + alts in tooltip, dedup across slots)
                 used = set()
+                has_prev_stage = False
                 # Starter
                 if build.stats_data.get("starter"):
                     best = build.stats_data["starter"][0]
-                    used.add(best["item"].lower().strip().replace("'", "'"))
-                    items_lay.addWidget(self._icon_factory(best["item"], 34))
+                    used.add(best["item"].lower().strip().replace("’", "'"))
+                    st_icon = self._icon_factory({"to": best["item"], "alts": build.stats_data["starter"][1:]}, 34)
+                    st_icon.setStyleSheet("border: 1px solid #3b82f6; border-radius: 4px;")
+                    items_lay.addWidget(st_icon)
+                    sep_st = QFrame()
+                    sep_st.setFixedSize(1, 22)
+                    sep_st.setStyleSheet("background: rgba(148, 163, 184, 0.25); margin: 0 2px;")
+                    items_lay.addWidget(sep_st)
+                    has_prev_stage = True
                 # Slots
                 for slot in build.stats_data.get("slots", []):
                     if slot:
                         chosen = slot[0]
                         for c in slot:
-                            name = c["item"].lower().strip().replace("'", "'")
+                            name = c["item"].lower().strip().replace("’", "'")
                             if name not in used:
                                 chosen = c
                                 used.add(name)
                                 break
-                        items_lay.addWidget(self._icon_factory(chosen["item"], 34))
+                        alts = [s for s in slot if s["item"] != chosen["item"]]
+                        items_lay.addWidget(self._icon_factory({"to": chosen["item"], "alts": alts}, 34))
+                        has_prev_stage = True
                 # Relic
                 if build.stats_data.get("relic"):
+                    if has_prev_stage:
+                        sep_rel = QFrame()
+                        sep_rel.setFixedSize(1, 22)
+                        sep_rel.setStyleSheet("background: rgba(148, 163, 184, 0.25); margin: 0 2px;")
+                        items_lay.addWidget(sep_rel)
                     best = build.stats_data["relic"][0]
-                    items_lay.addWidget(self._icon_factory(best["item"], 34))
+                    rel_icon = self._icon_factory({"to": best["item"], "alts": build.stats_data["relic"][1:]}, 34)
+                    rel_icon.setStyleSheet("border: 1px solid #C5A059; border-radius: 4px;")
+                    items_lay.addWidget(rel_icon)
             else:
                 # Regular view logic
                 has_starter_or_items = False
@@ -1337,6 +1402,12 @@ class ListScreen(QWidget):
                             continue
                     filtered_final.append(item_name)
                         
+                if has_starter_or_items and filtered_final:
+                    sep_st = QFrame()
+                    sep_st.setFixedSize(1, 22)
+                    sep_st.setStyleSheet("background: rgba(148, 163, 184, 0.25); margin: 0 2px;")
+                    items_lay.addWidget(sep_st)
+
                 for item_name in filtered_final[:6]:
                     items_lay.addWidget(self._icon_factory(item_name, 34))
                     has_starter_or_items = True
@@ -1361,7 +1432,7 @@ class ListScreen(QWidget):
             up = QLabel(f"🎮 {build.upvotes}")
             up.setObjectName("upvotes_count")
             up.setStyleSheet("font-size: 11px; font-weight: bold; color: #60a5fa;")
-            up.setToolTip(_t("stats_info_tooltip"))
+            self._attach_tooltip(up, _t("stats_info_tooltip"))
             bottom.addWidget(up, 0, Qt.AlignmentFlag.AlignBottom)
         else:
             tt_html = self.get_build_tooltip_html(build)
@@ -1373,20 +1444,20 @@ class ListScreen(QWidget):
                 if getattr(build, 'tier', None) and build.tier and build.tier != "-":
                     tier_badge = QLabel(f" {build.tier} ")
                     self.style_tier_badge(tier_badge, build.tier, font_size_px=10, is_mini=False)
-                    tier_badge.setToolTip(tt_html)
+                    self._attach_tooltip(tier_badge, tt_html)
                     stats_box.addWidget(tier_badge)
                     
                 up = QLabel(f"{build.win_rate} WR")
                 up.setObjectName("upvotes_count")
                 up.setStyleSheet("font-size: 11px; font-weight: bold; color: #10b981;")
-                up.setToolTip(tt_html)
+                self._attach_tooltip(up, tt_html)
                 stats_box.addWidget(up)
                 bottom.addLayout(stats_box)
             else:
                 unranked_badge = QLabel(f" {_t('unranked_badge')} ")
                 unranked_badge.setObjectName("upvotes_count")
                 self.style_tier_badge(unranked_badge, "Unranked", font_size_px=10, is_mini=False)
-                unranked_badge.setToolTip(tt_html)
+                self._attach_tooltip(unranked_badge, tt_html)
                 bottom.addWidget(unranked_badge, 0, Qt.AlignmentFlag.AlignBottom)
         layout.addLayout(bottom)
 

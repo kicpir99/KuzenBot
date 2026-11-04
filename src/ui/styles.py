@@ -516,7 +516,7 @@ def get_stylesheet(theme_name: str = "gold", font_key: str = "standard") -> str:
         QToolTip {{
             background-color: #0A0F19;
             color: #FFFFFF;
-            border: 1px solid rgba(59, 130, 246, 0.4);
+            border: 1px solid rgba({c["primary_rgb"]}, 0.5);
             border-radius: 8px;
             padding: 6px 10px;
             font-family: {f};

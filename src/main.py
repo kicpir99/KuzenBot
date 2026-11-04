@@ -25,7 +25,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, QUrl
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.12"
+CURRENT_VERSION = "1.1.13"
 API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
@@ -94,6 +94,15 @@ def parse_god_data(json_data: dict) -> GodData:
     builds = []
     seen_stats_roles = {}
 
+    current_patch_str = json_data.get('current_patch', '')
+    def _extract_patch_num(v):
+        if not v: return 0.0
+        m = re.search(r'(\d+(?:\.\d+)?)', str(v).upper().replace('OB', ''))
+        try: return float(m.group(1)) if m else 0.0
+        except (ValueError, TypeError): return 0.0
+
+    current_patch_num = _extract_patch_num(current_patch_str)
+
     for b in json_data.get('builds', []):
         build = SmiteBuild(**b)
         
@@ -102,19 +111,29 @@ def parse_god_data(json_data: dict) -> GodData:
                 role = build.roles[0] if build.roles else "Unknown"
                 aspect = getattr(build, 'is_aspect', False)
                 key = f"{role}_{aspect}"
+
+                b_patch_num = _extract_patch_num(build.patch)
+                # Odrzucamy relikty z bardzo starych patchy (starszych niz poprzedni patch fallbackowy)
+                if current_patch_num > 0 and b_patch_num < current_patch_num - 1:
+                    continue
                 
                 if key not in seen_stats_roles:
                     seen_stats_roles[key] = build
                 else:
                     existing = seen_stats_roles[key]
+                    e_patch_num = _extract_patch_num(existing.patch)
                     new_insufficient = getattr(build, 'insufficient_data', False)
                     old_insufficient = getattr(existing, 'insufficient_data', False)
                     
-                    if not new_insufficient and old_insufficient:
-                        seen_stats_roles[key] = build
-                    elif not new_insufficient and not old_insufficient:
-                        if getattr(build, 'upvotes', 0) > getattr(existing, 'upvotes', 0):
+                    if b_patch_num > e_patch_num:
+                        if not new_insufficient or old_insufficient:
                             seen_stats_roles[key] = build
+                    elif b_patch_num == e_patch_num:
+                        if not new_insufficient and old_insufficient:
+                            seen_stats_roles[key] = build
+                        elif not new_insufficient and not old_insufficient:
+                            if getattr(build, 'upvotes', 0) > getattr(existing, 'upvotes', 0):
+                                seen_stats_roles[key] = build
             else:
                 builds.append(build)
         else:
@@ -340,6 +359,7 @@ class SmiteController(QObject):
         self._config = self._load_config()
         Translator.set_language(self._config.get("language", "en"))
         self.overlay = SmiteOverlay()
+        self.overlay.current_version = CURRENT_VERSION
         self.image_manager = ImageManager()
         
         self.current_god_data = None
@@ -392,8 +412,10 @@ class SmiteController(QObject):
         # Scanner logów (Hemingway.log)
         self.scanner.god_detected.connect(self.on_god_detected)
         self.scanner.lobby_joined.connect(self.on_lobby_joined)
+        self.scanner.match_started.connect(self.on_match_started)
         self.process_monitor.game_started.connect(self.on_game_started)
         self.process_monitor.game_stopped.connect(self.on_game_stopped)
+        self.overlay.position_changed.connect(self._on_overlay_position_changed)
         
         # Nawigacja w overlay
         self.overlay.next_build_requested.connect(self.next_build)
@@ -482,7 +504,7 @@ class SmiteController(QObject):
     # ============================================================ SETTINGS
     def _open_settings(self):
         """Open the SettingsDialog."""
-        dialog = SettingsDialog(self._config, self.overlay)
+        dialog = SettingsDialog(self._config, self.overlay, app_version=CURRENT_VERSION)
         overlay_geo = self.overlay.geometry()
         dx = (overlay_geo.width() - 480) // 2
         dy = (overlay_geo.height() - 400) // 2
@@ -498,6 +520,10 @@ class SmiteController(QObject):
 
     def _apply_config(self, config):
         """Apply config settings to overlay and shortcuts."""
+        lang = config.get("language", "en")
+        Translator.set_language(lang)
+        if hasattr(self.overlay, "retranslate_ui"):
+            self.overlay.retranslate_ui()
         theme = config.get("theme", "gold")
         font_style = config.get("font_style", "standard")
         from ui.styles import get_stylesheet
@@ -615,6 +641,12 @@ class SmiteController(QObject):
         # Wystarczy samo quit(), Qt automatycznie wywoła _on_app_quit
         QApplication.instance().quit()
 
+    def _on_overlay_position_changed(self, x, y):
+        """Immediately saves new window coordinates after dragging."""
+        self._config["window_x"] = x
+        self._config["window_y"] = y
+        self._save_config()
+
     def _on_app_quit(self):
         """Saves window position to config before quitting the application."""
         pos = self.overlay.pos()
@@ -685,6 +717,12 @@ class SmiteController(QObject):
 
     def on_lobby_joined(self):
         """Handles lobby entry event."""
+        if self._config.get("auto_mini_on_match", False):
+            if getattr(self.overlay, '_is_locked', False):
+                self.overlay.toggle_click_through()
+            if not self.overlay.is_expanded:
+                self.overlay.toggle_mode()
+
         if self.mode == "AUTO":
             print("🤖 Automat: Wykryto wejście do lobby.")
             
@@ -694,6 +732,15 @@ class SmiteController(QObject):
             
             self.overlay.auto_wait_screen.show_lobby_waiting()
             self.overlay.navigate_to("auto_wait")
+
+    def on_match_started(self):
+        """Handles match map loaded event."""
+        if self._config.get("auto_mini_on_match", False):
+            print("🎮 Automat: Wykryto start meczu -> Przełączam w tryb Mini + Lock!")
+            if self.overlay.is_expanded:
+                self.overlay.toggle_mode()
+            if not getattr(self.overlay, '_is_locked', False):
+                self.overlay.toggle_click_through()
 
     def prompt_for_god(self):
         """Prompts for manual god name input."""
@@ -931,8 +978,12 @@ class SmiteController(QObject):
                 existing_build = self.current_god_data.builds[self.current_index]
                 # Jeśli serwer zwrócił puste statystyki (starsza wersja API), zachowaj aktualne statystyki
                 for field in ('tier', 'win_rate', 'wins', 'losses', 'total_matches', 'cost'):
-                    if not getattr(updated_build, field, None) and getattr(existing_build, field, None):
-                        setattr(updated_build, field, getattr(existing_build, field))
+                    val = getattr(updated_build, field, None)
+                    exist_val = getattr(existing_build, field, None)
+                    if (val is None or val == "" or val == 0) and exist_val:
+                        setattr(updated_build, field, exist_val)
+                    elif val is None and exist_val is not None:
+                        setattr(updated_build, field, exist_val)
                 self.current_god_data.builds[self.current_index] = updated_build
                 
                 # Zapisujemy świeżo pobrane detale do cache'u
@@ -1292,7 +1343,7 @@ class SmiteController(QObject):
 
         # --- ZMIANA: Wizualna reakcja na kliknięcie ---
         if hasattr(self.overlay, 'btn_update'):
-            self.overlay.btn_update.setText("⏳ Łączenie...")
+            self.overlay.btn_update.setText(_t("update_connecting"))
 
         self.update_downloader = UpdateDownloaderWorker(url)
         self.update_downloader.progress.connect(self._on_update_progress)
@@ -1306,19 +1357,19 @@ class SmiteController(QObject):
         """Called when download fails (e.g. 404 Not Found)."""
         print(f"⚠️ [Updater] Błąd pobierania: {error_msg}")
         if hasattr(self.overlay, 'btn_update'):
-            self.overlay.btn_update.setText("❌ Błąd pobierania")
+            self.overlay.btn_update.setText(_t("update_error"))
 
     def _on_update_progress(self, percent):
         """Updates the button text with download progress."""
         if self.overlay.is_expanded:
-            self.overlay.btn_update.setText(f"🚀 Pobieranie: {percent}%")
+            self.overlay.btn_update.setText(f"🚀 {_t('update_downloading').format(percent=percent)}")
         else:
             self.overlay.btn_update.setText(f"{percent}%")
 
     def _on_update_downloaded(self, installer_path):
         """Launches the silent installer and shuts down the current app."""
         print(f"✅ [Updater] Pobrane! Uruchamiam instalator z: {installer_path}")
-        self.overlay.btn_update.setText("🚀 Instalowanie...")
+        self.overlay.btn_update.setText(_t("update_installing"))
         
         # Otwiera instalator z wbudowaną dla Inno Setup flagą /SILENT 
         subprocess.Popen([installer_path, '/SILENT', '/SP-'])

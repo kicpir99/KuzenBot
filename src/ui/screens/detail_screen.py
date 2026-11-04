@@ -13,9 +13,10 @@ from core.translations import _t
 class DetailScreen(QWidget):
     """Build detail screen — items, swaps, ability grid."""
 
-    def __init__(self, icon_factory=None, parent=None):
+    def __init__(self, icon_factory=None, tooltip_filter=None, parent=None):
         super().__init__(parent)
         self._icon_factory = icon_factory
+        self._tooltip_filter = tooltip_filter
         self._build_ui()
 
     # ------------------------------------------------------------------ UI
@@ -184,30 +185,70 @@ class DetailScreen(QWidget):
             al.setStyleSheet("font-size: 12px;")
             ml.addWidget(al)
 
+            tt_html = self.get_build_tooltip_html(build)
             if getattr(build, 'win_rate', None) and build.win_rate:
                 if getattr(build, 'tier', None) and build.tier and build.tier != "-":
                     tb = QLabel(f"TIER {build.tier}")
                     tb.setStyleSheet(self._get_tier_badge_style(build.tier))
+                    self._attach_tooltip(tb, tt_html)
                     ml.addWidget(tb)
                     
                 wr_lbl = QLabel(f"{build.win_rate} WR ({build.wins}W - {build.losses}L)")
                 wr_lbl.setStyleSheet("font-size: 12px; font-weight: bold; color: #10b981;")
+                self._attach_tooltip(wr_lbl, tt_html)
                 ml.addWidget(wr_lbl)
                 
                 if getattr(build, 'cost', 0):
                     cost_lbl = QLabel(f"💰 {build.cost:,}g".replace(",", " "))
                     cost_lbl.setStyleSheet("font-size: 12px; color: #fbbf24; font-weight: bold;")
+                    self._attach_tooltip(cost_lbl, tt_html)
                     ml.addWidget(cost_lbl)
             else:
                 unranked_badge = QLabel(_t("unranked_badge"))
                 unranked_badge.setStyleSheet(self._get_tier_badge_style("Unranked"))
+                self._attach_tooltip(unranked_badge, tt_html)
                 ml.addWidget(unranked_badge)
                 if getattr(build, 'cost', 0):
                     cost_lbl = QLabel(f"💰 {build.cost:,}g".replace(",", " "))
                     cost_lbl.setStyleSheet("font-size: 12px; color: #fbbf24; font-weight: bold;")
+                    self._attach_tooltip(cost_lbl, tt_html)
                     ml.addWidget(cost_lbl)
 
             self._detail_layout.addWidget(meta)
+
+    def _attach_tooltip(self, widget, tooltip_html):
+        if not widget or not tooltip_html:
+            return
+        widget.setProperty("tooltip_html", tooltip_html)
+        widget.setObjectName("build_stats_badge")
+        widget.setMouseTracking(True)
+        if hasattr(self, '_tooltip_filter') and self._tooltip_filter:
+            widget.installEventFilter(self._tooltip_filter)
+
+    def get_build_tooltip_html(self, build) -> str:
+        """Zwraca jednolity, elegancki tooltip HTML dla buildów ze statystykami oraz Unranked."""
+        has_wr = bool(getattr(build, 'win_rate', None) and build.win_rate)
+        cost_val = getattr(build, 'cost', 0)
+        cost_str = f"{cost_val:,}g".replace(",", " ") if cost_val else ""
+
+        if has_wr:
+            tier_str = getattr(build, 'tier', '') or ''
+            tier_html = f" <span style='color: #60a5fa; font-weight: bold;'>[{tier_str}]</span>" if tier_str else ""
+            total_matches_str = _t("tt_total").format(count=build.total_matches)
+            lines = [
+                f"<div style='margin-bottom: 3px;'><b style='color: #93c5fd;'>{_t('tt_win_rate')}</b> <span style='color: #10b981; font-weight: bold;'>{build.win_rate}</span>{tier_html}</div>",
+                f"<div style='margin-bottom: 3px;'><b style='color: #93c5fd;'>{_t('tt_matches')}</b> <span style='color: #34d399; font-weight: bold;'>{build.wins}W</span> - <span style='color: #f87171; font-weight: bold;'>{build.losses}L</span> <span style='color: #94a3b8;'>({total_matches_str})</span></div>"
+            ]
+        else:
+            lines = [
+                f"<div style='margin-bottom: 3px;'><b style='color: #93c5fd;'>{_t('tt_status')}</b> <span style='color: #60a5fa; font-weight: bold;'>{_t('tt_unranked')}</span></div>",
+                f"<div style='margin-bottom: 3px;'><b style='color: #93c5fd;'>{_t('tt_matches')}</b> <span style='color: #e2e8f0;'>{_t('tt_unranked_desc')}</span></div>"
+            ]
+
+        if cost_str:
+            lines.append(f"<div><b style='color: #93c5fd;'>{_t('tt_build_cost')}</b> <span style='color: #fbbf24; font-weight: bold;'>{cost_str}</span></div>")
+
+        return f"<div style='line-height: 140%; padding: 2px 4px;'>{''.join(lines)}</div>"
 
     def _get_tier_badge_style(self, tier_str: str) -> str:
         t = (tier_str or "").strip().upper()

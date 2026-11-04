@@ -23,15 +23,16 @@ from core.translations import _t
 class SettingsDialog(QDialog):
     settings_changed = pyqtSignal(dict)
 
-    def __init__(self, current_config, overlay, parent=None):
+    def __init__(self, current_config, overlay, parent=None, app_version=None):
         super().__init__(parent)
         self.overlay = overlay
+        self._app_version = app_version or self._detect_app_version()
         # Używamy deepcopy, aby nie nadpisywać aktywnej konfiguracji w locie
         self._config = copy.deepcopy(current_config)
         self._original_config = copy.deepcopy(current_config)
         self._listening_for = None
 
-        self.setWindowTitle("Settings")
+        self.setWindowTitle(_t("settings_title"))
         # ZMIANA: Zwiększamy wysokość z 400 do 460 dla lepszego komfortu wizualnego
         self.setFixedSize(480, 460)
         flags = Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
@@ -141,6 +142,22 @@ class SettingsDialog(QDialog):
 
         self._build_ui()
 
+    def _detect_app_version(self):
+        if hasattr(self.overlay, "current_version") and self.overlay.current_version:
+            return str(self.overlay.current_version)
+        try:
+            import json, os, sys
+            base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+            v_path = os.path.join(base_path, "version.json")
+            if os.path.exists(v_path):
+                with open(v_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if "version" in data and data["version"]:
+                        return str(data["version"])
+        except Exception:
+            pass
+        return "1.1.12"
+
     def _build_ui(self):
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(20, 16, 20, 16)
@@ -190,7 +207,7 @@ class SettingsDialog(QDialog):
         app_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         about_layout.addWidget(app_title)
 
-        app_version = QLabel(_t("app_version_text").format(version="1.0.0 Alpha"))
+        app_version = QLabel(_t("app_version_text").format(version=self._app_version))
         app_version.setStyleSheet("font-size: 11px; color: #94a3b8;")
         app_version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         about_layout.addWidget(app_version)
@@ -554,7 +571,7 @@ class SettingsDialog(QDialog):
         if self._listening_for:
             return
         self._listening_for = action_key
-        label_widget.setText("Press a key...")
+        label_widget.setText(_t("press_key"))
         label_widget.setStyleSheet("""
             background: rgba(59,130,246,0.2);
             color: #f8fafc;
@@ -826,10 +843,16 @@ class SettingsDialog(QDialog):
             QGroupBox::title { subcontrol-origin: margin; padding: 0 6px; }
         """)
         top_layout = QVBoxLayout(top_group)
+        top_layout.setSpacing(8)
         self.always_top_cb = QCheckBox(_t("always_top"))
         self.always_top_cb.setChecked(self._config.get("always_on_top", True))
         self.always_top_cb.toggled.connect(self._on_always_top_changed)
         top_layout.addWidget(self.always_top_cb)
+
+        self.auto_mini_lock_cb = QCheckBox(_t("auto_mini_lock"))
+        self.auto_mini_lock_cb.setChecked(self._config.get("auto_mini_on_match", False))
+        self.auto_mini_lock_cb.toggled.connect(self._on_auto_mini_lock_changed)
+        top_layout.addWidget(self.auto_mini_lock_cb)
         layout.addWidget(top_group)
 
         # Monitor selection
@@ -950,6 +973,9 @@ class SettingsDialog(QDialog):
         if self.overlay:
             self.overlay.set_always_on_top(checked)
 
+    def _on_auto_mini_lock_changed(self, checked):
+        self._config["auto_mini_on_match"] = checked
+
     def _on_source_changed(self, idx):
         mapping = {0: "builds", 1: "stats", 2: "last_used"}
         self._config["build_source"] = mapping.get(idx, "builds")
@@ -1038,6 +1064,7 @@ class SettingsDialog(QDialog):
         self._config["opacity_items"] = 1.0
         self._config["opacity"] = 1.0
         self._config["always_on_top"] = True
+        self._config["auto_mini_on_match"] = False
         self._config["monitor_id"] = 0
         self._config["hide_mini_source"] = False
         self._config["hide_mini_role"] = False
@@ -1057,6 +1084,8 @@ class SettingsDialog(QDialog):
         if self.overlay and hasattr(self.overlay, "apply_opacities"):
             self.overlay.apply_opacities()
         self.always_top_cb.setChecked(True)
+        if hasattr(self, "auto_mini_lock_cb"):
+            self.auto_mini_lock_cb.setChecked(False)
         if self.monitor_cb.count() > 0:
             self.monitor_cb.setCurrentIndex(0)
             
