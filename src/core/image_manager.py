@@ -1,11 +1,7 @@
 import os
 import requests
 import sys
-
-def resource_path(*paths):
-    try: base_path = sys._MEIPASS
-    except AttributeError: base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 class ImageManager:
     def __init__(self):

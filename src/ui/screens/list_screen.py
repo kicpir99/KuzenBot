@@ -4,16 +4,12 @@ import os, sys
 from PyQt6.QtCore import Qt, pyqtSignal, QSize, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import QCursor, QFont, QIcon
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-                             QPushButton, QFrame, QScrollArea, QSizePolicy, QGraphicsOpacityEffect)
+                             QPushButton, QFrame, QScrollArea, QGraphicsOpacityEffect)
 
 from ui.components.skeleton import QSkeleton, clear_layout
 from ui.components.segmented_toggle import SegmentedToggle
 from core.translations import _t, get_role_translation
-
-def resource_path(*paths):
-    try: base_path = sys._MEIPASS
-    except AttributeError: base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 class ClickableFrame(QFrame):
     clicked = pyqtSignal()

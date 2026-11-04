@@ -3,16 +3,12 @@
 import os, sys
 import random
 
-def resource_path(*paths):
-    try: base_path = sys._MEIPASS
-    except AttributeError: base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
-
+from core.resources import resource_path
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QCursor, QPixmap
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, 
-                             QLabel, QFrame, QPushButton, QSizePolicy)
-from core.translations import _t, _t_random, TRANSLATIONS, Translator
+                             QLabel, QFrame, QSizePolicy)
+from core.translations import _t, TRANSLATIONS, Translator
 
 class ClickableFrame(QFrame):
     clicked = pyqtSignal()

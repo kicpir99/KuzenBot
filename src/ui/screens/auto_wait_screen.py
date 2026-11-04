@@ -1,16 +1,11 @@
 """AutoWaitScreen — Pulsating "Scanning" view for Auto-Mode."""
 
 import sys, os
-from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect, pyqtProperty, QSize
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QGraphicsOpacityEffect, QFrame
-from PyQt6.QtGui import QFont, QMovie
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame
+from PyQt6.QtGui import QMovie
 from core.translations import _t
-from ui.components.skeleton import clear_layout
-
-def resource_path(*paths):
-    try: base_path = sys._MEIPASS
-    except AttributeError: base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 class RatatoskrLoading(QLabel):
     def __init__(self, parent=None):

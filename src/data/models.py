@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import List
 
 @dataclass
 class SmiteBuild:
@@ -28,10 +27,6 @@ class SmiteBuild:
     total_matches: int = 0      # matchEvidenceGames
     cost: int = 0               # łączny koszt w goldzie
 
-    def is_outdated(self, current_patch: str) -> bool:
-        """Sprawdza czy build jest ze starszego patcha."""
-        return self.patch != current_patch
-    
     def is_valid(self) -> bool:
         """Returns True if the build has all required data for display."""
         if self.title is None:
@@ -52,19 +47,3 @@ class GodData:
     current_patch: str
     builds: list[SmiteBuild] = field(default_factory=list)
     error: str = None
-
-    def get_best_match(self, role: str = "mid", want_aspect: bool = False):
-        """Logika wybierania najlepszego buildu z listy."""
-        if not self.builds:
-            return None
-        # Najpierw szukamy w aktualnym patchu, a w razie braku używamy wszystkich dostępnych buildów
-        valid = [b for b in self.builds if b.patch == self.current_patch]
-        if not valid:
-            valid = self.builds
-
-        # Szukamy dopasowania roli i aspektu
-        matches = [b for b in valid if b.is_aspect == want_aspect and any(role.lower() == r.lower() for r in b.roles)]
-        if not matches and want_aspect:
-            matches = [b for b in valid if any(role.lower() == r.lower() for r in b.roles)]
-        
-        return matches[0] if matches else valid[0]

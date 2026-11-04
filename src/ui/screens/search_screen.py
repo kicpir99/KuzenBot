@@ -8,10 +8,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
                              QFrame)
 from core.translations import _t
 
-def resource_path(*paths):
-    try: base_path = sys._MEIPASS
-    except AttributeError: base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 class ClickableFrame(QFrame):
     clicked = pyqtSignal()
@@ -27,6 +24,7 @@ class ClickableFrame(QFrame):
 class SearchScreen(QWidget):
     """God search screen — text input + portrait grid."""
     search_requested = pyqtSignal(str)
+    escape_pressed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -55,6 +53,7 @@ class SearchScreen(QWidget):
         self.input.setFixedHeight(40)
         self.input.textChanged.connect(self._on_text_changed)
         self.input.returnPressed.connect(self._on_search)
+        self.input.installEventFilter(self)
         sl.addWidget(self.input)
         self.search_btn = QPushButton(_t("btn_go"))
         self.search_btn.setObjectName("search_btn")
@@ -243,6 +242,18 @@ class SearchScreen(QWidget):
         
         self.grid_layout.addWidget(msg, 0, 0)
         self.grid_layout.addWidget(sub, 1, 0)
+
+    def eventFilter(self, watched, event):
+        from PyQt6.QtCore import QEvent
+        if watched == self.input and event.type() == QEvent.Type.KeyPress:
+            if event.key() == Qt.Key.Key_Escape:
+                if self.input.text():
+                    self.input.clear()
+                    return True
+                else:
+                    self.escape_pressed.emit()
+                    return True
+        return super().eventFilter(watched, event)
 
     def _on_search(self):
         text = self.input.text().strip()

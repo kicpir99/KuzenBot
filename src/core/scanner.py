@@ -8,13 +8,7 @@ import sys
 from PyQt6.QtCore import QThread, pyqtSignal
 from core.logger import logger
 
-def resource_path(*paths):
-    """Zwraca ścieżkę do zasobów rozpakowanych przez PyInstaller."""
-    try:
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 class GameScanner(QThread):
     god_detected = pyqtSignal(str) 

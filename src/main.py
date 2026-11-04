@@ -9,23 +9,18 @@ import time
 import urllib.request
 import tempfile
 import subprocess
-import ssl
 import certifi
 
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
-def resource_path(*paths):
-    try: base_path = sys._MEIPASS
-    except AttributeError: base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 from core.translations import Translator, _t
-from PyQt6.QtCore import QThread, pyqtSignal, QUrl
-from PyQt6.QtGui import QDesktopServices
+from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtNetwork import QLocalServer, QLocalSocket
 
-CURRENT_VERSION = "1.1.13"
+CURRENT_VERSION = "1.2.0"
 API_BASE_URL = "https://kuzenbot.duckdns.org/api/v1"
 
 STATE_LOADING = "loading"
@@ -36,10 +31,9 @@ STATE_EMPTY = "empty"
 if "SSLKEYLOGFILE" in os.environ:
     del os.environ["SSLKEYLOGFILE"]
 
-from PyQt6.QtWidgets import (QApplication, QInputDialog, QLineEdit,
-                             QSystemTrayIcon, QMenu, QDialog)
+from PyQt6.QtWidgets import (QApplication, QSystemTrayIcon, QMenu, QDialog)
 from PyQt6.QtCore import QThread, pyqtSignal, Qt, QObject, QTimer, QPoint
-from PyQt6.QtGui import QGuiApplication, QIcon
+from PyQt6.QtGui import QGuiApplication, QIcon, QPixmapCache
 
 def get_appdata_dir():
     """Zwraca i ewentualnie tworzy folder KuzenBot w AppData/Local użytkownika."""
@@ -47,9 +41,6 @@ def get_appdata_dir():
     kuzen_dir = os.path.join(appdata, "KuzenBot")
     os.makedirs(kuzen_dir, exist_ok=True)
     return kuzen_dir
-
-def get_project_root():
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def clean_old_cache(days_old=7):
     """Usuwa pliki cache grafik starsze niż podana liczba dni."""
@@ -335,6 +326,7 @@ class SmiteController(QObject):
     def __init__(self):
         super().__init__()
         self.app = QApplication(sys.argv)
+        QPixmapCache.setCacheLimit(32768)  # 32 MB cache limit
         self.app.setApplicationName("KuzenBot")
         self.app.setQuitOnLastWindowClosed(False)
         self.server_name = "KuzenBot_SingleInstanceServer"
@@ -742,17 +734,6 @@ class SmiteController(QObject):
             if not getattr(self.overlay, '_is_locked', False):
                 self.overlay.toggle_click_through()
 
-    def prompt_for_god(self):
-        """Prompts for manual god name input."""
-        self.overlay.show()
-        self.overlay.raise_()
-        self.overlay.activateWindow()
-        
-        god, ok = QInputDialog.getText(self.overlay, "Manual", "God Name:", QLineEdit.EchoMode.Normal)
-        if ok and god:
-            self.mode = "MANUAL"
-            self.start_build_fetch(god)
-
     def on_auto_mode_selected(self):
         print("🤖 Tryb AUTO aktywowany.")
         self.mode = "AUTO"
@@ -1075,34 +1056,6 @@ class SmiteController(QObject):
             self.overlay.show()
             self.overlay.raise_()
             self.overlay.activateWindow()
-
-    def handle_quick_search(self):
-        """Global shortcut: Immediately opens the search window."""
-        print("[Controller] Globalny skrót: Aktywacja szybkiego wyszukiwania.")
-        self.mode = "MANUAL"
-        self.overlay.navigate_to("search")
-        
-        # Wymuszamy pokazanie okna (z pre-hide trickiem)
-        if not self.overlay.isVisible():
-            self.overlay.setWindowOpacity(0.0)
-            self.overlay.show()
-            
-        self.overlay.raise_()
-        self.overlay.activateWindow()
-        
-        if hasattr(self.overlay.search_screen, "search_input"):
-            self.overlay.search_screen.search_input.setFocus()
-            self.overlay.search_screen.search_input.selectAll()
-
-    def handle_toggle_source(self):
-        """Global shortcut: Toggles between Community and Stats build sources."""
-        # Jeśli aktualnie mamy builds -> zmieniamy na stats, i odwrotnie
-        new_source = "stats" if self.build_source == "builds" else "builds"
-        
-        print(f"[Controller] Globalny skrót: Przełączanie źródła buildów na -> {new_source}")
-        
-        # Wywołujemy Twoją potężną metodę, która podmienia dane, obsługuje cache i odświeża UI!
-        self.set_build_source(new_source)
 
     def _load_config(self) -> dict:
         import json

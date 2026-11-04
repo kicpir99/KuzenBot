@@ -10,8 +10,8 @@ Slim orchestrator (~300 lines) that owns:
 
 import os
 import re
-from PyQt6.QtCore import Qt, pyqtSignal, QEvent, QPropertyAnimation, QEasingCurve, QRect, QSize, QByteArray, QTimer, QUrl, QThread
-from PyQt6.QtGui import QPixmap, QCursor, QFont, QIcon, QDesktopServices
+from PyQt6.QtCore import Qt, pyqtSignal, QEvent, QPropertyAnimation, QEasingCurve, QSize, QByteArray, QTimer, QThread
+from PyQt6.QtGui import QPixmap, QCursor, QIcon, QDesktopServices
 from PyQt6.QtWidgets import (QMainWindow, QLabel, QVBoxLayout, QHBoxLayout,
                              QWidget, QPushButton, QFrame, QStackedWidget,
                              QSizePolicy, QApplication)
@@ -32,14 +32,7 @@ PAGE_LIST = 2
 PAGE_DETAIL = 3
 PAGE_AUTO_WAIT = 4
 
-def resource_path(*paths):
-    """Resolves resource paths inside _MEIPASS for bundled executables."""
-    import sys, os
-    try:
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 class AsyncIconDownloader(QThread):
     icon_ready = pyqtSignal(str, str, object, int)
@@ -464,6 +457,7 @@ class SmiteOverlay(QMainWindow):
             lambda: self.navigate_to("search")
         )
         self.search_screen.search_requested.connect(self.search_requested.emit)
+        self.search_screen.escape_pressed.connect(self.go_back)
         self.list_screen.build_selected.connect(self._on_card_clicked)
         self.list_screen.role_filter_clicked.connect(self._cycle_role_filter)
         self.list_screen.aspect_filter_clicked.connect(self._cycle_aspect_filter)
@@ -618,10 +612,6 @@ class SmiteOverlay(QMainWindow):
                 if next_page == "auto_wait":
                     self.returned_to_auto_wait.emit()
 
-    # Alias for backward compat
-    def show_home_page(self):
-        self.navigate_to("home")
-
     def set_god_list(self, god_list, new_gods=None):
         """Passes the god list to the search screen."""
         self.search_screen.set_gods(god_list, new_gods)
@@ -633,11 +623,6 @@ class SmiteOverlay(QMainWindow):
             self._current_god_name = title.upper()
         self.list_screen.show_error_screen(title, message)
         self._refresh_title()
-        self.navigate_to("list")
-
-    def show_empty_screen(self, message):
-        """Pokazuje ekran braku danych w ListScreen."""
-        self.list_screen.show_empty_state()
         self.navigate_to("list")
 
     def show_builds_list(self, builds, god_name="", current_patch=None, error_message=None):
@@ -1134,16 +1119,6 @@ class SmiteOverlay(QMainWindow):
 
         self.mini_layout.addWidget(row)
 
-    def _add_mini_item_row(self, items, size):
-        row = QWidget()
-        rl = QHBoxLayout(row)
-        rl.setContentsMargins(0, 0, 0, 0)
-        rl.setSpacing(8)
-        rl.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        for name in items:
-            rl.addWidget(self._make_icon(name, size))
-        self.mini_layout.addWidget(row)
-
     def _add_mini_swap_row(self, swaps):
         row = QWidget()
         rl = QHBoxLayout(row)
@@ -1600,6 +1575,14 @@ class SmiteOverlay(QMainWindow):
         return super().eventFilter(obj, event)
 
     # ============================================================ DRAGGING
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            if self.pages.currentIndex() in (PAGE_SEARCH, PAGE_DETAIL):
+                self.go_back()
+                event.accept()
+                return
+        super().keyPressEvent(event)
+
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self._drag_pos = event.globalPosition().toPoint()

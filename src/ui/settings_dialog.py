@@ -5,18 +5,14 @@ import json
 import copy
 import sys
 
-def resource_path(*paths):
-    try: base_path = sys._MEIPASS
-    except AttributeError: base_path = os.path.abspath(".")
-    return os.path.join(base_path, *paths)
+from core.resources import resource_path
 
 from PyQt6.QtCore import Qt, pyqtSignal, QEvent, QSize
 from PyQt6.QtGui import QKeySequence, QCursor, QIcon, QPixmap, QPainter, QColor, QBrush
 from PyQt6.QtWidgets import (QApplication, QDialog, QTabWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QComboBox, QCheckBox, QSlider,
-                             QPushButton, QWidget, QFrame, QGridLayout,
-                             QDialogButtonBox, QGroupBox, QScrollArea,
-                             QTextBrowser)
+                             QPushButton, QWidget, QFrame,
+                             QGroupBox, QScrollArea, QTextBrowser)
 from core.translations import _t
 
 
@@ -961,13 +957,6 @@ class SettingsDialog(QDialog):
             self.monitor_cb.setCurrentIndex(selected)
 
     # ── Callbacks ────────────────────────────────────────────────
-    def _on_opacity_changed(self, val):
-        pct = val / 100.0
-        self.opacity_label.setText(f"{val}%")
-        self._config["opacity"] = pct
-        if self.overlay:
-            self.overlay.set_opacity(pct)
-
     def _on_always_top_changed(self, checked):
         self._config["always_on_top"] = checked
         if self.overlay:
