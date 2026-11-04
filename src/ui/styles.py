@@ -411,6 +411,11 @@ def get_stylesheet(theme_name: str = "gold", font_key: str = "standard") -> str:
             border: 2px solid rgba(51, 65, 85, 0.3);
             border-radius: 15px;
         }}
+        #god_results_box[mini="true"] {{
+            background: rgba(15, 23, 42, 0.35);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 10px;
+        }}
         
         #god_portrait_container {{
             background: rgba(30, 41, 59, 0.3);
@@ -443,15 +448,15 @@ def get_stylesheet(theme_name: str = "gold", font_key: str = "standard") -> str:
         /* --- MINI RIBBON STYLE --- */
         #god_portrait_container[mini="true"] {{
             background: rgba(30, 41, 59, 0.5);
-            border-radius: 25px;
-            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 23px;
+            border: 1px solid rgba(148, 163, 184, 0.15);
         }}
         #god_portrait_container[mini="true"]:hover {{
             border-color: {c["primary"]};
-            background: rgba({c["primary_rgb"]}, 0.1);
+            background: rgba({c["primary_rgb"]}, 0.2);
         }}
         #god_portrait_container[mini="true"] #god_portrait_img {{
-            border-radius: 20px;
+            border-radius: 19px;
             border: none;
         }}
 

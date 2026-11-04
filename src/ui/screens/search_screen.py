@@ -110,19 +110,21 @@ class SearchScreen(QWidget):
         if self.is_mini != is_mini:
             self.is_mini = is_mini
             if is_mini:
-                # Blokada pionowa dla Mini (160px total)
-                self.main_layout.setContentsMargins(5, 4, 5, 2)
+                self.main_layout.setContentsMargins(6, 4, 6, 4)
                 self.main_layout.setSpacing(8) 
                 self.status_label.hide()
-                self.search_bar_container.setFixedHeight(28)
-                self.input.setFixedHeight(26)
-                self.search_btn.setFixedSize(40, 26)
-                self.grid_layout.setContentsMargins(0, 0, 0, 0)
+                self.search_bar_container.setFixedHeight(30)
+                self.input.setFixedHeight(30)
+                self.search_btn.setFixedSize(72, 30)
+                self.grid_layout.setContentsMargins(6, 4, 6, 4)
+                self.grid_layout.setSpacing(6)
+                self.results_box.setProperty("mini", "true")
+                self.results_box.style().unpolish(self.results_box)
+                self.results_box.style().polish(self.results_box)
                 
-                self.scroll_area.setFixedHeight(52) # Sztywna wysokość pola ikon
+                self.scroll_area.setFixedHeight(62)
                 self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
                 self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-                # Instalujemy filtr, aby kółko myszy przewijało w poziomie
                 self.scroll_area.viewport().installEventFilter(self)
             else:
                 self.main_layout.setContentsMargins(15, 20, 15, 10)
@@ -132,8 +134,12 @@ class SearchScreen(QWidget):
                 self.input.setFixedHeight(40)
                 self.search_btn.setFixedSize(70, 40)
                 self.grid_layout.setContentsMargins(10, 10, 10, 10)
+                self.grid_layout.setSpacing(4)
+                self.results_box.setProperty("mini", "false")
+                self.results_box.style().unpolish(self.results_box)
+                self.results_box.style().polish(self.results_box)
                 
-                self.scroll_area.setFixedHeight(16777215) # QWIDGETSIZE_MAX
+                self.scroll_area.setFixedHeight(16777215)
                 self.scroll_area.setMaximumHeight(16777215)
                 self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
                 self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -290,23 +296,24 @@ class SearchScreen(QWidget):
         
         # Adaptacyjny rozmiar i property dla stylów CSS
         if self.is_mini:
-            container.setFixedSize(42, 42) # Jeszcze mniejszy
+            container.setFixedSize(46, 46)
             container.setProperty("mini", "true")
         else:
             container.setFixedSize(82, 125)
             container.setProperty("mini", "false")
             
         container.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        container.setToolTip(name)
         container.style().unpolish(container)
         container.style().polish(container)
         
         cl = QVBoxLayout(container)
-        cl.setContentsMargins(2, 2, 2, 2)
+        cl.setContentsMargins(3, 3, 3, 3)
         cl.setSpacing(0)
         cl.setAlignment(Qt.AlignmentFlag.AlignCenter if self.is_mini else Qt.AlignmentFlag.AlignTop)
 
         # Icon size
-        sz = 36 if self.is_mini else 60
+        sz = 38 if self.is_mini else 60
 
         # Icon
         icon = QLabel()
