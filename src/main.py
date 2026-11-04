@@ -247,11 +247,12 @@ class ProcessMonitorWorker(QThread):
         super().__init__()
         self.target_process = target_process.lower()
         self._is_running = None
+        self.running = True
 
     def run(self):
         time.sleep(1.5)
         
-        while True:
+        while self.running:
             found = False
             for p in psutil.process_iter():
                 try:
@@ -268,7 +269,13 @@ class ProcessMonitorWorker(QThread):
                 self._is_running = False
                 self.game_stopped.emit()
 
-            time.sleep(3)
+            for _ in range(30):
+                if not self.running:
+                    break
+                time.sleep(0.1)
+
+    def stop(self):
+        self.running = False
 
 class UpdateCheckerWorker(QThread):
     """Asynchronously checks for new versions on GitHub."""
@@ -631,7 +638,7 @@ class SmiteController(QObject):
             self._show_from_tray()
 
     def _exit_app(self):
-        # Wystarczy samo quit(), Qt automatycznie wywoła _on_app_quit
+        self._on_app_quit()
         QApplication.instance().quit()
 
     def _on_overlay_position_changed(self, x, y):
@@ -642,16 +649,30 @@ class SmiteController(QObject):
 
     def _on_app_quit(self):
         """Saves window position to config before quitting the application."""
-        pos = self.overlay.pos()
-        self._config["window_x"] = pos.x()
-        self._config["window_y"] = pos.y()
-        self._save_config()
-        
-        # --- ZMIANA: Zwalnianie hooków klawiatury w momencie faktycznego zamykania ---
+        try:
+            pos = self.overlay.pos()
+            self._config["window_x"] = pos.x()
+            self._config["window_y"] = pos.y()
+            self._save_config()
+        except Exception:
+            pass
+
+        if hasattr(self, 'process_monitor'):
+            self.process_monitor.stop()
+            self.process_monitor.wait(300)
+
+        if hasattr(self, 'scanner'):
+            self.scanner.stop()
+            self.scanner.wait(300)
+
         if hasattr(self, 'hotkey_listener'):
             self.hotkey_listener.stop()
-            
-        print("💾 [Controller] Zapisano pozycję okna na ekranie i bezpiecznie odpięto skróty.")
+            self.hotkey_listener.wait(300)
+
+        if hasattr(self, 'server'):
+            self.server.close()
+
+        print("💾 [Controller] Zapisano pozycję okna, bezpiecznie zatrzymano wątki i odpięto skróty.")
 
     def _restore_window_position(self):
         """Restores window position with safety check for disconnected monitors."""
